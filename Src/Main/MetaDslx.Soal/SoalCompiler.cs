@@ -209,11 +209,18 @@ namespace MetaDslx.Soal
                 {
                     if (!this.SingleFileWsdl)
                     {
-                        string xsdFileName = Path.Combine(xsdDirectory, ns.FullName + ".xsd");
-                        using (StreamWriter writer = new StreamWriter(xsdFileName))
+                        foreach (var dec in ns.Declarations)
                         {
-                            XsdGenerator xsdGen = new XsdGenerator(ns);
-                            writer.WriteLine(xsdGen.Generate(ns));
+                            StructuredType entity = dec as StructuredType;
+                            if (entity != null)
+                            {
+                                string javaFileName = Path.Combine(xsdDirectory, entity.Name + ".java");
+                                using (StreamWriter writer = new StreamWriter(javaFileName))
+                                {
+                                    SpringGenerator springGen = new SpringGenerator(ns);
+                                    writer.WriteLine(springGen.GenerateEntity(entity));
+                                }
+                            }
                         }
                     }
                     string wsdlFileName = Path.Combine(wsdlDirectory, ns.FullName + ".wsdl");

@@ -75,6 +75,11 @@
     <Compile Include="SoalParserVisitor.cs">
       <DependentUpon>SoalParser.ag4</DependentUpon>
     </Compile>
+    <Compile Include="SpringGenerator.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SpringGenerator.mgen</DependentUpon>
+    </Compile>
     <Compile Include="WsdlGenerator.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -116,6 +121,10 @@
     </None>
     <None Include="SoalParser.tokens">
       <DependentUpon>SoalParser.ag4</DependentUpon>
+    </None>
+    <None Include="SpringGenerator.mgen">
+      <Generator>MetaGenerator</Generator>
+      <LastGenOutput>SpringGenerator.cs</LastGenOutput>
     </None>
     <None Include="WsdlGenerator.mgen">
       <Generator>MetaGenerator</Generator>

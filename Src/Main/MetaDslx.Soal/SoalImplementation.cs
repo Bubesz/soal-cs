@@ -215,6 +215,57 @@ namespace MetaDslx.Soal
             return null;
         }
 
+
+        public static string GetJavaName(this SoalType type)
+        {
+            if (type is PrimitiveType)
+            {
+                string name = ((PrimitiveType)type).Name;
+                switch (name)
+                {
+                    case "int":
+                        return "Integer";
+                    case "long":
+                    case "float":
+                    case "double":
+                    case "byte":
+                    case "string":
+                    case "object":
+                        return name.ToPascalCase();
+                    case "bool":
+                        return "Boolean";
+                    case "Date":
+                        return "LocalDate";
+                    case "Time":
+                        return "LocalTime";
+                    case "DateTime":
+                        return "LocalDateTime";
+                    case "TimeSpan":
+                        return "Duration";
+                    default:
+                        break;
+                }
+            }
+            if (type is NullableType) return GetJavaName(((NullableType)type).InnerType);
+            if (type is NonNullableType) return GetJavaName(((NonNullableType)type).InnerType);
+            if (type is ArrayType)
+            {
+                if (((ArrayType)type).InnerType == SoalInstance.Byte) return "base64Binary";
+                else return ("List<"+GetJavaName(((ArrayType)type).InnerType) + ">");
+            }
+            if (type is Enum)
+            {
+                Enum etype = (Enum)type;
+                return etype.Name;
+            }
+            if (type is StructuredType)
+            {
+                StructuredType stype = (StructuredType)type;
+                return stype.Name;
+            }
+            return null;
+        }
+
         public static string ToPascalCase(this string identifier)
         {
             if (string.IsNullOrEmpty(identifier)) return identifier;
