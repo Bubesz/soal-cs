@@ -77,7 +77,9 @@ namespace Soal
                 using (StreamReader reader = new StreamReader(fileName))
                 {
                     string source = reader.ReadToEnd();
-                    SoalCompiler compiler = new SoalCompiler(source, Path.GetFileName(fileName));
+                    SoalToSpringCompiler compiler = new SoalToSpringCompiler(source, outputDirectory, Path.GetFileName(fileName));
+                    compiler.SeparateXsdWsdl = separateXsdWsdl;
+                    compiler.SingleFileWsdl = singleFileWsdl;
                     compiler.Compile();
                     if (!compiler.Diagnostics.HasErrors())
                     {
