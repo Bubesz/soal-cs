@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal
 {
-    public class SoalCompiler : SoalCompilerBase
+    public class SoalToSpringCompiler : SoalCompilerBase
     {
         public static Namespace XsdNamespace;
 
-        public SoalCompiler(string source, string outputDirectory, string fileName)
+        public SoalToSpringCompiler(string source, string outputDirectory, string fileName)
             : base(source, outputDirectory, fileName)
         {
             this.GlobalScope.BuiltInEntries.Add((ModelObject)SoalInstance.Object);
@@ -103,13 +103,12 @@ namespace MetaDslx.Soal
                                     symbols = new List<ModelObject>();
                                     typeNames.Add(key, symbols);
                                 }
-                                symbols.Add((ModelObject)op);
                             }
                         }
                         StructuredType stype = decl as StructuredType;
                         if (stype != null)
                         {
-                            string key = stype.GetXsdName();
+                            string key = stype.GetJavaName();
                             List<ModelObject> symbols = null;
                             if (!typeNames.TryGetValue(key, out symbols))
                             {
@@ -121,7 +120,7 @@ namespace MetaDslx.Soal
                         Enum etype = decl as Enum;
                         if (etype != null)
                         {
-                            string key = etype.GetXsdName();
+                            string key = etype.GetJavaName();
                             List<ModelObject> symbols = null;
                             if (!typeNames.TryGetValue(key, out symbols))
                             {
@@ -138,7 +137,7 @@ namespace MetaDslx.Soal
                         {
                             foreach (var symbol in symbols)
                             {
-                                this.Diagnostics.AddError("XSD type named '" + key + "' is defined multiple times.", this.FileName, symbol);
+                                this.Diagnostics.AddError("Java type named '" + key + "' is defined multiple times.", this.FileName, symbol);
                             }
                         }
                     }
@@ -190,46 +189,85 @@ namespace MetaDslx.Soal
             {
                 this.SeparateXsdWsdl = false;
             }
-            string xsdDirectory = Path.Combine(this.OutputDirectory, "xsd");
-            string wsdlDirectory = Path.Combine(this.OutputDirectory, "wsdl");
-            if (this.SeparateXsdWsdl)
-            {
-                Directory.CreateDirectory(xsdDirectory);
-            }
-            else
-            {
-                xsdDirectory = wsdlDirectory;
-            }
-            Directory.CreateDirectory(wsdlDirectory);
+
 
             var namespaces = this.Data.GetSymbols().OfType<Namespace>().ToList();
             foreach (var ns in namespaces)
             {
+                List<string> pathes = new List<string>();
+                pathes.Add(this.OutputDirectory);
+                /*foreach (string nameSegment in ns.FullName.ToLower().Split('.')) {
+                    pathes.Add(nameSegment);
+                }
+                pathes.Add("src");
+                pathes.Add("main");
+                pathes.Add("java");*/
+                string componentDirectory = Path.Combine(pathes.ToArray());
+
+                string entityDirectory = Path.Combine(componentDirectory, "entity");
+                string exceptionDirectory = Path.Combine(componentDirectory, "exception");
+                string interfaceDirectory = Path.Combine(componentDirectory, "interface");
+                string enumDirectory = Path.Combine(componentDirectory, "enum");
+
                 if (ns.Uri != null)
                 {
-                    if (!this.SingleFileWsdl)
+                    foreach (var dec in ns.Declarations)
                     {
-                        foreach (var dec in ns.Declarations)
+                        Entity entity = dec as Entity;
+                        if (entity != null)
                         {
-                            Entity entity = dec as Entity;
-                            if (entity != null)
+                            Directory.CreateDirectory(entityDirectory);
+                            
+                            string javaFileName = Path.Combine(entityDirectory, entity.Name + ".java");
+                            using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                string javaFileName = Path.Combine(xsdDirectory, entity.Name + ".java");
-                                using (StreamWriter writer = new StreamWriter(javaFileName))
-                                {
-                                    SpringGenerator springGen = new SpringGenerator(ns);
-                                    writer.WriteLine(springGen.GenerateEntity(entity));
-                                }
+                                SpringGenerator springGen = new SpringGenerator(ns);
+                                //springGen.Properties.SeparateXsdWsdl = asd;
+                                writer.WriteLine(springGen.GenerateEntity(entity));
                             }
                         }
-                    }
-                    string wsdlFileName = Path.Combine(wsdlDirectory, ns.FullName + ".wsdl");
-                    using (StreamWriter writer = new StreamWriter(wsdlFileName))
-                    {
-                        WsdlGenerator wsdlGen = new WsdlGenerator(ns);
-                        wsdlGen.Properties.SingleFileWsdl = this.SingleFileWsdl;
-                        wsdlGen.Properties.SeparateXsdWsdl = this.SeparateXsdWsdl;
-                        writer.WriteLine(wsdlGen.Generate(ns));
+
+                        Exception ex = dec as Exception;
+                        if (ex != null)
+                        {
+                            Directory.CreateDirectory(exceptionDirectory);
+                            
+                            string javaFileName = Path.Combine(exceptionDirectory, ex.Name + ".java");
+                            using (StreamWriter writer = new StreamWriter(javaFileName))
+                            {
+                                SpringGenerator springGen = new SpringGenerator(ns);
+                                //springGen.Properties.SeparateXsdWsdl = asd;
+                                writer.WriteLine(springGen.GenerateException(ex));
+                            }
+                        }
+                        
+                        Interface iface = dec as Interface;
+                        if (iface != null)
+                        {
+                            Directory.CreateDirectory(interfaceDirectory);
+
+                            string javaFileName = Path.Combine(interfaceDirectory, iface.Name + ".java");
+                            using (StreamWriter writer = new StreamWriter(javaFileName))
+                            {
+                                SpringGenerator springGen = new SpringGenerator(ns);
+                                //springGen.Properties.SeparateXsdWsdl = asd;
+                                writer.WriteLine(springGen.GenerateInterface(iface));
+                            }
+                        }
+
+                        Enum myEnum = dec as Enum;
+                        if (myEnum != null)
+                        {
+                            Directory.CreateDirectory(enumDirectory);
+
+                            string javaFileName = Path.Combine(enumDirectory, myEnum.Name + ".java");
+                            using (StreamWriter writer = new StreamWriter(javaFileName))
+                            {
+                                SpringGenerator springGen = new SpringGenerator(ns);
+                                //springGen.Properties.SeparateXsdWsdl = asd;
+                                writer.WriteLine(springGen.GenerateEnum(myEnum));
+                            }
+                        }
                     }
                 }
             }

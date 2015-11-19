@@ -223,6 +223,8 @@ namespace MetaDslx.Soal
                 string name = ((PrimitiveType)type).Name;
                 switch (name)
                 {
+                    case "void":
+                        return "void";
                     case "int":
                         return "Integer";
                     case "long":
@@ -250,7 +252,7 @@ namespace MetaDslx.Soal
             if (type is NonNullableType) return GetJavaName(((NonNullableType)type).InnerType);
             if (type is ArrayType)
             {
-                if (((ArrayType)type).InnerType == SoalInstance.Byte) return "base64Binary";
+                if (((ArrayType)type).InnerType == SoalInstance.Byte) return "byte[]";
                 else return ("List<"+GetJavaName(((ArrayType)type).InnerType) + ">");
             }
             if (type is Enum)
