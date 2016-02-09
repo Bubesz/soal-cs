@@ -1,0 +1,63 @@
+﻿namespace MetaDslx.Soal;
+generator SpringGeneratorUtil for object;
+
+properties Properties
+	string entityPackage = "entity";
+	string repositoryPackage = "repository";
+	string exceptionPackage = "exception";
+	string interfacePackage = "interfaces";
+	string enumPackage = "enums";
+	string serviceFacadePackage = "facade";
+end properties
+
+template GenerateGetter(Property prop)
+^
+public [prop.Type.GetJavaName()] get[prop.Name.ToString().ToPascalCase()]() {
+	return this.[prop.Name.ToString().ToCamelCase()];
+}
+end template
+
+template GenerateSetter(Property prop)
+^
+public void set[prop.Name.ToString().ToPascalCase()]([prop.Type.GetJavaName()] [prop.Name.ToString().ToCamelCase()]) {
+	this.[prop.Name.ToString().ToCamelCase()] = [prop.Name.ToString().ToCamelCase()];
+}
+end template
+
+function string GetParameterList(Operation op)
+    string result = "";
+    loop (op->param:Parameters; string delimiter = ""; delimiter = ", ")
+        result = result + delimiter + param.Type.GetJavaName() + " " + param.Name.ToString().ToCamelCase();
+    end loop
+    return result;
+end function
+
+function string GetPropertyList(StructuredType sType)
+    string result = "";
+    loop (sType->p:Properties; string delimiter = ""; delimiter = ", ")
+        result = result + delimiter + p.Type.GetJavaName() + " " + p.Name.ToString().ToCamelCase();
+    end loop
+    return result;
+end function
+
+function string GetInterfaceList(Component comp)
+    string result = "";
+    loop (comp->service:Services; string delimiter = ""; delimiter = ", ")
+        result = result + delimiter + service.Interface.Name;
+    end loop
+    return result;
+end function
+
+function int GetNumberOfFieldWithIdSuffix(StructuredType sType)
+	int result = 0;
+	loop (sType->p:Properties)
+		if (p.Name.ToString().EndsWith("Id"))
+			result++;
+		end if
+    end loop
+    return result;
+end function
+
+function string GetPackage(Declaration d)
+	return d.Namespace.FullName.ToLower();
+end function

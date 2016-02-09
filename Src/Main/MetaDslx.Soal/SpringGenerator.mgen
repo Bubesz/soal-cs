@@ -1,35 +1,96 @@
 ﻿namespace MetaDslx.Soal;
 generator SpringGenerator for object;
 
-using generator XsdGenerator;
+using generator SpringGeneratorUtil;
 
-properties Properties
-	bool SingleFileWsdl = false;
-	bool SeparateXsdWsdl = false;
+properties
+	SpringGeneratorUtil util = new SpringGeneratorUtil();
 end properties
 
 template GenerateInterface(Interface iface)
-[GetPackageRow(iface)].interface;
+package [SpringGeneratorUtil.GetPackage(iface)].[Properties.util.Properties.interfacePackage];
 ^
 public interface [iface.Name] {
 [loop (iface->op:Operations)]
-	[op.ReturnType.GetJavaName()] [op.Name]([GetParameterList(op)]);
+	[op.ReturnType.GetJavaName()] [op.Name]([SpringGeneratorUtil.GetParameterList(op)]);
+[end loop]
+}
+end template
+
+template GenerateComponent(Component component)
+package [SpringGeneratorUtil.GetPackage(component)].[SpringGeneratorUtil.Properties.serviceFacadePackage];
+^
+import [SpringGeneratorUtil.GetPackage(component)].[SpringGeneratorUtil.Properties.entityPackage].*;
+import [SpringGeneratorUtil.GetPackage(component)].[SpringGeneratorUtil.Properties.repositoryPackage].*;
+	[loop(component->s:Services)]
+import [SpringGeneratorUtil.GetPackage(component)].[SpringGeneratorUtil.Properties.interfacePackage].[s.Interface.Name];
+	[end loop]
+//import [SpringGeneratorUtil.GetPackage(component)].util.ListUtil; TODO
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+^
+import java.util.List;
+^
+@Service
+public class [component.Name] implements [SpringGeneratorUtil.GetInterfaceList(component)] {
+
+//TODO autowire by type :)
+
+^
+[loop(component->s:Services)]
+[Interface i = s.Interface]
+	//operations of [i.Name]
+		[loop(i->op:Operations)]
+	public [op.ReturnType.GetJavaName()] [op.Name]([SpringGeneratorUtil.GetParameterList(op)]) {
+	^
+	}
+	^
+		[end loop]
+		^
 [end loop]
 }
 end template
 
 template GenerateEnum(Enum myEnum)
-[GetPackageRow(myEnum)].enum;
+package [SpringGeneratorUtil.GetPackage(myEnum)].[SpringGeneratorUtil.Properties.enumPackage];
 ^
 public enum [myEnum.Name] {
-[loop (myEnum->literal:EnumLiterals; string delimiter=""; delimiter=", ")]
-	[delimiter][literal]
+[loop (myEnum->literal:EnumLiterals; string delimiter=""; delimiter=",")]
+[delimiter]
+	[literal.Name.ToUpper()]\
 [end loop]
+^
+^
 }
 end template
 
+template GenerateException(Exception ex)
+package [SpringGeneratorUtil.GetPackage(ex)].[SpringGeneratorUtil.Properties.exceptionPackage];
+^
+public class [ex.Name] extends Exception {
+
+[loop (ex->prop:Properties)]
+	^
+	private [prop.Type.GetJavaName()] [prop.Name.ToString().ToCamelCase()];
+[end loop]
+
+	^
+	public [ex.Name]([SpringGeneratorUtil.GetPropertyList(ex)]) {
+[loop (ex->prop:Properties)]
+		this.[prop.Name.ToString().ToCamelCase()] = [prop.Name.ToString().ToCamelCase()];
+[end loop]
+	}
+
+[loop (ex->prop:Properties)]
+	[SpringGeneratorUtil.GenerateGetter(prop)]
+[end loop]
+
+}
+end template
+
+//TODO separate entity and Struct
 template GenerateEntity(StructuredType sType)
-[GetPackageRow(sType)].entity;
+package [SpringGeneratorUtil.GetPackage(sType)].[SpringGeneratorUtil.Properties.entityPackage];
 ^
 	[if (sType is Entity)] 
 import javax.persistence.*;
@@ -38,7 +99,7 @@ import javax.persistence.*;
 	[end if]
 public class [sType.Name] {
 
-[int ids = GetNumberOfFieldWithIdSuffix(sType)]
+[int ids = SpringGeneratorUtil.GetNumberOfFieldWithIdSuffix(sType)]
 [if (ids != 1)]
 	^
 		[if (sType is Entity)]
@@ -81,77 +142,52 @@ public class [sType.Name] {
 [end if]
 
 [loop (sType->prop:Properties where !prop.Name.EndsWith("Id"))]
-	[GenerateGetter(prop)]
-	[GenerateSetter(prop)]
+	[SpringGeneratorUtil.GenerateGetter(prop)]
+	[SpringGeneratorUtil.GenerateSetter(prop)]
 [end loop]
 
 }
 end template
 
-template GenerateException(Exception ex)
-[GetPackageRow(ex)].exception;
+template GenerateRepository(Entity entity)
+package [SpringGeneratorUtil.GetPackage(entity)].[SpringGeneratorUtil.Properties.repositoryPackage];
 ^
-public class [ex.Name] extends Exception {
+import [SpringGeneratorUtil.GetPackage(entity)].[SpringGeneratorUtil.Properties.entityPackage].[entity.Name];
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+^
+@Repository
+public interface [entity.Name]Repository extends CrudRepository<[entity.Name],Long> {
+^
+}
+end template
 
-[loop (ex->prop:Properties)]
+template GeneratePersistence(Namespace ns)
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
+    <persistence-unit name="[ns.Name]PU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		^
+	[loop (ns->entity:Declarations where entity is Entity)]
+		<class>[SpringGeneratorUtil.GetPackage(entity)].[SpringGeneratorUtil.Properties.entityPackage].[entity.Name]</class>
+	[end loop]
 	^
-	private [prop.Type.GetJavaName()] [prop.Name.ToString().ToCamelCase()];
-[end loop]
-
-	^
-	public [ex.Name]([GetPropertyList(ex)]) {
-[loop (ex->prop:Properties)]
-		this.[prop.Name.ToString().ToCamelCase()] = [prop.Name.ToString().ToCamelCase()];
-[end loop]
-	}
-
-[loop (ex->prop:Properties)]
-	[GenerateGetter(prop)]
-[end loop]
-
-}
-end template
-
-function string GetParameterList(Operation op)
-    string result = "";
-    loop (op->param:Parameters; string delimiter = ""; delimiter = ", ")
-        result = result + delimiter + param.Type.GetJavaName() + " " + param.Name.ToString().ToCamelCase();
-    end loop
-    return result;
-end function
-
-function string GetPropertyList(StructuredType sType)
-    string result = "";
-    loop (sType->p:Properties; string delimiter = ""; delimiter = ", ")
-        result = result + delimiter + p.Type.GetJavaName() + " " + p.Name.ToString().ToCamelCase();
-    end loop
-    return result;
-end function
-
-function int GetNumberOfFieldWithIdSuffix(StructuredType sType)
-	int result = 0;
-	loop (sType->p:Properties)
-		if (p.Name.ToString().EndsWith("Id"))
-			result++;
-		end if
-    end loop
-    return result;
-end function
-
-function string GetPackageRow(Declaration d)
-return "package "+d.Namespace.FullName.ToLower();
-end function
-
-template GenerateGetter(Property prop)
-^
-public [prop.Type.GetJavaName()] get[prop.Name.ToString().ToPascalCase()]() {
-	return this.[prop.Name.ToString().ToCamelCase()];
-}
-end template
-
-template GenerateSetter(Property prop)
-^
-public void set[prop.Name.ToString().ToPascalCase()]([prop.Type.GetJavaName()] [prop.Name.ToString().ToCamelCase()]) {
-	this.[prop.Name.ToString().ToCamelCase()] = [prop.Name.ToString().ToCamelCase()];
-}
+        <class>iit.cinema.status.ReservationStatus</class>
+        <class>iit.cinema.status.SeatStatus</class>
+		^
+        <shared-cache-mode>NONE</shared-cache-mode>
+		^
+        <properties>
+            <!--for debug-->
+            <property name="eclipselink.ddl-generation" value="create-tables"/>
+            <!--<property name="eclipselink.logging.level" value="FINE"/>-->
+			^
+            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+            <property name="javax.persistence.jdbc.url"
+                      value="jdbc:h2:mem/[ns.Name]"/>
+            <property name="javax.persistence.jdbc.user" value="sa"/>
+            <property name="javax.persistence.jdbc.password" value=""/><!-- sa? -->
+        </properties>
+    </persistence-unit>
+</persistence>
 end template
