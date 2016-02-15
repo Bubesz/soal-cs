@@ -20,8 +20,6 @@ end template
 template GenerateComponent(Component component)
 package [SpringGeneratorUtil.GetPackage(component)].[SpringGeneratorUtil.Properties.serviceFacadePackage];
 ^
-import [SpringGeneratorUtil.GetPackage(component)].[SpringGeneratorUtil.Properties.entityPackage].*;
-import [SpringGeneratorUtil.GetPackage(component)].[SpringGeneratorUtil.Properties.repositoryPackage].*;
 	[loop(component->s:Services)]
 import [SpringGeneratorUtil.GetPackage(component)].[SpringGeneratorUtil.Properties.interfacePackage].[s.Interface.Name];
 	[end loop]
@@ -29,12 +27,15 @@ import [SpringGeneratorUtil.GetPackage(component)].[SpringGeneratorUtil.Properti
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 ^
-import java.util.List;
+[SpringGeneratorUtil.GenerateImports(component)]
 ^
 @Service
 public class [component.Name] implements [SpringGeneratorUtil.GetInterfaceList(component)] {
-
-//TODO autowire by type :)
+^
+[loop (component->repo:GetRepositories())]
+	@Autowired
+	[repo];
+[end loop]
 
 ^
 [loop(component->s:Services)]
@@ -67,6 +68,8 @@ end template
 template GenerateException(Exception ex)
 package [SpringGeneratorUtil.GetPackage(ex)].[SpringGeneratorUtil.Properties.exceptionPackage];
 ^
+[SpringGeneratorUtil.GenerateImports(ex)]
+^
 public class [ex.Name] extends Exception {
 
 [loop (ex->prop:Properties)]
@@ -91,6 +94,8 @@ end template
 //TODO separate entity and Struct
 template GenerateEntity(StructuredType sType)
 package [SpringGeneratorUtil.GetPackage(sType)].[SpringGeneratorUtil.Properties.entityPackage];
+^
+[SpringGeneratorUtil.GenerateImports(sType)]
 ^
 	[if (sType is Entity)] 
 import javax.persistence.*;

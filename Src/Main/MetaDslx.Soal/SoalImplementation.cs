@@ -215,6 +215,133 @@ namespace MetaDslx.Soal
             return null;
         }
 
+        public static List<string> GetRepositories(this SoalType type)
+        {
+            List<string> repos = new List<string>();
+            List<string> imports = type.GetImports();
+            foreach (string import in imports)
+            {
+                if (import.Contains("repository"))
+                {
+                    string[] parts = import.Split('.');
+                    string lastPart = parts[parts.Length - 1];
+                    lastPart = lastPart.Replace(";", "");
+                    repos.Add(lastPart + " " + lastPart.ToCamelCase());
+                }
+            }
+
+            return repos;
+        }
+
+        public static List<string> GetImports(this SoalType type)
+        {
+            HashSet<string> imported = new HashSet<string>();
+
+            StructuredType stuctured = type as StructuredType;
+            foreach (String import in stuctured.GetTypes())
+            {
+                imported.Add(import);
+            }
+
+            List<string> result = new List<string>(imported);
+            result.Remove("import");
+            result.Remove(null);
+            return result;
+        }
+
+        public static List<string> GetTypes(this StructuredType type)
+        {
+            List<string> result = new List<string>();
+
+            foreach (Property prop in type.Properties)
+            {
+                result.AddRange(HandleArrayType(prop.Type));
+            }
+
+            Component component = type as Component;
+            if (component != null)
+            {
+                foreach (Service service in component.Services)
+                {
+                    foreach (Operation operation in service.Interface.Operations)
+                    {
+                        foreach(Parameter param in operation.Parameters)
+                        {
+                            result.AddRange(HandleArrayType(param.Type));
+                        }
+                        List<string> im = HandleArrayType(operation.ReturnType);
+                        string entityImport = null;
+                        foreach (string s in im)
+                        {
+                            if (s != null && s.Contains("entity"))
+                            {
+                                entityImport = s;
+                            }
+                        }
+                        if (entityImport != null)
+                        {
+                            im.Add(entityImport.Replace("entity", "repository").Replace(";", "Repository;"));
+                        }
+                        result.AddRange(im);
+                    }
+                }
+                result.Add(component.BaseComponent.GetImportString());
+            }
+
+            return result;
+        }
+
+        private static List<string> HandleArrayType(SoalType type)
+        {
+            List<string> result = new List<string>();
+            ArrayType array = type as ArrayType;
+            if (array != null)
+            {
+                if (array.InnerType != SoalInstance.Byte)
+                {
+                    result.Add("import java.util.List;");
+                    result.Add(array.InnerType.GetImportString());
+                }
+            }
+            else
+            {
+                result.Add(type.GetImportString());
+            }
+
+            return result;
+        }
+
+        private static string SubPackage(SoalType type)
+        {
+            if (type is Interface)
+                return ".facade";
+            if (type is Exception)
+                return ".exception";
+            if (type is Enum)
+                return ".enums";
+            if (type is Entity)
+                return ".entity";
+            return null;
+        }
+
+        public static string GetImportString(this SoalType type)
+        {
+            string result = null;
+            string package = type.GetJavaName().GetPackageOfJavaType();
+            if (package == null || !package.Any())
+            {
+                StructuredType st = type as StructuredType;
+                if (st != null)
+                {
+                    string subpackage = SubPackage(type);
+                    package = st.Namespace.FullName.ToLower();
+                    package = package + subpackage;
+                }
+            }
+            if (package != null)
+                result = "import " + package + "." + type.GetJavaName()+";";
+            return result;
+        }
 
         public static string GetJavaName(this SoalType type)
         {
@@ -266,6 +393,30 @@ namespace MetaDslx.Soal
                 return stype.Name;
             }
             return null;
+        }
+
+
+        public static string GetPackageOfJavaType(this string type)
+        {
+            switch (type)
+            {
+                case "Integer":
+                case "Long":
+                case "Float":
+                case "Double":
+                case "Byte":
+                case "String":
+                case "Object":
+                case "Boolean":
+                    return null; // no need to import
+                case "LocalDate":
+                case "LocalTime":
+                case "LocalDateTime":
+                case "Duration":
+                    return "java.time";
+                default:
+                    return null;
+            }
         }
 
         public static string ToPascalCase(this string identifier)

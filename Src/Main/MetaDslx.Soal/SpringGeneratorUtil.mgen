@@ -24,6 +24,13 @@ public void set[prop.Name.ToString().ToPascalCase()]([prop.Type.GetJavaName()] [
 }
 end template
 
+template GenerateImports(StructuredType sType)
+[Boolean hasList = false]
+[loop (sType->import:GetImports())]
+[import]
+[end loop]
+end template
+
 function string GetParameterList(Operation op)
     string result = "";
     loop (op->param:Parameters; string delimiter = ""; delimiter = ", ")
