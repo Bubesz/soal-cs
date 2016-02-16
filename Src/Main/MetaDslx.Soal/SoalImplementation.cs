@@ -215,7 +215,7 @@ namespace MetaDslx.Soal
             return null;
         }
 
-        public static List<string> GetRepositories(this SoalType type)
+        public static List<string> GetRepositories(this StructuredType type)
         {
             List<string> repos = new List<string>();
             List<string> imports = type.GetImports();
@@ -233,25 +233,36 @@ namespace MetaDslx.Soal
             return repos;
         }
 
-        public static List<string> GetImports(this SoalType type)
+        public static List<string> GetImports(this StructuredType type)
         {
             HashSet<string> imported = new HashSet<string>();
+            List<string> repoImports;
+            List<SoalType> imports = type.GetTypes(out repoImports);
 
-            StructuredType stuctured = type as StructuredType;
-            foreach (String import in stuctured.GetTypes())
+            foreach (SoalType import in imports)
             {
-                imported.Add(import);
+                if (import is ArrayType)
+                {
+                    imported.Add("import java.util.List;");
+                }
+                imported.Add(import.GetImportString());
+            }
+
+            foreach (string repoImport in repoImports)
+            {
+                imported.Add(repoImport);
             }
 
             List<string> result = new List<string>(imported);
-            result.Remove("import");
+            //result.Remove("import");
             result.Remove(null);
             return result;
         }
 
-        public static List<string> GetTypes(this StructuredType type)
+        public static List<SoalType> GetTypes(this StructuredType type, out List<string> repoImports)
         {
-            List<string> result = new List<string>();
+            List<SoalType> result = new List<SoalType>();
+            repoImports = new List<string>();
 
             foreach (Property prop in type.Properties)
             {
@@ -269,43 +280,43 @@ namespace MetaDslx.Soal
                         {
                             result.AddRange(HandleArrayType(param.Type));
                         }
-                        List<string> im = HandleArrayType(operation.ReturnType);
+                        List<SoalType> im = HandleArrayType(operation.ReturnType);
                         string entityImport = null;
-                        foreach (string s in im)
+                        foreach (SoalType s in im)
                         {
-                            if (s != null && s.Contains("entity"))
+                            if (s != null && s is Entity)
                             {
-                                entityImport = s;
+                                entityImport = s.GetImportString();
                             }
                         }
                         if (entityImport != null)
                         {
-                            im.Add(entityImport.Replace("entity", "repository").Replace(";", "Repository;"));
+                            repoImports.Add(entityImport.Replace("entity", "repository").Replace(";", "Repository;"));
                         }
                         result.AddRange(im);
                     }
                 }
-                result.Add(component.BaseComponent.GetImportString());
+                result.Add(component.BaseComponent);
             }
 
             return result;
         }
 
-        private static List<string> HandleArrayType(SoalType type)
+        private static List<SoalType> HandleArrayType(SoalType type)
         {
-            List<string> result = new List<string>();
+            List<SoalType> result = new List<SoalType>();
             ArrayType array = type as ArrayType;
             if (array != null)
             {
                 if (array.InnerType != SoalInstance.Byte)
                 {
-                    result.Add("import java.util.List;");
-                    result.Add(array.InnerType.GetImportString());
+                    result.Add(array);
+                    result.Add(array.InnerType);
                 }
             }
             else
             {
-                result.Add(type.GetImportString());
+                result.Add(type);
             }
 
             return result;
