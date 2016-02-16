@@ -10,6 +10,7 @@ end properties
 template GenerateInterface(Interface iface)
 package [SpringGeneratorUtil.GetPackage(iface)].[Properties.util.Properties.interfacePackage];
 ^
+[SpringGeneratorUtil.GenerateImports(iface)]
 public interface [iface.Name] {
 [loop (iface->op:Operations)]
 	[op.ReturnType.GetJavaName()] [op.Name]([SpringGeneratorUtil.GetParameterList(op)]);
@@ -20,17 +21,24 @@ end template
 template GenerateComponent(Component component)
 package [SpringGeneratorUtil.GetPackage(component)].[SpringGeneratorUtil.Properties.serviceFacadePackage];
 ^
-	[loop(component->s:Services)]
-import [SpringGeneratorUtil.GetPackage(component)].[SpringGeneratorUtil.Properties.interfacePackage].[s.Interface.Name];
-	[end loop]
+	[HashSet<Service> services = new HashSet<Service>(component.Services)]
+	[if (services.Any())]
+		[loop(services->i:Interface)]
+import [SpringGeneratorUtil.GetPackage(component)].[SpringGeneratorUtil.Properties.interfacePackage].[i.Name];
+		[end loop]
+	[end if]
 //import [SpringGeneratorUtil.GetPackage(component)].util.ListUtil; TODO
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 ^
 [SpringGeneratorUtil.GenerateImports(component)]
-^
 @Service
-public class [component.Name] implements [SpringGeneratorUtil.GetInterfaceList(component)] {
+[string interfaces = SpringGeneratorUtil.GetInterfaceList(component)]
+[if (interfaces.Any())]
+public class [component.Name] implements [interfaces] {
+[else]
+public class [component.Name] {
+[end if]
 ^
 [loop (component->repo:GetRepositories())]
 	@Autowired

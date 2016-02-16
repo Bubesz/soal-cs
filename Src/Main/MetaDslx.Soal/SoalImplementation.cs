@@ -233,7 +233,7 @@ namespace MetaDslx.Soal
             return repos;
         }
 
-        public static List<string> GetImports(this StructuredType type)
+        public static List<string> GetImports(this SoalType type)
         {
             HashSet<string> imported = new HashSet<string>();
             List<string> repoImports;
@@ -254,49 +254,64 @@ namespace MetaDslx.Soal
             }
 
             List<string> result = new List<string>(imported);
-            //result.Remove("import");
             result.Remove(null);
             return result;
         }
 
-        public static List<SoalType> GetTypes(this StructuredType type, out List<string> repoImports)
+        public static List<SoalType> GetTypes(this SoalType type, out List<string> repoImports)
         {
             List<SoalType> result = new List<SoalType>();
             repoImports = new List<string>();
 
-            foreach (Property prop in type.Properties)
+            StructuredType sType = type as StructuredType;
+            if (sType != null)
             {
-                result.AddRange(HandleArrayType(prop.Type));
-            }
-
-            Component component = type as Component;
-            if (component != null)
-            {
-                foreach (Service service in component.Services)
+                foreach (Property prop in sType.Properties)
                 {
-                    foreach (Operation operation in service.Interface.Operations)
-                    {
-                        foreach(Parameter param in operation.Parameters)
-                        {
-                            result.AddRange(HandleArrayType(param.Type));
-                        }
-                        List<SoalType> im = HandleArrayType(operation.ReturnType);
-                        string entityImport = null;
-                        foreach (SoalType s in im)
-                        {
-                            if (s != null && s is Entity)
-                            {
-                                entityImport = s.GetImportString();
-                            }
-                        }
-                        if (entityImport != null)
-                        {
-                            repoImports.Add(entityImport.Replace("entity", "repository").Replace(";", "Repository;"));
-                        }
-                        result.AddRange(im);
-                    }
+                    result.AddRange(HandleArrayType(prop.Type));
                 }
-                result.Add(component.BaseComponent);
+
+                Component component = sType as Component;
+                if (component != null)
+                {
+                    foreach (Service service in component.Services)
+                    {
+                        foreach (Operation operation in service.Interface.Operations)
+                        {
+                            foreach(Parameter param in operation.Parameters)
+                            {
+                                result.AddRange(HandleArrayType(param.Type));
+                            }
+                            List<SoalType> im = HandleArrayType(operation.ReturnType);
+                            string entityImport = null;
+                            foreach (SoalType s in im)
+                            {
+                                if (s != null && s is Entity)
+                                {
+                                    entityImport = s.GetImportString();
+                                }
+                            }
+                            if (entityImport != null)
+                            {
+                                repoImports.Add(entityImport.Replace("entity", "repository").Replace(";", "Repository;"));
+                            }
+                            result.AddRange(im);
+                        }
+                    }
+                    result.Add(component.BaseComponent);
+                }
+            }
+            Interface iface = type as Interface;
+            if (iface != null)
+            {
+                foreach (Operation operation in iface.Operations)
+                {
+                    foreach (Parameter param in operation.Parameters)
+                    {
+                        result.AddRange(HandleArrayType(param.Type));
+                    }
+                    result.AddRange(HandleArrayType(operation.ReturnType));
+                }
             }
 
             return result;
