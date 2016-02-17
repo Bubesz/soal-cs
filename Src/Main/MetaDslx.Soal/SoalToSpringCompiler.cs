@@ -203,9 +203,9 @@ namespace MetaDslx.Soal
             var namespaces = this.Data.GetSymbols().OfType<Namespace>().ToList();
             foreach (var ns in namespaces)
             {
-                //final path: Path.Combine(this.OutputDirectory, projectDir, mvnDir, innerDir);
+                // final path: Path.Combine(this.OutputDirectory, projectDir, mvnDir, innerDir);
 
-                //defined namespace
+                // defined namespace
                 List<string> innerPath = new List<string>();
                 foreach (string nameSegment in ns.FullName.ToLower().Split('.')) {
                     innerPath.Add(nameSegment);
@@ -217,46 +217,64 @@ namespace MetaDslx.Soal
                 SpringGenerator springGen = new SpringGenerator(ns);
                 SpringGeneratorUtil generatorUtil = new SpringGeneratorUtil(ns);
                 //generatorUtil.Properties.entityPackage = "asdasd";
-                //springGen.Properties.util = generatorUtil;
 
                 if (ns.Uri != null)
                 {
+                    bool dataPomWritten = false;
                     List<Entity> entities = new List<Entity>();
+                    List<string> modules = new List<string>();
                     foreach (var dec in ns.Declarations)
                     {
                         Entity entity = dec as Entity;
                         if (entity != null)
                         {
-                            entities.Add(entity); //TODO better collect the others as well
+                            entities.Add(entity); // TODO better collect the others as well
 
-                            //entity
-                            //TODO -Data ?
-                            string entityDirectory = createDirectory(ns.Name, "Commons", innerDir, generatorUtil.Properties.entityPackage);
+                            // entity
+                            string module = "Data";
+                            string entityDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.entityPackage);
                             string javaFileName = Path.Combine(entityDirectory, entity.Name + ".java");
+                            if (!modules.Contains(module))
+                                modules.Add(module);
+
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                //springGen.Properties.SeparateXsdWsdl = asd;
                                 writer.WriteLine(springGen.GenerateEntity(entity));
                             }
 
-                            //repository
-                            string repoDirectory = createDirectory(ns.Name, "Commons", innerDir, generatorUtil.Properties.repositoryPackage);
+                            // repository
+                            string repoDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.repositoryPackage);
                             javaFileName = Path.Combine(repoDirectory, entity.Name + "Repository.java");
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                //springGen.Properties.SeparateXsdWsdl = asd;
                                 writer.WriteLine(springGen.GenerateRepository(entity));
                             }
+
+                            // pom.xml
+                            if (!dataPomWritten)
+                            {
+                                string moduleDirectory = createDirectory(ns.Name, module, innerDir, "");
+                                string fileName = Path.Combine(moduleDirectory, "pom.xml");
+                                using (StreamWriter writer = new StreamWriter(fileName))
+                                {
+                                    writer.WriteLine(springGen.generateDataPom(ns));
+                                }
+                                dataPomWritten = true;
+                            }
+
                         }
 
                         Exception ex = dec as Exception;
                         if (ex != null)
                         {
-                            string exceptionDirectory = createDirectory(ns.Name, "Commons", innerDir, generatorUtil.Properties.exceptionPackage); 
+                            string module = "Commons";
+                            string exceptionDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.exceptionPackage); 
                             string javaFileName = Path.Combine(exceptionDirectory, ex.Name + ".java");
+                            if (!modules.Contains(module))
+                                modules.Add(module);
+
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                //springGen.Properties.SeparateXsdWsdl = asd;
                                 writer.WriteLine(springGen.GenerateException(ex));
                             }
                         }
@@ -264,11 +282,14 @@ namespace MetaDslx.Soal
                         Interface iface = dec as Interface;
                         if (iface != null)
                         {
-                            string interfaceDirectory = createDirectory(ns.Name, "Commons", innerDir, generatorUtil.Properties.interfacePackage);
+                            string module = "Commons";
+                            string interfaceDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.interfacePackage);
                             string javaFileName = Path.Combine(interfaceDirectory, iface.Name + ".java");
+                            if (!modules.Contains(module))
+                                modules.Add(module);
+
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                //springGen.Properties.SeparateXsdWsdl = asd;
                                 writer.WriteLine(springGen.GenerateInterface(iface));
                             }
                         }
@@ -276,11 +297,14 @@ namespace MetaDslx.Soal
                         Enum myEnum = dec as Enum;
                         if (myEnum != null)
                         {
-                            string enumDirectory = createDirectory(ns.Name, "Commons", innerDir, generatorUtil.Properties.enumPackage);
+                            string module = "Commons";
+                            string enumDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.enumPackage);
                             string javaFileName = Path.Combine(enumDirectory, myEnum.Name + ".java");
+                            if (!modules.Contains(module))
+                                modules.Add(module);
+
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                //springGen.Properties.SeparateXsdWsdl = asd;
                                 writer.WriteLine(springGen.GenerateEnum(myEnum));
                             }
                         }
@@ -290,23 +314,32 @@ namespace MetaDslx.Soal
                         {
                             string compDirectory = createDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.serviceFacadePackage);
                             string javaFileName = Path.Combine(compDirectory, component.Name + ".java");
+                            modules.Add(component.Name);
+
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                //springGen.Properties.SeparateXsdWsdl = asd;
                                 writer.WriteLine(springGen.GenerateComponent(component));
+                            }
+
+                            // generate pom.xml
+                            // TODO fill up dependencies
+                            List<string> dependencies = new List<string>();
+                            string compMainDirectory = createDirectory(ns.Name, component.Name, innerDir, "");
+                            string fileName = Path.Combine(compMainDirectory, "pom.xml");
+                            using (StreamWriter writer = new StreamWriter(fileName))
+                            {
+                                writer.WriteLine(springGen.generateComponentPom(ns, component.Name, dependencies));
                             }
                         }
                     }
 
-                    //generate persistence.xml
+                    // generate persistence.xml
                     if (entities.Any())
                     {
-                        //TODO Data as suffix ?
-                        string myDirectory = createDirectory(ns.Name, "Commons", innerDir, "");
+                        string myDirectory = createDirectory(ns.Name, "Data", innerDir, "");
                         string fileName = Path.Combine(myDirectory, "persistence.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
-                            //springGen.Properties.SeparateXsdWsdl = asd;
                             writer.WriteLine(springGen.GeneratePersistence(ns));
                         }
                     }
@@ -314,6 +347,17 @@ namespace MetaDslx.Soal
                     {
 
                     }*/
+
+                    // generate master pom.xml
+                    if (modules.Any())
+                    {
+                        string myDirectory = createDirectory(ns.Name, null, innerDir, "");
+                        string fileName = Path.Combine(myDirectory, "pom.xml");
+                        using (StreamWriter writer = new StreamWriter(fileName))
+                        {
+                            writer.WriteLine(springGen.generateMasterPom(ns, modules));
+                        }
+                    }
                 }
             }
         }

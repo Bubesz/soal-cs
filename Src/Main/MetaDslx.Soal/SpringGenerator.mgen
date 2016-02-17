@@ -204,3 +204,77 @@ template GeneratePersistence(Namespace ns)
     </persistence-unit>
 </persistence>
 end template
+
+template generateMasterPom(Namespace ns, List<string> modules)
+[SpringGeneratorUtil.GeneratePomStart()]
+^
+    <properties>
+        <springframework.version>4.1.6.RELEASE</springframework.version>
+        <spring-data-jpa.version>1.9.0.RELEASE</spring-data-jpa.version>
+        <!--<spring-security.version>4.0.2.RELEASE</spring-security.version>-->
+    </properties>
+^
+    <groupId>[ns.Name]</groupId>
+    <artifactId>[ns.Name]App</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0</version>
+    <modules>
+[loop (module:modules)]
+        <module>[ns.Name]-[module]</module>
+[end loop]
+    </modules>
+^
+    <dependencies>
+        <!-- eclipseLink -->
+		[SpringGeneratorUtil.GeneratePomDependency("org.eclipse.persistence", "javax.persistence", "2.1.0")]
+		[SpringGeneratorUtil.GeneratePomDependency("org.eclipse.persistence", "eclipselink", "2.6.2")]
+    </dependencies>
+</project>
+end template
+
+template generateComponentPom(Namespace ns, string moduleName, List<string> modules)
+[SpringGeneratorUtil.GeneratePomStart()]
+    <parent>
+        <artifactId>[ns.Name]App</artifactId>
+        <groupId>[ns.Name]</groupId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>[ns.Name]-[moduleName]</artifactId>
+
+    <dependencies>
+        [SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-Commons", "1.0")]
+		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-Data", "1.0")]
+
+[loop (module:modules)]
+		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-"+module, "1.0")]
+[end loop]
+
+        [SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-context", "${springframework.version}")]
+    </dependencies>
+</project>
+end template
+
+template generateDataPom(Namespace ns)
+[SpringGeneratorUtil.GeneratePomStart()]
+    <parent>
+        <artifactId>[ns.Name]App</artifactId>
+        <groupId>[ns.Name]</groupId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>[ns.Name]-Data</artifactId>
+
+    <dependencies>
+		<!-- spring data -->
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework","spring-orm", "${springframework.version}")]
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework.data", "spring-data-jpa", "${spring-data-jpa.version}")]
+          <!--  <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-orm</artifactId>
+                </exclusion>
+            </exclusions> -->
+	</dependencies>
+</project>
+end template

@@ -33,6 +33,23 @@ template GenerateImports(SoalType sType)
 	[end if]
 end template
 
+template GeneratePomStart()
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+end template
+
+template GeneratePomDependency(string groupid, string artifact, string version)
+<dependency>
+    <groupId>[groupid]</groupId>
+    <artifactId>[artifact]</artifactId>
+    <version>[version]</version>
+</dependency>
+end template
+
 function string GetParameterList(Operation op)
     string result = "";
     loop (op->param:Parameters; string delimiter = ""; delimiter = ", ")
