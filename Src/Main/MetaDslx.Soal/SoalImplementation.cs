@@ -274,6 +274,15 @@ namespace MetaDslx.Soal
                 Component component = sType as Component;
                 if (component != null)
                 {
+                    List<InterfaceReference> referencesAndServices = new List<InterfaceReference>();
+                    referencesAndServices.AddRange(component.Services);
+                    referencesAndServices.AddRange(component.References);
+
+                    foreach (InterfaceReference iref in referencesAndServices)
+                    {
+                        result.Add(iref.Interface);
+                    }
+
                     foreach (Service service in component.Services)
                     {
                         foreach (Operation operation in service.Interface.Operations)
@@ -350,22 +359,28 @@ namespace MetaDslx.Soal
             return null;
         }
 
-        public static string GetImportString(this SoalType type)
+        private static string GetImportString(this SoalType type)
         {
             string result = null;
+            string javaName = type.GetJavaName();
             string package = type.GetJavaName().GetPackageOfJavaType();
             if (package == null || !package.Any())
             {
-                StructuredType st = type as StructuredType;
-                if (st != null)
+                Declaration dec = type as Declaration;
+                if (dec != null)
                 {
                     string subpackage = SubPackage(type);
-                    package = st.Namespace.FullName.ToLower();
+                    package = dec.Namespace.FullName.ToLower();
                     package = package + subpackage;
+                    if (javaName == null)
+                    {
+                        javaName = dec.Name;
+                    }
                 }
             }
+            
             if (package != null)
-                result = "import " + package + "." + type.GetJavaName()+";";
+                result = "import " + package + "." + javaName + ";";
             return result;
         }
 

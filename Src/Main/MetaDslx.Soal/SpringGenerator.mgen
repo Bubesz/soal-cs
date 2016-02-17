@@ -3,12 +3,8 @@ generator SpringGenerator for object;
 
 using generator SpringGeneratorUtil;
 
-properties
-	SpringGeneratorUtil util = new SpringGeneratorUtil();
-end properties
-
 template GenerateInterface(Interface iface)
-package [SpringGeneratorUtil.GetPackage(iface)].[Properties.util.Properties.interfacePackage];
+package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
 ^
 [SpringGeneratorUtil.GenerateImports(iface)]
 public interface [iface.Name] {
@@ -44,7 +40,11 @@ public class [component.Name] {
 	@Autowired
 	[repo];
 [end loop]
-
+^
+[loop (component->reference:References)]
+	@Autowired
+	private [reference.Interface.Name] [reference.Name];
+[end loop]
 ^
 [loop(component->s:Services)]
 [Interface i = s.Interface]
