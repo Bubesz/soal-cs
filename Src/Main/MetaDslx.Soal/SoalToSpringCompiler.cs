@@ -221,6 +221,7 @@ namespace MetaDslx.Soal
                 if (ns.Uri != null)
                 {
                     bool dataPomWritten = false;
+                    bool writeCommonsPom = false;
                     List<Entity> entities = new List<Entity>();
                     List<string> modules = new List<string>();
                     foreach (var dec in ns.Declarations)
@@ -253,8 +254,7 @@ namespace MetaDslx.Soal
                             // pom.xml
                             if (!dataPomWritten)
                             {
-                                string moduleDirectory = createDirectory(ns.Name, module, innerDir, "");
-                                string fileName = Path.Combine(moduleDirectory, "pom.xml");
+                                string fileName = Path.Combine(ns.Name+"-"+module, "pom.xml");
                                 using (StreamWriter writer = new StreamWriter(fileName))
                                 {
                                     writer.WriteLine(springGen.generateDataPom(ns));
@@ -277,6 +277,8 @@ namespace MetaDslx.Soal
                             {
                                 writer.WriteLine(springGen.GenerateException(ex));
                             }
+
+                            writeCommonsPom = true;
                         }
                         
                         Interface iface = dec as Interface;
@@ -292,6 +294,8 @@ namespace MetaDslx.Soal
                             {
                                 writer.WriteLine(springGen.GenerateInterface(iface));
                             }
+
+                            writeCommonsPom = true;
                         }
 
                         Enum myEnum = dec as Enum;
@@ -307,6 +311,8 @@ namespace MetaDslx.Soal
                             {
                                 writer.WriteLine(springGen.GenerateEnum(myEnum));
                             }
+
+                            writeCommonsPom = true;
                         }
 
                         Component component = dec as Component;
@@ -324,8 +330,7 @@ namespace MetaDslx.Soal
                             // generate pom.xml
                             // TODO fill up dependencies
                             List<string> dependencies = new List<string>();
-                            string compMainDirectory = createDirectory(ns.Name, component.Name, innerDir, "");
-                            string fileName = Path.Combine(compMainDirectory, "pom.xml");
+                            string fileName = Path.Combine(ns.Name+"-"+component.Name, "pom.xml");
                             using (StreamWriter writer = new StreamWriter(fileName))
                             {
                                 writer.WriteLine(springGen.generateComponentPom(ns, component.Name, dependencies));
@@ -333,11 +338,24 @@ namespace MetaDslx.Soal
                         }
                     }
 
+
+                    // pom.xml
+                    if (writeCommonsPom)
+                    {
+                        string fileName = Path.Combine(ns.Name + "-Commons", "pom.xml");
+                        using (StreamWriter writer = new StreamWriter(fileName))
+                        {
+                            // TODO isn't -Data needed?
+                            writer.WriteLine(springGen.generateComponentPom(ns, "Commons", new List<string>()));
+                        }
+                    }
+
                     // generate persistence.xml
                     if (entities.Any())
                     {
-                        string myDirectory = createDirectory(ns.Name, "Data", innerDir, "");
-                        string fileName = Path.Combine(myDirectory, "persistence.xml");
+                        string metaFolder = Path.Combine(ns.Name + "-Data", "src", "main", "resources", "META - INF");
+                        Directory.CreateDirectory(metaFolder);
+                        string fileName = Path.Combine(metaFolder, "persistence.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
                             writer.WriteLine(springGen.GeneratePersistence(ns));
@@ -351,7 +369,7 @@ namespace MetaDslx.Soal
                     // generate master pom.xml
                     if (modules.Any())
                     {
-                        string myDirectory = createDirectory(ns.Name, null, innerDir, "");
+                        string myDirectory = "";
                         string fileName = Path.Combine(myDirectory, "pom.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
@@ -370,8 +388,8 @@ namespace MetaDslx.Soal
             else
                 projectDir = Path.Combine(this.OutputDirectory, namespaceName);
 
-            //string directory = Path.Combine(projectDir, this.mvnDir, innerDir, subDir);
-            string directory = Path.Combine(projectDir, subDir); // TODO change
+            string directory = Path.Combine(projectDir, this.mvnDir, innerDir, subDir);
+            //string directory = Path.Combine(projectDir, subDir); // TODO change
 
             Directory.CreateDirectory(directory);
 
