@@ -180,6 +180,9 @@ template GeneratePersistence(Namespace ns)
 <persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
     <persistence-unit name="[ns.Name]PU" transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+
+		<jta-data-source>java:jboss/datasources/[ns.Name]DS</jta-data-source>
+
 		^
 	[loop (ns->entity:Declarations where entity is Entity)]
 		<class>[SpringGeneratorUtil.GetPackage(entity)].[SpringGeneratorUtil.Properties.entityPackage].[entity.Name]</class>
@@ -194,12 +197,6 @@ template GeneratePersistence(Namespace ns)
             <!--for debug-->
             <property name="eclipselink.ddl-generation" value="create-tables"/>
             <!--<property name="eclipselink.logging.level" value="FINE"/>-->
-			^
-            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
-            <property name="javax.persistence.jdbc.url"
-                      value="jdbc:h2:mem/[ns.Name]"/>
-            <property name="javax.persistence.jdbc.user" value="sa"/>
-            <property name="javax.persistence.jdbc.password" value=""/><!-- sa? -->
         </properties>
     </persistence-unit>
 </persistence>
@@ -266,6 +263,7 @@ template generateDataPom(Namespace ns)
     <artifactId>[ns.Name]-Data</artifactId>
 
     <dependencies>
+		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-Commons", "1.0")]
 		<!-- spring data -->
 		[SpringGeneratorUtil.GeneratePomDependency("org.springframework","spring-orm", "${springframework.version}")]
 		[SpringGeneratorUtil.GeneratePomDependency("org.springframework.data", "spring-data-jpa", "${spring-data-jpa.version}")]
