@@ -217,7 +217,7 @@ namespace MetaDslx.Soal
                                 string javaFileName = Path.Combine(xsdDirectory, entity.Name + ".java");
                                 using (StreamWriter writer = new StreamWriter(javaFileName))
                                 {
-                                    SpringGenerator springGen = new SpringGenerator(ns);
+                                    SpringClassGenerator springGen = new SpringClassGenerator(ns);
                                     writer.WriteLine(springGen.GenerateEntity(entity));
                                 }
                             }

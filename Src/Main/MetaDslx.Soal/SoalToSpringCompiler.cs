@@ -57,11 +57,7 @@ namespace MetaDslx.Soal
         private void PrepareGeneration()
         {
             //standard maven path
-            List<string> mvnPath = new List<string>();
-            mvnPath.Add("src");
-            mvnPath.Add("main");
-            mvnPath.Add("java");
-            this.mvnDir = Path.Combine(mvnPath.ToArray());
+            this.mvnDir = Path.Combine("src", "main", "java");
 
             HashSet<string> prefixes = new HashSet<string>();
             prefixes.Add("xs");
@@ -221,7 +217,7 @@ namespace MetaDslx.Soal
 
                 if (ns.Uri != null)
                 {
-                    bool dataPomWritten = false;
+                    bool dataConfigWritten = false;
                     bool writeCommonsPom = false;
                     List<Entity> entities = new List<Entity>();
                     List<string> modules = new List<string>();
@@ -253,14 +249,21 @@ namespace MetaDslx.Soal
                             }
 
                             // pom.xml
-                            if (!dataPomWritten)
+                            if (!dataConfigWritten)
                             {
                                 string fileName = Path.Combine(ns.Name+"-"+module, "pom.xml");
                                 using (StreamWriter writer = new StreamWriter(fileName))
                                 {
                                     writer.WriteLine(springConfigGen.generateDataPom(ns));
                                 }
-                                dataPomWritten = true;
+
+                                fileName = Path.Combine(ns.Name + "-" + module, this.mvnDir, "spring-config.xml");
+                                using (StreamWriter writer = new StreamWriter(fileName))
+                                {
+                                    writer.WriteLine(springConfigGen.generateDataSpringConfig(ns));
+                                }
+
+                                dataConfigWritten = true;
                             }
 
                         }
@@ -328,7 +331,7 @@ namespace MetaDslx.Soal
                                 writer.WriteLine(springClassGen.GenerateComponent(component));
                             }
 
-                            // generate pom.xml
+                            // generate pom.xml and spring-config.xml
                             // TODO fill up dependencies
                             List<string> dependencies = new List<string>();
                             string fileName = Path.Combine(ns.Name+"-"+component.Name, "pom.xml");
@@ -336,11 +339,17 @@ namespace MetaDslx.Soal
                             {
                                 writer.WriteLine(springConfigGen.generateComponentPom(ns, component.Name, dependencies));
                             }
+
+                            fileName = Path.Combine(ns.Name + "-" + component.Name, this.mvnDir, "spring-config.xml");
+                            using (StreamWriter writer = new StreamWriter(fileName))
+                            {
+                                writer.WriteLine(springConfigGen.generateComponentSpringConfig(ns));
+                            }
                         }
                     }
 
 
-                    // pom.xml
+                    // pom.xml and spring.config.xml for Commons module
                     if (writeCommonsPom)
                     {
                         string fileName = Path.Combine(ns.Name + "-Commons", "pom.xml");
@@ -348,6 +357,12 @@ namespace MetaDslx.Soal
                         {
                             // TODO isn't -Data needed?
                             writer.WriteLine(springConfigGen.generateComponentPom(ns, "Commons", new List<string>()));
+                        }
+
+                        fileName = Path.Combine(ns.Name + "-Commons", this.mvnDir, "spring-config.xml");
+                        using (StreamWriter writer = new StreamWriter(fileName))
+                        {
+                            writer.WriteLine(springConfigGen.generateComponentSpringConfig(ns));
                         }
                     }
 
