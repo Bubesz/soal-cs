@@ -76,10 +76,15 @@
     <Compile Include="SoalParserVisitor.cs">
       <DependentUpon>SoalParser.ag4</DependentUpon>
     </Compile>
-    <Compile Include="SpringGenerator.cs">
+    <Compile Include="SpringConfigurationGenerator.cs">
+      <DependentUpon>SpringConfigurationGenerator.mgen</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>SpringGenerator.mgen</DependentUpon>
+    </Compile>
+    <Compile Include="SpringClassGenerator.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SpringClassGenerator.mgen</DependentUpon>
     </Compile>
     <Compile Include="SpringGeneratorUtil.cs">
       <AutoGen>True</AutoGen>
@@ -128,13 +133,17 @@
     <None Include="SoalParser.tokens">
       <DependentUpon>SoalParser.ag4</DependentUpon>
     </None>
+    <None Include="SpringConfigurationGenerator.mgen">
+      <Generator>MetaGenerator</Generator>
+      <LastGenOutput>SpringConfigurationGenerator.cs</LastGenOutput>
+    </None>
     <None Include="SpringGeneratorUtil.mgen">
       <Generator>MetaGenerator</Generator>
       <LastGenOutput>SpringGeneratorUtil.cs</LastGenOutput>
     </None>
-    <None Include="SpringGenerator.mgen">
+    <None Include="SpringClassGenerator.mgen">
       <Generator>MetaGenerator</Generator>
-      <LastGenOutput>SpringGenerator.cs</LastGenOutput>
+      <LastGenOutput>SpringClassGenerator.cs</LastGenOutput>
     </None>
     <None Include="WsdlGenerator.mgen">
       <Generator>MetaGenerator</Generator>
