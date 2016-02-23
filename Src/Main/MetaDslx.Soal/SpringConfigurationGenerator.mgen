@@ -104,3 +104,44 @@ template generateDataPom(Namespace ns)
 	</dependencies>
 </project>
 end template
+
+template generateComponentSpringConfig(Namespace ns)
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/data/jpa
+       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+	   ^
+       <jpa:repositories base-package="[ns.FullName.ToLower()].[SpringGeneratorUtil.Properties.repositoryPackage]"/>
+       <context:component-scan base-package="[ns.FullName.ToLower()].[SpringGeneratorUtil.Properties.serviceFacadePackage]"/>
+</beans>
+end template
+
+template generateDataSpringConfig(Namespace ns)
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/data/jpa
+       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+	   ^
+       <jpa:repositories base-package="[ns.FullName.ToLower()].[SpringGeneratorUtil.Properties.repositoryPackage]"/>
+       ^
+       <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter"/>
+       <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
+              <property name="persistenceUnitName" value="[ns.Name]PU"/>
+              <property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
+       </bean>
+       <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+              <property name="entityManagerFactory" ref="entityManagerFactory"/>
+       </bean>
+</beans>
+end template
