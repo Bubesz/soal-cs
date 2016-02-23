@@ -62,7 +62,14 @@ public enum [myEnum.Name] {
 [delimiter]
 	[literal.Name.ToUpper()]\
 [end loop]
+;^
+[loop (myEnum->literal:EnumLiterals)]
 ^
+	public boolean is[literal.Name.ToPascalCase()]() {
+		return [literal.Name.ToUpper()].equals(this);
+	}
+
+[end loop]
 ^
 }
 end template
