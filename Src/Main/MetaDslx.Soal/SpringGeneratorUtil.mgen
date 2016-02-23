@@ -42,9 +42,9 @@ template GeneratePomStart()
 
 end template
 
-template GeneratePomDependency(string groupid, string artifact, string version)
+template GeneratePomDependency(string group, string artifact, string version)
 <dependency>
-    <groupId>[groupid]</groupId>
+    <groupId>[group]</groupId>
     <artifactId>[artifact]</artifactId>
     <version>[version]</version>
 </dependency>
