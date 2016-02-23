@@ -76,15 +76,15 @@
     <Compile Include="SoalParserVisitor.cs">
       <DependentUpon>SoalParser.ag4</DependentUpon>
     </Compile>
-    <Compile Include="SpringGeneratorUtil.cs">
-      <DependentUpon>SpringGeneratorUtil.mgen</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <Compile Include="SpringGenerator.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>SpringGenerator.mgen</DependentUpon>
+    </Compile>
+    <Compile Include="SpringGeneratorUtil.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SpringGeneratorUtil.mgen</DependentUpon>
     </Compile>
     <Compile Include="WsdlGenerator.cs">
       <AutoGen>True</AutoGen>
