@@ -500,7 +500,7 @@ namespace MetaDslx.Soal
         private static string SubPackage(SoalType type)
         {
             if (type is Interface)
-                return ".facade";
+                return ".interfaces";
             if (type is Exception)
                 return ".exception";
             if (type is Enum)
