@@ -100,7 +100,7 @@ public class [ex.Name] extends Exception {
 }
 end template
 
-//TODO separate entity and Struct
+//TODO what is an entity?
 template GenerateEntity(StructuredType sType)
 package [SpringGeneratorUtil.GetPackage(sType)].[SpringGeneratorUtil.Properties.entityPackage];
 ^
@@ -128,6 +128,9 @@ public class [sType.Name] {
 		[if (sType is Entity && ids == 1 && prop.Name.ToString().EndsWith("Id"))]
 	@Id
 	@GeneratedValue
+		[end if]
+		[if (sType is Entity && prop.Type is Enum)]
+	@Enumarated
 		[end if]
 	private [prop.Type.GetJavaName()] [prop.Name.ToString().ToCamelCase()];
 [end loop]
