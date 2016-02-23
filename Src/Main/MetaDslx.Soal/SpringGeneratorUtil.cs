@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringGeneratorUtil_401790369;
-    namespace __Hidden_SpringGeneratorUtil_401790369
+    using __Hidden_SpringGeneratorUtil_1323285326;
+    namespace __Hidden_SpringGeneratorUtil_1323285326
     {
         internal static class __Extensions
         {
@@ -253,103 +253,236 @@ namespace MetaDslx.Soal //1:1
             return __out.ToString();
         }
 
-        public string GetParameterList(Operation op) //27:1
+        public string GenerateImports(SoalType sType) //27:1
         {
-            string result = ""; //28:5
-            var __loop1_results = 
-                (from __loop1_var1 in __Enumerate((op).GetEnumerator()) //29:11
-                from param in __Enumerate((__loop1_var1.Parameters).GetEnumerator()) //29:15
-                select new { __loop1_var1 = __loop1_var1, param = param}
-                ).ToList(); //29:5
-            int __loop1_iteration = 0;
-            string delimiter = ""; //29:33
-            foreach (var __tmp1 in __loop1_results)
+            StringBuilder __out = new StringBuilder();
+            if (sType.GetImports().Any()) //28:3
             {
-                ++__loop1_iteration;
-                if (__loop1_iteration >= 2) //29:56
+                var __loop1_results = 
+                    (from __loop1_var1 in __Enumerate((sType).GetEnumerator()) //29:10
+                    from import in __Enumerate((__loop1_var1.GetImports()).GetEnumerator()) //29:17
+                    select new { __loop1_var1 = __loop1_var1, import = import}
+                    ).ToList(); //29:4
+                int __loop1_iteration = 0;
+                foreach (var __tmp1 in __loop1_results)
                 {
-                    delimiter = ", "; //29:56
+                    ++__loop1_iteration;
+                    var __loop1_var1 = __tmp1.__loop1_var1;
+                    var import = __tmp1.import;
+                    string __tmp2Prefix = string.Empty;
+                    string __tmp3Suffix = string.Empty;
+                    StringBuilder __tmp4 = new StringBuilder();
+                    __tmp4.Append(import);
+                    using(StreamReader __tmp4Reader = new StreamReader(this.__ToStream(__tmp4.ToString())))
+                    {
+                        bool __tmp4_first = true;
+                        while(__tmp4_first || !__tmp4Reader.EndOfStream)
+                        {
+                            __tmp4_first = false;
+                            string __tmp4Line = __tmp4Reader.ReadLine();
+                            if (__tmp4Line == null)
+                            {
+                                __tmp4Line = "";
+                            }
+                            __out.Append(__tmp2Prefix);
+                            __out.Append(__tmp4Line);
+                            __out.Append(__tmp3Suffix);
+                            __out.AppendLine(); //30:9
+                        }
+                    }
                 }
-                var __loop1_var1 = __tmp1.__loop1_var1;
-                var param = __tmp1.param;
-                result = result + delimiter + param.Type.GetJavaName() + " " + param.Name.ToString().ToCamelCase(); //30:9
+                __out.AppendLine(); //32:1
             }
-            return result; //32:5
+            return __out.ToString();
         }
 
-        public string GetPropertyList(StructuredType sType) //35:1
+        public string GeneratePomStart() //36:1
         {
-            string result = ""; //36:5
+            StringBuilder __out = new StringBuilder();
+            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //37:1
+            __out.AppendLine(); //37:39
+            __out.Append("<project xmlns=\"http://maven.apache.org/POM/4.0.0\""); //38:1
+            __out.AppendLine(); //38:51
+            __out.Append("         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //39:1
+            __out.AppendLine(); //39:63
+            __out.Append("         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">"); //40:1
+            __out.AppendLine(); //40:109
+            __out.Append("	<modelVersion>4.0.0</modelVersion>"); //41:1
+            __out.AppendLine(); //41:36
+            return __out.ToString();
+        }
+
+        public string GeneratePomDependency(string group, string artifact, string version) //45:1
+        {
+            StringBuilder __out = new StringBuilder();
+            __out.Append("<dependency>"); //46:1
+            __out.AppendLine(); //46:13
+            string __tmp1Prefix = "    <groupId>"; //47:1
+            string __tmp2Suffix = "</groupId>"; //47:21
+            StringBuilder __tmp3 = new StringBuilder();
+            __tmp3.Append(group);
+            using(StreamReader __tmp3Reader = new StreamReader(this.__ToStream(__tmp3.ToString())))
+            {
+                bool __tmp3_first = true;
+                while(__tmp3_first || !__tmp3Reader.EndOfStream)
+                {
+                    __tmp3_first = false;
+                    string __tmp3Line = __tmp3Reader.ReadLine();
+                    if (__tmp3Line == null)
+                    {
+                        __tmp3Line = "";
+                    }
+                    __out.Append(__tmp1Prefix);
+                    __out.Append(__tmp3Line);
+                    __out.Append(__tmp2Suffix);
+                    __out.AppendLine(); //47:31
+                }
+            }
+            string __tmp4Prefix = "    <artifactId>"; //48:1
+            string __tmp5Suffix = "</artifactId>"; //48:27
+            StringBuilder __tmp6 = new StringBuilder();
+            __tmp6.Append(artifact);
+            using(StreamReader __tmp6Reader = new StreamReader(this.__ToStream(__tmp6.ToString())))
+            {
+                bool __tmp6_first = true;
+                while(__tmp6_first || !__tmp6Reader.EndOfStream)
+                {
+                    __tmp6_first = false;
+                    string __tmp6Line = __tmp6Reader.ReadLine();
+                    if (__tmp6Line == null)
+                    {
+                        __tmp6Line = "";
+                    }
+                    __out.Append(__tmp4Prefix);
+                    __out.Append(__tmp6Line);
+                    __out.Append(__tmp5Suffix);
+                    __out.AppendLine(); //48:40
+                }
+            }
+            string __tmp7Prefix = "    <version>"; //49:1
+            string __tmp8Suffix = "</version>"; //49:23
+            StringBuilder __tmp9 = new StringBuilder();
+            __tmp9.Append(version);
+            using(StreamReader __tmp9Reader = new StreamReader(this.__ToStream(__tmp9.ToString())))
+            {
+                bool __tmp9_first = true;
+                while(__tmp9_first || !__tmp9Reader.EndOfStream)
+                {
+                    __tmp9_first = false;
+                    string __tmp9Line = __tmp9Reader.ReadLine();
+                    if (__tmp9Line == null)
+                    {
+                        __tmp9Line = "";
+                    }
+                    __out.Append(__tmp7Prefix);
+                    __out.Append(__tmp9Line);
+                    __out.Append(__tmp8Suffix);
+                    __out.AppendLine(); //49:33
+                }
+            }
+            __out.Append("</dependency>"); //50:1
+            __out.AppendLine(); //50:14
+            return __out.ToString();
+        }
+
+        public string GetParameterList(Operation op) //53:1
+        {
+            string result = ""; //54:5
             var __loop2_results = 
-                (from __loop2_var1 in __Enumerate((sType).GetEnumerator()) //37:11
-                from p in __Enumerate((__loop2_var1.Properties).GetEnumerator()) //37:18
-                select new { __loop2_var1 = __loop2_var1, p = p}
-                ).ToList(); //37:5
+                (from __loop2_var1 in __Enumerate((op).GetEnumerator()) //55:11
+                from param in __Enumerate((__loop2_var1.Parameters).GetEnumerator()) //55:15
+                select new { __loop2_var1 = __loop2_var1, param = param}
+                ).ToList(); //55:5
             int __loop2_iteration = 0;
-            string delimiter = ""; //37:32
+            string delimiter = ""; //55:33
             foreach (var __tmp1 in __loop2_results)
             {
                 ++__loop2_iteration;
-                if (__loop2_iteration >= 2) //37:55
+                if (__loop2_iteration >= 2) //55:56
                 {
-                    delimiter = ", "; //37:55
+                    delimiter = ", "; //55:56
                 }
                 var __loop2_var1 = __tmp1.__loop2_var1;
-                var p = __tmp1.p;
-                result = result + delimiter + p.Type.GetJavaName() + " " + p.Name.ToString().ToCamelCase(); //38:9
-            }
-            return result; //40:5
-        }
-
-        public string GetInterfaceList(Component comp) //43:1
-        {
-            string result = ""; //44:5
-            var __loop3_results = 
-                (from __loop3_var1 in __Enumerate((comp).GetEnumerator()) //45:11
-                from service in __Enumerate((__loop3_var1.Services).GetEnumerator()) //45:17
-                select new { __loop3_var1 = __loop3_var1, service = service}
-                ).ToList(); //45:5
-            int __loop3_iteration = 0;
-            string delimiter = ""; //45:35
-            foreach (var __tmp1 in __loop3_results)
-            {
-                ++__loop3_iteration;
-                if (__loop3_iteration >= 2) //45:58
-                {
-                    delimiter = ", "; //45:58
-                }
-                var __loop3_var1 = __tmp1.__loop3_var1;
-                var service = __tmp1.service;
-                result = result + delimiter + service.Interface.Name; //46:9
-            }
-            return result; //48:5
-        }
-
-        public int GetNumberOfFieldWithIdSuffix(StructuredType sType) //51:1
-        {
-            int result = 0; //52:2
-            var __loop4_results = 
-                (from __loop4_var1 in __Enumerate((sType).GetEnumerator()) //53:8
-                from p in __Enumerate((__loop4_var1.Properties).GetEnumerator()) //53:15
-                select new { __loop4_var1 = __loop4_var1, p = p}
-                ).ToList(); //53:2
-            int __loop4_iteration = 0;
-            foreach (var __tmp1 in __loop4_results)
-            {
-                ++__loop4_iteration;
-                var __loop4_var1 = __tmp1.__loop4_var1;
-                var p = __tmp1.p;
-                if (p.Name.ToString().EndsWith("Id")) //54:3
-                {
-                    result++; //55:4
-                }
+                var param = __tmp1.param;
+                result = result + delimiter + param.Type.GetJavaName() + " " + param.Name.ToString().ToCamelCase(); //56:9
             }
             return result; //58:5
         }
 
-        public string GetPackage(Declaration d) //61:1
+        public string GetPropertyList(StructuredType sType) //61:1
         {
-            return d.Namespace.FullName.ToLower(); //62:2
+            string result = ""; //62:5
+            var __loop3_results = 
+                (from __loop3_var1 in __Enumerate((sType).GetEnumerator()) //63:11
+                from p in __Enumerate((__loop3_var1.Properties).GetEnumerator()) //63:18
+                select new { __loop3_var1 = __loop3_var1, p = p}
+                ).ToList(); //63:5
+            int __loop3_iteration = 0;
+            string delimiter = ""; //63:32
+            foreach (var __tmp1 in __loop3_results)
+            {
+                ++__loop3_iteration;
+                if (__loop3_iteration >= 2) //63:55
+                {
+                    delimiter = ", "; //63:55
+                }
+                var __loop3_var1 = __tmp1.__loop3_var1;
+                var p = __tmp1.p;
+                result = result + delimiter + p.Type.GetJavaName() + " " + p.Name.ToString().ToCamelCase(); //64:9
+            }
+            return result; //66:5
+        }
+
+        public string GetInterfaceList(Component component) //69:1
+        {
+            string result = ""; //70:5
+            HashSet<Service> services = new HashSet<Service>(component.Services); //71:2
+            var __loop4_results = 
+                (from __loop4_var1 in __Enumerate((services).GetEnumerator()) //72:7
+                from i in __Enumerate((__loop4_var1.Interface).GetEnumerator()) //72:17
+                select new { __loop4_var1 = __loop4_var1, i = i}
+                ).ToList(); //72:2
+            int __loop4_iteration = 0;
+            string delimiter = ""; //72:30
+            foreach (var __tmp1 in __loop4_results)
+            {
+                ++__loop4_iteration;
+                if (__loop4_iteration >= 2) //72:53
+                {
+                    delimiter = ", "; //72:53
+                }
+                var __loop4_var1 = __tmp1.__loop4_var1;
+                var i = __tmp1.i;
+                result = result + delimiter + i.Name; //73:9
+            }
+            return result; //75:5
+        }
+
+        public int GetNumberOfFieldWithIdSuffix(StructuredType sType) //78:1
+        {
+            int result = 0; //79:2
+            var __loop5_results = 
+                (from __loop5_var1 in __Enumerate((sType).GetEnumerator()) //80:8
+                from p in __Enumerate((__loop5_var1.Properties).GetEnumerator()) //80:15
+                select new { __loop5_var1 = __loop5_var1, p = p}
+                ).ToList(); //80:2
+            int __loop5_iteration = 0;
+            foreach (var __tmp1 in __loop5_results)
+            {
+                ++__loop5_iteration;
+                var __loop5_var1 = __tmp1.__loop5_var1;
+                var p = __tmp1.p;
+                if (p.Name.ToString().EndsWith("Id")) //81:3
+                {
+                    result++; //82:4
+                }
+            }
+            return result; //85:5
+        }
+
+        public string GetPackage(Declaration d) //88:1
+        {
+            return d.Namespace.FullName.ToLower(); //89:2
         }
 
     }

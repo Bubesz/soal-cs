@@ -214,7 +214,8 @@ namespace MetaDslx.Soal
 
                 //string componentDir = Path.Combine(mvnDir, innerDir);
 
-                SpringGenerator springGen = new SpringGenerator(ns);
+                SpringClassGenerator springClassGen = new SpringClassGenerator(ns);
+                SpringConfigurationGenerator springConfigGen = new SpringConfigurationGenerator(ns);
                 SpringGeneratorUtil generatorUtil = new SpringGeneratorUtil(ns);
                 //generatorUtil.Properties.entityPackage = "asdasd";
 
@@ -240,7 +241,7 @@ namespace MetaDslx.Soal
 
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                writer.WriteLine(springGen.GenerateEntity(entity));
+                                writer.WriteLine(springClassGen.GenerateEntity(entity));
                             }
 
                             // repository
@@ -248,7 +249,7 @@ namespace MetaDslx.Soal
                             javaFileName = Path.Combine(repoDirectory, entity.Name + "Repository.java");
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                writer.WriteLine(springGen.GenerateRepository(entity));
+                                writer.WriteLine(springClassGen.GenerateRepository(entity));
                             }
 
                             // pom.xml
@@ -257,7 +258,7 @@ namespace MetaDslx.Soal
                                 string fileName = Path.Combine(ns.Name+"-"+module, "pom.xml");
                                 using (StreamWriter writer = new StreamWriter(fileName))
                                 {
-                                    writer.WriteLine(springGen.generateDataPom(ns));
+                                    writer.WriteLine(springConfigGen.generateDataPom(ns));
                                 }
                                 dataPomWritten = true;
                             }
@@ -275,7 +276,7 @@ namespace MetaDslx.Soal
 
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                writer.WriteLine(springGen.GenerateException(ex));
+                                writer.WriteLine(springClassGen.GenerateException(ex));
                             }
 
                             writeCommonsPom = true;
@@ -292,7 +293,7 @@ namespace MetaDslx.Soal
 
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                writer.WriteLine(springGen.GenerateInterface(iface));
+                                writer.WriteLine(springClassGen.GenerateInterface(iface));
                             }
 
                             writeCommonsPom = true;
@@ -309,7 +310,7 @@ namespace MetaDslx.Soal
 
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                writer.WriteLine(springGen.GenerateEnum(myEnum));
+                                writer.WriteLine(springClassGen.GenerateEnum(myEnum));
                             }
 
                             writeCommonsPom = true;
@@ -324,7 +325,7 @@ namespace MetaDslx.Soal
 
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                writer.WriteLine(springGen.GenerateComponent(component));
+                                writer.WriteLine(springClassGen.GenerateComponent(component));
                             }
 
                             // generate pom.xml
@@ -333,7 +334,7 @@ namespace MetaDslx.Soal
                             string fileName = Path.Combine(ns.Name+"-"+component.Name, "pom.xml");
                             using (StreamWriter writer = new StreamWriter(fileName))
                             {
-                                writer.WriteLine(springGen.generateComponentPom(ns, component.Name, dependencies));
+                                writer.WriteLine(springConfigGen.generateComponentPom(ns, component.Name, dependencies));
                             }
                         }
                     }
@@ -346,7 +347,7 @@ namespace MetaDslx.Soal
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
                             // TODO isn't -Data needed?
-                            writer.WriteLine(springGen.generateComponentPom(ns, "Commons", new List<string>()));
+                            writer.WriteLine(springConfigGen.generateComponentPom(ns, "Commons", new List<string>()));
                         }
                     }
 
@@ -358,7 +359,7 @@ namespace MetaDslx.Soal
                         string fileName = Path.Combine(metaFolder, "persistence.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
-                            writer.WriteLine(springGen.GeneratePersistence(ns));
+                            writer.WriteLine(springConfigGen.GeneratePersistence(ns));
                         }
                     }
                     /*foreach (Entity entity in entities)
@@ -373,7 +374,7 @@ namespace MetaDslx.Soal
                         string fileName = Path.Combine(myDirectory, "pom.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
-                            writer.WriteLine(springGen.generateMasterPom(ns, modules));
+                            writer.WriteLine(springConfigGen.generateMasterPom(ns, modules));
                         }
                     }
                 }

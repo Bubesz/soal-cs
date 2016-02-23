@@ -1,0 +1,106 @@
+﻿namespace MetaDslx.Soal;
+generator SpringConfigurationGenerator for object;
+
+using generator SpringGeneratorUtil;
+
+template GeneratePersistence(Namespace ns)
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
+    <persistence-unit name="[ns.Name]PU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+
+		<jta-data-source>java:jboss/datasources/[ns.Name]DS</jta-data-source>
+
+		^
+	[loop (ns->entity:Declarations where entity is Entity)]
+		<class>[SpringGeneratorUtil.GetPackage(entity)].[SpringGeneratorUtil.Properties.entityPackage].[entity.Name]</class>
+	[end loop]
+	^
+        <class>iit.cinema.status.ReservationStatus</class>
+        <class>iit.cinema.status.SeatStatus</class>
+		^
+        <shared-cache-mode>NONE</shared-cache-mode>
+		^
+        <properties>
+            <!--for debug-->
+            <property name="eclipselink.ddl-generation" value="create-tables"/>
+            <!--<property name="eclipselink.logging.level" value="FINE"/>-->
+        </properties>
+    </persistence-unit>
+</persistence>
+end template
+
+template generateMasterPom(Namespace ns, List<string> modules)
+[SpringGeneratorUtil.GeneratePomStart()]
+^
+    <properties>
+        <springframework.version>4.1.6.RELEASE</springframework.version>
+        <spring-data-jpa.version>1.9.0.RELEASE</spring-data-jpa.version>
+        <!--<spring-security.version>4.0.2.RELEASE</spring-security.version>-->
+    </properties>
+^
+    <groupId>[ns.Name]</groupId>
+    <artifactId>[ns.Name]App</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0</version>
+    <modules>
+[loop (module:modules)]
+        <module>[ns.Name]-[module]</module>
+[end loop]
+    </modules>
+^
+    <dependencies>
+        <!-- eclipseLink -->
+		[SpringGeneratorUtil.GeneratePomDependency("org.eclipse.persistence", "javax.persistence", "2.1.0")]
+		[SpringGeneratorUtil.GeneratePomDependency("org.eclipse.persistence", "eclipselink", "2.6.2")]
+    </dependencies>
+</project>
+end template
+
+template generateComponentPom(Namespace ns, string moduleName, List<string> modules)
+[SpringGeneratorUtil.GeneratePomStart()]
+    <parent>
+        <artifactId>[ns.Name]App</artifactId>
+        <groupId>[ns.Name]</groupId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>[ns.Name]-[moduleName]</artifactId>
+
+    <dependencies>
+        [SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-Commons", "1.0")]
+		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-Data", "1.0")]
+
+[loop (module:modules)]
+		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-"+module, "1.0")]
+[end loop]
+
+        [SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-context", "${springframework.version}")]
+    </dependencies>
+</project>
+end template
+
+template generateDataPom(Namespace ns)
+[SpringGeneratorUtil.GeneratePomStart()]
+    <parent>
+        <artifactId>[ns.Name]App</artifactId>
+        <groupId>[ns.Name]</groupId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>[ns.Name]-Data</artifactId>
+
+    <dependencies>
+		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-Commons", "1.0")]
+		<!-- spring data -->
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework","spring-orm", "${springframework.version}")]
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework.data", "spring-data-jpa", "${spring-data-jpa.version}")]
+          <!--  <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-orm</artifactId>
+                </exclusion>
+            </exclusions> -->
+	</dependencies>
+</project>
+end template
