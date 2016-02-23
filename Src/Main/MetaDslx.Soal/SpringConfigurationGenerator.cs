@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringConfigurationGenerator_348222543;
-    namespace __Hidden_SpringConfigurationGenerator_348222543
+    using __Hidden_SpringConfigurationGenerator_1753867170;
+    namespace __Hidden_SpringConfigurationGenerator_1753867170
     {
         internal static class __Extensions
         {
@@ -786,6 +786,215 @@ namespace MetaDslx.Soal //1:1
             __out.AppendLine(); //104:17
             __out.Append("</project>"); //105:1
             __out.AppendLine(); //105:11
+            return __out.ToString();
+        }
+
+        public string generateComponentSpringConfig(Namespace ns) //108:1
+        {
+            StringBuilder __out = new StringBuilder();
+            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //109:1
+            __out.AppendLine(); //109:39
+            __out.Append("<beans xmlns=\"http://www.springframework.org/schema/beans\""); //110:1
+            __out.AppendLine(); //110:59
+            __out.Append("       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //111:1
+            __out.AppendLine(); //111:61
+            __out.Append("       xmlns:context=\"http://www.springframework.org/schema/context\""); //112:1
+            __out.AppendLine(); //112:69
+            __out.Append("       xmlns:jpa=\"http://www.springframework.org/schema/data/jpa\""); //113:1
+            __out.AppendLine(); //113:66
+            __out.Append("       xsi:schemaLocation=\"http://www.springframework.org/schema/beans"); //114:1
+            __out.AppendLine(); //114:71
+            __out.Append("       http://www.springframework.org/schema/beans/spring-beans.xsd"); //115:1
+            __out.AppendLine(); //115:68
+            __out.Append("       http://www.springframework.org/schema/context"); //116:1
+            __out.AppendLine(); //116:53
+            __out.Append("       http://www.springframework.org/schema/context/spring-context.xsd"); //117:1
+            __out.AppendLine(); //117:72
+            __out.Append("       http://www.springframework.org/schema/data/jpa"); //118:1
+            __out.AppendLine(); //118:54
+            __out.Append("       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd\">"); //119:1
+            __out.AppendLine(); //119:71
+            __out.AppendLine(); //120:5
+            string __tmp1Prefix = "       <jpa:repositories base-package=\""; //121:1
+            string __tmp2Suffix = "\"/>"; //121:114
+            StringBuilder __tmp3 = new StringBuilder();
+            __tmp3.Append(ns.FullName.ToLower());
+            using(StreamReader __tmp3Reader = new StreamReader(this.__ToStream(__tmp3.ToString())))
+            {
+                bool __tmp3_first = true;
+                while(__tmp3_first || !__tmp3Reader.EndOfStream)
+                {
+                    __tmp3_first = false;
+                    string __tmp3Line = __tmp3Reader.ReadLine();
+                    if (__tmp3Line == null)
+                    {
+                        __tmp3Line = "";
+                    }
+                    __out.Append(__tmp1Prefix);
+                    __out.Append(__tmp3Line);
+                }
+            }
+            string __tmp4Line = "."; //121:63
+            __out.Append(__tmp4Line);
+            StringBuilder __tmp5 = new StringBuilder();
+            __tmp5.Append(SpringGeneratorUtil.Properties.repositoryPackage);
+            using(StreamReader __tmp5Reader = new StreamReader(this.__ToStream(__tmp5.ToString())))
+            {
+                bool __tmp5_first = true;
+                while(__tmp5_first || !__tmp5Reader.EndOfStream)
+                {
+                    __tmp5_first = false;
+                    string __tmp5Line = __tmp5Reader.ReadLine();
+                    if (__tmp5Line == null)
+                    {
+                        __tmp5Line = "";
+                    }
+                    __out.Append(__tmp5Line);
+                    __out.Append(__tmp2Suffix);
+                    __out.AppendLine(); //121:117
+                }
+            }
+            string __tmp6Prefix = "       <context:component-scan base-package=\""; //122:1
+            string __tmp7Suffix = "\"/>"; //122:123
+            StringBuilder __tmp8 = new StringBuilder();
+            __tmp8.Append(ns.FullName.ToLower());
+            using(StreamReader __tmp8Reader = new StreamReader(this.__ToStream(__tmp8.ToString())))
+            {
+                bool __tmp8_first = true;
+                while(__tmp8_first || !__tmp8Reader.EndOfStream)
+                {
+                    __tmp8_first = false;
+                    string __tmp8Line = __tmp8Reader.ReadLine();
+                    if (__tmp8Line == null)
+                    {
+                        __tmp8Line = "";
+                    }
+                    __out.Append(__tmp6Prefix);
+                    __out.Append(__tmp8Line);
+                }
+            }
+            string __tmp9Line = "."; //122:69
+            __out.Append(__tmp9Line);
+            StringBuilder __tmp10 = new StringBuilder();
+            __tmp10.Append(SpringGeneratorUtil.Properties.serviceFacadePackage);
+            using(StreamReader __tmp10Reader = new StreamReader(this.__ToStream(__tmp10.ToString())))
+            {
+                bool __tmp10_first = true;
+                while(__tmp10_first || !__tmp10Reader.EndOfStream)
+                {
+                    __tmp10_first = false;
+                    string __tmp10Line = __tmp10Reader.ReadLine();
+                    if (__tmp10Line == null)
+                    {
+                        __tmp10Line = "";
+                    }
+                    __out.Append(__tmp10Line);
+                    __out.Append(__tmp7Suffix);
+                    __out.AppendLine(); //122:126
+                }
+            }
+            __out.Append("</beans>"); //123:1
+            __out.AppendLine(); //123:9
+            return __out.ToString();
+        }
+
+        public string generateDataSpringConfig(Namespace ns) //126:1
+        {
+            StringBuilder __out = new StringBuilder();
+            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //127:1
+            __out.AppendLine(); //127:39
+            __out.Append("<beans xmlns=\"http://www.springframework.org/schema/beans\""); //128:1
+            __out.AppendLine(); //128:59
+            __out.Append("       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //129:1
+            __out.AppendLine(); //129:61
+            __out.Append("       xmlns:jpa=\"http://www.springframework.org/schema/data/jpa\""); //130:1
+            __out.AppendLine(); //130:66
+            __out.Append("       xsi:schemaLocation=\"http://www.springframework.org/schema/beans"); //131:1
+            __out.AppendLine(); //131:71
+            __out.Append("       http://www.springframework.org/schema/beans/spring-beans.xsd"); //132:1
+            __out.AppendLine(); //132:68
+            __out.Append("       http://www.springframework.org/schema/data/jpa"); //133:1
+            __out.AppendLine(); //133:54
+            __out.Append("       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd\">"); //134:1
+            __out.AppendLine(); //134:71
+            __out.AppendLine(); //135:5
+            string __tmp1Prefix = "       <jpa:repositories base-package=\""; //136:1
+            string __tmp2Suffix = "\"/>"; //136:114
+            StringBuilder __tmp3 = new StringBuilder();
+            __tmp3.Append(ns.FullName.ToLower());
+            using(StreamReader __tmp3Reader = new StreamReader(this.__ToStream(__tmp3.ToString())))
+            {
+                bool __tmp3_first = true;
+                while(__tmp3_first || !__tmp3Reader.EndOfStream)
+                {
+                    __tmp3_first = false;
+                    string __tmp3Line = __tmp3Reader.ReadLine();
+                    if (__tmp3Line == null)
+                    {
+                        __tmp3Line = "";
+                    }
+                    __out.Append(__tmp1Prefix);
+                    __out.Append(__tmp3Line);
+                }
+            }
+            string __tmp4Line = "."; //136:63
+            __out.Append(__tmp4Line);
+            StringBuilder __tmp5 = new StringBuilder();
+            __tmp5.Append(SpringGeneratorUtil.Properties.repositoryPackage);
+            using(StreamReader __tmp5Reader = new StreamReader(this.__ToStream(__tmp5.ToString())))
+            {
+                bool __tmp5_first = true;
+                while(__tmp5_first || !__tmp5Reader.EndOfStream)
+                {
+                    __tmp5_first = false;
+                    string __tmp5Line = __tmp5Reader.ReadLine();
+                    if (__tmp5Line == null)
+                    {
+                        __tmp5Line = "";
+                    }
+                    __out.Append(__tmp5Line);
+                    __out.Append(__tmp2Suffix);
+                    __out.AppendLine(); //136:117
+                }
+            }
+            __out.AppendLine(); //137:8
+            __out.Append("       <bean id=\"jpaVendorAdapter\" class=\"org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter\"/>"); //138:1
+            __out.AppendLine(); //138:108
+            __out.Append("       <bean id=\"entityManagerFactory\" class=\"org.springframework.orm.jpa.LocalEntityManagerFactoryBean\">"); //139:1
+            __out.AppendLine(); //139:106
+            string __tmp6Prefix = "              <property name=\"persistenceUnitName\" value=\""; //140:1
+            string __tmp7Suffix = "PU\"/>"; //140:68
+            StringBuilder __tmp8 = new StringBuilder();
+            __tmp8.Append(ns.Name);
+            using(StreamReader __tmp8Reader = new StreamReader(this.__ToStream(__tmp8.ToString())))
+            {
+                bool __tmp8_first = true;
+                while(__tmp8_first || !__tmp8Reader.EndOfStream)
+                {
+                    __tmp8_first = false;
+                    string __tmp8Line = __tmp8Reader.ReadLine();
+                    if (__tmp8Line == null)
+                    {
+                        __tmp8Line = "";
+                    }
+                    __out.Append(__tmp6Prefix);
+                    __out.Append(__tmp8Line);
+                    __out.Append(__tmp7Suffix);
+                    __out.AppendLine(); //140:73
+                }
+            }
+            __out.Append("              <property name=\"jpaVendorAdapter\" ref=\"jpaVendorAdapter\"/>"); //141:1
+            __out.AppendLine(); //141:73
+            __out.Append("       </bean>"); //142:1
+            __out.AppendLine(); //142:15
+            __out.Append("       <bean id=\"transactionManager\" class=\"org.springframework.orm.jpa.JpaTransactionManager\">"); //143:1
+            __out.AppendLine(); //143:96
+            __out.Append("              <property name=\"entityManagerFactory\" ref=\"entityManagerFactory\"/>"); //144:1
+            __out.AppendLine(); //144:81
+            __out.Append("       </bean>"); //145:1
+            __out.AppendLine(); //145:15
+            __out.Append("</beans>"); //146:1
+            __out.AppendLine(); //146:9
             return __out.ToString();
         }
 
