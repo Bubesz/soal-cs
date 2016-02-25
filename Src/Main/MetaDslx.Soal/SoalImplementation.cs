@@ -366,7 +366,7 @@ namespace MetaDslx.Soal
             return null;
         }
 
-        public static List<string> GetRepositories(this StructuredType type)
+        public static List<string> GetRepositories(this Declaration type)
         {
             List<string> repos = new List<string>();
             List<string> imports = type.GetImports();
@@ -384,11 +384,11 @@ namespace MetaDslx.Soal
             return repos;
         }
 
-        public static List<string> GetImports(this SoalType type)
+        public static List<string> GetImports(this Declaration declaration)
         {
             HashSet<string> imported = new HashSet<string>();
             List<string> repoImports;
-            List<SoalType> imports = type.GetTypes(out repoImports);
+            List<SoalType> imports = declaration.GetTypes(out repoImports);
 
             foreach (SoalType import in imports)
             {
@@ -409,12 +409,12 @@ namespace MetaDslx.Soal
             return result;
         }
 
-        public static List<SoalType> GetTypes(this SoalType type, out List<string> repoImports)
+        public static List<SoalType> GetTypes(this Declaration declaration, out List<string> repoImports)
         {
             List<SoalType> result = new List<SoalType>();
             repoImports = new List<string>();
 
-            StructuredType sType = type as StructuredType;
+            Struct sType = declaration as Struct;
             if (sType != null)
             {
                 foreach (Property prop in sType.Properties)
@@ -425,11 +425,11 @@ namespace MetaDslx.Soal
                 Component component = sType as Component;
                 if (component != null)
                 {
-                    List<InterfaceReference> referencesAndServices = new List<InterfaceReference>();
+                    List<Port> referencesAndServices = new List<Port>();
                     referencesAndServices.AddRange(component.Services);
                     referencesAndServices.AddRange(component.References);
 
-                    foreach (InterfaceReference iref in referencesAndServices)
+                    foreach (Port iref in referencesAndServices)
                     {
                         result.Add(iref.Interface);
                     }
@@ -438,15 +438,15 @@ namespace MetaDslx.Soal
                     {
                         foreach (Operation operation in service.Interface.Operations)
                         {
-                            foreach(Parameter param in operation.Parameters)
+                            foreach(InputParameter param in operation.Parameters)
                             {
                                 result.AddRange(HandleArrayType(param.Type));
                             }
-                            List<SoalType> im = HandleArrayType(operation.ReturnType);
+                            List<SoalType> im = HandleArrayType(operation.Result.Type);
                             string entityImport = null;
                             foreach (SoalType s in im)
                             {
-                                if (s != null && s is Entity)
+                                if (s != null /*&& s is Entity*/) //FIXME
                                 {
                                     entityImport = s.GetImportString();
                                 }
@@ -458,19 +458,19 @@ namespace MetaDslx.Soal
                             result.AddRange(im);
                         }
                     }
-                    result.Add(component.BaseComponent);
+                    //result.Add(component.BaseComponent); TODO mi volt eddig?
                 }
             }
-            Interface iface = type as Interface;
+            Interface iface = declaration as Interface;
             if (iface != null)
             {
                 foreach (Operation operation in iface.Operations)
                 {
-                    foreach (Parameter param in operation.Parameters)
+                    foreach (InputParameter param in operation.Parameters)
                     {
                         result.AddRange(HandleArrayType(param.Type));
                     }
-                    result.AddRange(HandleArrayType(operation.ReturnType));
+                    result.AddRange(HandleArrayType(operation.Result.Type));
                 }
             }
 
@@ -505,8 +505,8 @@ namespace MetaDslx.Soal
                 return ".exception";
             if (type is Enum)
                 return ".enums";
-            if (type is Entity)
-                return ".entity";
+            //if (type is Entity)
+            //    return ".entity"; FIXME
             return null;
         }
 
@@ -569,19 +569,20 @@ namespace MetaDslx.Soal
             }
             if (type is NullableType) return GetJavaName(((NullableType)type).InnerType);
             if (type is NonNullableType) return GetJavaName(((NonNullableType)type).InnerType);
-            if (type is ArrayType)
+            ArrayType aType = type as ArrayType;
+            if (aType != null)
             {
-                if (((ArrayType)type).InnerType == SoalInstance.Byte) return "byte[]";
+                if (aType.InnerType == SoalInstance.Byte) return "byte[]";
                 else return ("List<"+GetJavaName(((ArrayType)type).InnerType) + ">");
             }
-            if (type is Enum)
+            Enum etype = type as Enum;
+            if (etype != null)
             {
-                Enum etype = (Enum)type;
                 return etype.Name;
             }
-            if (type is StructuredType)
+            Struct stype = type as Struct;
+            if (stype != null)
             {
-                StructuredType stype = (StructuredType)type;
                 return stype.Name;
             }
             return null;

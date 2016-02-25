@@ -15,7 +15,7 @@ namespace MetaDslx.Soal
         private string mvnDir;
 
         public SoalToSpringCompiler(string source, string outputDirectory, string fileName)
-            : base(source, outputDirectory, fileName)
+            : base(source, fileName)
         {
             this.GlobalScope.BuiltInEntries.Add((ModelObject)SoalInstance.Object);
             this.GlobalScope.BuiltInEntries.Add((ModelObject)SoalInstance.String);
@@ -110,7 +110,7 @@ namespace MetaDslx.Soal
                                 }
                             }
                         }
-                        StructuredType stype = decl as StructuredType;
+                        Struct stype = decl as Struct;
                         if (stype != null)
                         {
                             string key = stype.GetJavaName();
@@ -159,14 +159,14 @@ namespace MetaDslx.Soal
                         {
                             foreach (var op in intf.Operations)
                             {
-                                this.CheckXsdNamespace(op.ReturnType, (ModelObject)op);
+                                this.CheckXsdNamespace(op.Result.Type, (ModelObject)op);
                                 foreach (var param in op.Parameters)
                                 {
                                     this.CheckXsdNamespace(param.Type, (ModelObject)param);
                                 }
                             }
                         }
-                        StructuredType stype = decl as StructuredType;
+                        Struct stype = decl as Struct;
                         if (stype != null)
                         {
                             foreach (var prop in stype.Properties)
@@ -219,67 +219,28 @@ namespace MetaDslx.Soal
                 {
                     bool dataConfigWritten = false;
                     bool writeCommonsPom = false;
-                    List<Entity> entities = new List<Entity>();
+                    List<Struct> entities = new List<Struct>();
                     List<string> modules = new List<string>();
+
+                    foreach (Database db in ns.Declarations.OfType<Database>())
+                    {
+                        entities.AddRange(db.Entities);
+                    }
+
                     foreach (var dec in ns.Declarations)
                     {
-                        Entity entity = dec as Entity;
-                        if (entity != null)
-                        {
-                            entities.Add(entity); // TODO better collect the others as well
-
-                            // entity
-                            string module = "Data";
-                            string entityDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.entityPackage);
-                            string javaFileName = Path.Combine(entityDirectory, entity.Name + ".java");
-                            if (!modules.Contains(module))
-                                modules.Add(module);
-
-                            using (StreamWriter writer = new StreamWriter(javaFileName))
-                            {
-                                writer.WriteLine(springClassGen.GenerateEntity(entity));
-                            }
-
-                            // repository
-                            string repoDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.repositoryPackage);
-                            javaFileName = Path.Combine(repoDirectory, entity.Name + "Repository.java");
-                            using (StreamWriter writer = new StreamWriter(javaFileName))
-                            {
-                                writer.WriteLine(springClassGen.GenerateRepository(entity));
-                            }
-
-                            // pom.xml
-                            if (!dataConfigWritten)
-                            {
-                                string fileName = Path.Combine(ns.Name+"-"+module, "pom.xml");
-                                using (StreamWriter writer = new StreamWriter(fileName))
-                                {
-                                    writer.WriteLine(springConfigGen.generateDataPom(ns));
-                                }
-
-                                fileName = Path.Combine(ns.Name + "-" + module, this.mvnDir, "spring-config.xml");
-                                using (StreamWriter writer = new StreamWriter(fileName))
-                                {
-                                    writer.WriteLine(springConfigGen.generateDataSpringConfig(ns));
-                                }
-
-                                dataConfigWritten = true;
-                            }
-
-                        }
-
-                        Exception ex = dec as Exception;
-                        if (ex != null)
+                        Struct exception = dec as Struct;
+                        if (exception != null && !entities.Contains(exception))
                         {
                             string module = "Commons";
                             string exceptionDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.exceptionPackage); 
-                            string javaFileName = Path.Combine(exceptionDirectory, ex.Name + ".java");
+                            string javaFileName = Path.Combine(exceptionDirectory, exception.Name + ".java");
                             if (!modules.Contains(module))
                                 modules.Add(module);
 
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                writer.WriteLine(springClassGen.GenerateException(ex));
+                                writer.WriteLine(springClassGen.GenerateException(exception));
                             }
 
                             writeCommonsPom = true;
@@ -374,13 +335,49 @@ namespace MetaDslx.Soal
                         string fileName = Path.Combine(metaFolder, "persistence.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
-                            writer.WriteLine(springConfigGen.GeneratePersistence(ns));
+                            writer.WriteLine(springConfigGen.GeneratePersistence(ns, entities));
                         }
                     }
-                    /*foreach (Entity entity in entities)
+                    foreach (Struct entity in entities)
                     {
+                        // entity
+                        string module = "Data";
+                        string entityDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.entityPackage);
+                        string javaFileName = Path.Combine(entityDirectory, entity.Name + ".java");
+                        if (!modules.Contains(module))
+                            modules.Add(module);
 
-                    }*/
+                        using (StreamWriter writer = new StreamWriter(javaFileName))
+                        {
+                            writer.WriteLine(springClassGen.GenerateEntity(entity));
+                        }
+
+                        // repository
+                        string repoDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.repositoryPackage);
+                        javaFileName = Path.Combine(repoDirectory, entity.Name + "Repository.java");
+                        using (StreamWriter writer = new StreamWriter(javaFileName))
+                        {
+                            writer.WriteLine(springClassGen.GenerateRepository(entity));
+                        }
+
+                        // pom.xml
+                        if (!dataConfigWritten)
+                        {
+                            string fileName = Path.Combine(ns.Name+"-"+module, "pom.xml");
+                            using (StreamWriter writer = new StreamWriter(fileName))
+                            {
+                                writer.WriteLine(springConfigGen.generateDataPom(ns));
+                            }
+
+                            fileName = Path.Combine(ns.Name + "-" + module, this.mvnDir, "spring-config.xml");
+                            using (StreamWriter writer = new StreamWriter(fileName))
+                            {
+                                writer.WriteLine(springConfigGen.generateDataSpringConfig(ns));
+                            }
+
+                            dataConfigWritten = true;
+                        }
+                    }
 
                     // generate master pom.xml
                     if (modules.Any())
@@ -400,9 +397,9 @@ namespace MetaDslx.Soal
         {
             string projectDir = "";
             if (projectSuffix != null)
-                projectDir = Path.Combine(this.OutputDirectory, namespaceName + "-"+ projectSuffix);
+                projectDir = namespaceName + "-" + projectSuffix;
             else
-                projectDir = Path.Combine(this.OutputDirectory, namespaceName);
+                projectDir = namespaceName;
 
             string directory = Path.Combine(projectDir, this.mvnDir, innerDir, subDir);
             //string directory = Path.Combine(projectDir, subDir); // TODO change

@@ -24,9 +24,9 @@ public void set[prop.Name.ToString().ToPascalCase()]([prop.Type.GetJavaName()] [
 }
 end template
 
-template GenerateImports(SoalType sType)
-	[if (sType.GetImports().Any())]
-		[loop (sType->import:GetImports())]
+template GenerateImports(Declaration declaration)
+	[if (declaration.GetImports().Any())]
+		[loop (declaration->import:GetImports())]
 [import]
 		[end loop]
 ^
@@ -58,7 +58,7 @@ function string GetParameterList(Operation op)
     return result;
 end function
 
-function string GetPropertyList(StructuredType sType)
+function string GetPropertyList(Struct sType)
     string result = "";
     loop (sType->p:Properties; string delimiter = ""; delimiter = ", ")
         result = result + delimiter + p.Type.GetJavaName() + " " + p.Name.ToString().ToCamelCase();
@@ -67,7 +67,7 @@ function string GetPropertyList(StructuredType sType)
 end function
 
 function string GetInterfaceList(Component component)
-    string result = "";
+    string result = ""; // TODO kidobni, implementációk külön
 	HashSet<Service> services = new HashSet<Service>(component.Services);
 	loop(services->i:Interface; string delimiter = ""; delimiter = ", ")
         result = result + delimiter + i.Name;
@@ -75,7 +75,7 @@ function string GetInterfaceList(Component component)
     return result;
 end function
 
-function int GetNumberOfFieldWithIdSuffix(StructuredType sType)
+function int GetNumberOfFieldWithIdSuffix(Struct sType)
 	int result = 0;
 	loop (sType->p:Properties)
 		if (p.Name.ToString().EndsWith("Id"))

@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringGeneratorUtil_1323285326;
-    namespace __Hidden_SpringGeneratorUtil_1323285326
+    using __Hidden_SpringGeneratorUtil_1094748488;
+    namespace __Hidden_SpringGeneratorUtil_1094748488
     {
         internal static class __Extensions
         {
@@ -253,14 +253,14 @@ namespace MetaDslx.Soal //1:1
             return __out.ToString();
         }
 
-        public string GenerateImports(SoalType sType) //27:1
+        public string GenerateImports(Declaration declaration) //27:1
         {
             StringBuilder __out = new StringBuilder();
-            if (sType.GetImports().Any()) //28:3
+            if (declaration.GetImports().Any()) //28:3
             {
                 var __loop1_results = 
-                    (from __loop1_var1 in __Enumerate((sType).GetEnumerator()) //29:10
-                    from import in __Enumerate((__loop1_var1.GetImports()).GetEnumerator()) //29:17
+                    (from __loop1_var1 in __Enumerate((declaration).GetEnumerator()) //29:10
+                    from import in __Enumerate((__loop1_var1.GetImports()).GetEnumerator()) //29:23
                     select new { __loop1_var1 = __loop1_var1, import = import}
                     ).ToList(); //29:4
                 int __loop1_iteration = 0;
@@ -409,7 +409,7 @@ namespace MetaDslx.Soal //1:1
             return result; //58:5
         }
 
-        public string GetPropertyList(StructuredType sType) //61:1
+        public string GetPropertyList(Struct sType) //61:1
         {
             string result = ""; //62:5
             var __loop3_results = 
@@ -458,7 +458,7 @@ namespace MetaDslx.Soal //1:1
             return result; //75:5
         }
 
-        public int GetNumberOfFieldWithIdSuffix(StructuredType sType) //78:1
+        public int GetNumberOfFieldWithIdSuffix(Struct sType) //78:1
         {
             int result = 0; //79:2
             var __loop5_results = 

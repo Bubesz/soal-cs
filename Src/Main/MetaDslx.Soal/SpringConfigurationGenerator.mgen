@@ -3,7 +3,7 @@ generator SpringConfigurationGenerator for object;
 
 using generator SpringGeneratorUtil;
 
-template GeneratePersistence(Namespace ns)
+template GeneratePersistence(Namespace ns, List<Struct> entities)
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
     <persistence-unit name="[ns.Name]PU" transaction-type="RESOURCE_LOCAL">
@@ -12,7 +12,7 @@ template GeneratePersistence(Namespace ns)
 		<jta-data-source>java:jboss/datasources/[ns.Name]DS</jta-data-source>
 
 		^
-	[loop (ns->entity:Declarations where entity is Entity)]
+	[loop (entity:entities)]
 		<class>[SpringGeneratorUtil.GetPackage(entity)].[SpringGeneratorUtil.Properties.entityPackage].[entity.Name]</class>
 	[end loop]
 	^

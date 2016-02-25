@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringConfigurationGenerator_1753867170;
-    namespace __Hidden_SpringConfigurationGenerator_1753867170
+    using __Hidden_SpringConfigurationGenerator_737942986;
+    namespace __Hidden_SpringConfigurationGenerator_737942986
     {
         internal static class __Extensions
         {
@@ -59,7 +59,7 @@ namespace MetaDslx.Soal //1:1
 
         private SpringGeneratorUtil SpringGeneratorUtil = new SpringGeneratorUtil(); //4:1
 
-        public string GeneratePersistence(Namespace ns) //6:1
+        public string GeneratePersistence(Namespace ns, List<Struct> entities) //6:1
         {
             StringBuilder __out = new StringBuilder();
             __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //7:1
@@ -112,16 +112,13 @@ namespace MetaDslx.Soal //1:1
             }
             __out.AppendLine(); //14:3
             var __loop1_results = 
-                (from __loop1_var1 in __Enumerate((ns).GetEnumerator()) //15:9
-                from entity in __Enumerate((__loop1_var1.Declarations).GetEnumerator()) //15:13
-                where entity is Entity //15:33
-                select new { __loop1_var1 = __loop1_var1, entity = entity}
+                (from entity in __Enumerate((entities).GetEnumerator()) //15:9
+                select new { entity = entity}
                 ).ToList(); //15:3
             int __loop1_iteration = 0;
             foreach (var __tmp7 in __loop1_results)
             {
                 ++__loop1_iteration;
-                var __loop1_var1 = __tmp7.__loop1_var1;
                 var entity = __tmp7.entity;
                 string __tmp8Prefix = "		<class>"; //16:1
                 string __tmp9Suffix = "</class>"; //16:111

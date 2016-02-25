@@ -9,7 +9,7 @@ package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.
 [SpringGeneratorUtil.GenerateImports(iface)]
 public interface [iface.Name] {
 [loop (iface->op:Operations)]
-	[op.ReturnType.GetJavaName()] [op.Name]([SpringGeneratorUtil.GetParameterList(op)]);
+	[op.Result.Type.GetJavaName()] [op.Name]([SpringGeneratorUtil.GetParameterList(op)]);
 [end loop]
 }
 end template
@@ -44,7 +44,7 @@ public class [component.Name] {
 [Interface i = s.Interface]
 	//operations of [i.Name]
 		[loop(i->op:Operations)]
-	public [op.ReturnType.GetJavaName()] [op.Name]([SpringGeneratorUtil.GetParameterList(op)]) {
+	public [op.Result.Type.GetJavaName()] [op.Name]([SpringGeneratorUtil.GetParameterList(op)]) {
 	^
 	}
 	^
@@ -74,7 +74,7 @@ public enum [myEnum.Name] {
 }
 end template
 
-template GenerateException(Exception ex)
+template GenerateException(Struct ex)
 package [SpringGeneratorUtil.GetPackage(ex)].[SpringGeneratorUtil.Properties.exceptionPackage];
 ^
 [SpringGeneratorUtil.GenerateImports(ex)]
@@ -101,40 +101,34 @@ public class [ex.Name] extends Exception {
 end template
 
 //TODO what is an entity?
-template GenerateEntity(StructuredType sType)
+template GenerateEntity(Struct sType)
 package [SpringGeneratorUtil.GetPackage(sType)].[SpringGeneratorUtil.Properties.entityPackage];
 ^
 [SpringGeneratorUtil.GenerateImports(sType)]
 ^
-	[if (sType is Entity)] 
 import javax.persistence.*;
 ^
 @Entity
-	[end if]
 public class [sType.Name] {
 
 [int ids = SpringGeneratorUtil.GetNumberOfFieldWithIdSuffix(sType)]
 [if (ids != 1)]
 	^
-		[if (sType is Entity)]
 	@Id
 	@GeneratedValue
-		[end if]
 	private Long [sType.Name.ToString().ToCamelCase()]Id;
 [end if]
 
 [loop (sType->prop:Properties)]
 	^
-		[if (sType is Entity && ids == 1 && prop.Name.ToString().EndsWith("Id"))]
+		[if (ids == 1 && prop.Name.ToString().EndsWith("Id"))]
 	@Id
 	@GeneratedValue
-		[end if]
-		[if (sType is Entity && prop.Type is Enum)]
+		[else if (prop.Type is Enum)]
 	@Enumarated
 		[end if]
 	private [prop.Type.GetJavaName()] [prop.Name.ToString().ToCamelCase()];
 [end loop]
-
 
 	^
 [if (ids == 1)]
@@ -166,7 +160,7 @@ public class [sType.Name] {
 }
 end template
 
-template GenerateRepository(Entity entity)
+template GenerateRepository(Struct entity)
 package [SpringGeneratorUtil.GetPackage(entity)].[SpringGeneratorUtil.Properties.repositoryPackage];
 ^
 import [SpringGeneratorUtil.GetPackage(entity)].[SpringGeneratorUtil.Properties.entityPackage].[entity.Name];
@@ -178,3 +172,24 @@ public interface [entity.Name]Repository extends CrudRepository<[entity.Name],Lo
 ^
 }
 end template
+
+template GenerateStruct(Struct sType)
+package [SpringGeneratorUtil.GetPackage(sType)].[SpringGeneratorUtil.Properties.entityPackage];
+^
+[SpringGeneratorUtil.GenerateImports(sType)]
+^
+public class [sType.Name] {
+
+[loop (sType->prop:Properties)]
+	^
+	private [prop.Type.GetJavaName()] [prop.Name.ToString().ToCamelCase()];
+[end loop]
+
+[loop (sType->prop:Properties)]
+	[SpringGeneratorUtil.GenerateGetter(prop)]
+	[SpringGeneratorUtil.GenerateSetter(prop)]
+[end loop]
+
+}
+end template
+

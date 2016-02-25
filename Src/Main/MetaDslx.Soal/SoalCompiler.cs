@@ -176,7 +176,7 @@ namespace MetaDslx.Soal
                                 break;
                             default:
                                 break;
-						}
+                        }
                     }
                 }
             }

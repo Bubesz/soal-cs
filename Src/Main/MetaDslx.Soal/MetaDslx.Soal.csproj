@@ -43,21 +43,6 @@
     <Reference Include="Antlr4.Runtime" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Soal.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Soal.mm</DependentUpon>
-    </Compile>
-    <Compile Include="SoalToSpringCompiler.cs" />
-    <Compile Include="SoalCompiler.cs" />
-    <Compile Include="SoalImplementation.cs" />
-    <Compile Include="SoalLexer.cs">
-      <DependentUpon>SoalLexer.ag4</DependentUpon>
-    </Compile>
-    <Compile Include="SoalLexerAnnotator.cs">
-      <DependentUpon>SoalLexer.ag4</DependentUpon>
-    </Compile>
     <Compile Include="SoalParser.cs">
       <DependentUpon>SoalParser.ag4</DependentUpon>
     </Compile>
@@ -97,11 +82,20 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>SoalPrinter.mgen</DependentUpon>
-	</Compile>
-    <Compile Include="SpringGeneratorUtil.cs">
-      <DependentUpon>SpringGeneratorUtil.mgen</DependentUpon>
-	</Compile>
-    <Compile Include="SpringGenerator.cs" />
+    </Compile>
+    <Compile Include="WsdlGenerator.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WsdlGenerator.mgen</DependentUpon>
+    </Compile>
+    <Compile Include="WsdlReader.cs" />
+    <Compile Include="XsdGenerator.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>XsdGenerator.mgen</DependentUpon>
+    </Compile>
+    <Compile Include="XsdReader.cs" />
+    <Compile Include="SoalToSpringCompiler.cs" />
     <Compile Include="SpringConfigurationGenerator.cs">
       <DependentUpon>SpringConfigurationGenerator.mgen</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -117,18 +111,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SpringGeneratorUtil.mgen</DependentUpon>
     </Compile>
-    <Compile Include="WsdlGenerator.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>WsdlGenerator.mgen</DependentUpon>
-    </Compile>
-    <Compile Include="WsdlReader.cs" />
-    <Compile Include="XsdGenerator.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>XsdGenerator.mgen</DependentUpon>
-    </Compile>
-    <Compile Include="XsdReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Soal.mm">
@@ -164,7 +146,15 @@
     <None Include="SoalPrinter.mgen">
       <Generator>MetaGenerator</Generator>
       <LastGenOutput>SoalPrinter.cs</LastGenOutput>
-	</None>
+    </None>
+    <None Include="WsdlGenerator.mgen">
+      <Generator>MetaGenerator</Generator>
+      <LastGenOutput>WsdlGenerator.cs</LastGenOutput>
+    </None>
+    <None Include="XsdGenerator.mgen">
+      <Generator>MetaGenerator</Generator>
+      <LastGenOutput>XsdGenerator.cs</LastGenOutput>
+    </None>
     <None Include="SpringConfigurationGenerator.mgen">
       <Generator>MetaGenerator</Generator>
       <LastGenOutput>SpringConfigurationGenerator.cs</LastGenOutput>
@@ -177,18 +167,10 @@
       <Generator>MetaGenerator</Generator>
       <LastGenOutput>SpringClassGenerator.cs</LastGenOutput>
     </None>
-    <None Include="WsdlGenerator.mgen">
-      <Generator>MetaGenerator</Generator>
-      <LastGenOutput>WsdlGenerator.cs</LastGenOutput>
-    </None>
-    <None Include="XsdGenerator.mgen">
-      <Generator>MetaGenerator</Generator>
-      <LastGenOutput>XsdGenerator.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)..\Install\$(ProjectName).dll"</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)Install\$(ProjectName).dll"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
