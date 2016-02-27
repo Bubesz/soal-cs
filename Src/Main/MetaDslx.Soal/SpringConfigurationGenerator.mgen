@@ -88,7 +88,6 @@ template generateDataPom(Namespace ns)
     <artifactId>[ns.Name]-Data</artifactId>
 
     <dependencies>
-		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-Commons", "1.0")]
 		<!-- spring data -->
 		[SpringGeneratorUtil.GeneratePomDependency("org.springframework","spring-orm", "${springframework.version}")]
 		[SpringGeneratorUtil.GeneratePomDependency("org.springframework.data", "spring-data-jpa", "${spring-data-jpa.version}")]
