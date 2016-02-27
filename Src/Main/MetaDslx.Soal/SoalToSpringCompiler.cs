@@ -217,9 +217,8 @@ namespace MetaDslx.Soal
 
                 if (ns.Uri != null)
                 {
-                    bool dataConfigWritten = false;
-                    bool writeCommonsPom = false;
                     List<Struct> entities = new List<Struct>();
+                    List<Struct> exceptions = new List<Struct>();
                     List<string> modules = new List<string>();
 
                     foreach (Database db in ns.Declarations.OfType<Database>())
@@ -227,13 +226,20 @@ namespace MetaDslx.Soal
                         entities.AddRange(db.Entities);
                     }
 
-                    foreach (var dec in ns.Declarations)
+                    foreach (Struct exception in ns.Declarations.OfType<Struct>())
                     {
-                        Struct exception = dec as Struct;
-                        if (exception != null && !entities.Contains(exception))
+                        if (exception.IsException())
+                        {
+                            exceptions.Add(exception);
+                        }
+                    }
+
+                    if (exceptions.Any() || ns.Declarations.OfType<Interface>().Any())
+                    {
+                        foreach (Struct exception in exceptions)
                         {
                             string module = "Commons";
-                            string exceptionDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.exceptionPackage); 
+                            string exceptionDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.exceptionPackage);
                             string javaFileName = Path.Combine(exceptionDirectory, exception.Name + ".java");
                             if (!modules.Contains(module))
                                 modules.Add(module);
@@ -242,12 +248,9 @@ namespace MetaDslx.Soal
                             {
                                 writer.WriteLine(springClassGen.GenerateException(exception));
                             }
-
-                            writeCommonsPom = true;
                         }
-                        
-                        Interface iface = dec as Interface;
-                        if (iface != null)
+
+                        foreach (Interface iface in ns.Declarations.OfType<Interface>())
                         {
                             string module = "Commons";
                             string interfaceDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.interfacePackage);
@@ -259,14 +262,75 @@ namespace MetaDslx.Soal
                             {
                                 writer.WriteLine(springClassGen.GenerateInterface(iface));
                             }
-
-                            writeCommonsPom = true;
                         }
 
-                        Enum myEnum = dec as Enum;
-                        if (myEnum != null)
+                        // pom.xml and spring.config.xml for Commons module
+                        string fileName = Path.Combine(ns.Name + "-Commons", "pom.xml");
+                        using (StreamWriter writer = new StreamWriter(fileName))
                         {
-                            string module = "Commons";
+                            // TODO isn't -Data needed?
+                            List<string> dependencies = new List<string>();
+                            dependencies.Add("Data"); // TODO name!
+                            writer.WriteLine(springConfigGen.generateComponentPom(ns, "Commons", dependencies));
+                        }
+
+                        fileName = Path.Combine(ns.Name + "-Commons", this.mvnDir, "spring-config.xml");
+                        using (StreamWriter writer = new StreamWriter(fileName))
+                        {
+                            writer.WriteLine(springConfigGen.generateComponentSpringConfig(ns));
+                        }
+                }
+
+
+                    foreach (Component component in ns.Declarations.OfType<Component>())
+                    {
+                        string compDirectory = createDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.serviceFacadePackage);
+                        string javaFileName = Path.Combine(compDirectory, component.Name + ".java");
+                        modules.Add(component.Name);
+
+                        using (StreamWriter writer = new StreamWriter(javaFileName))
+                        {
+                            writer.WriteLine(springClassGen.GenerateComponent(component));
+                        }
+
+                        // generate pom.xml and spring-config.xml
+                        // TODO fill up dependencies
+                        List<string> dependencies = new List<string>();
+                        dependencies.Add("Commons"); // not needed if we are "Data"
+                        dependencies.Add("Data"); // not needed if we are "Data"
+                        string fileName = Path.Combine(ns.Name+"-"+component.Name, "pom.xml");
+                        using (StreamWriter writer = new StreamWriter(fileName))
+                        {
+                            writer.WriteLine(springConfigGen.generateComponentPom(ns, component.Name, dependencies));
+                        }
+
+                        fileName = Path.Combine(ns.Name + "-" + component.Name, this.mvnDir, "spring-config.xml");
+                        using (StreamWriter writer = new StreamWriter(fileName))
+                        {
+                            writer.WriteLine(springConfigGen.generateComponentSpringConfig(ns));
+                        }
+                    }
+
+                    // Data module // TODO what is the name of the module with database?
+                    if (entities.Any() || ns.Declarations.OfType<Enum>().Any())
+                    {
+                        //pom.xml
+                        string module = "Data";
+                        string fileName = Path.Combine(ns.Name + "-" + module, "pom.xml");
+                        using (StreamWriter writer = new StreamWriter(fileName))
+                        {
+                            writer.WriteLine(springConfigGen.generateDataPom(ns));
+                        }
+
+                        fileName = Path.Combine(ns.Name + "-" + module, this.mvnDir, "spring-config.xml");
+                        using (StreamWriter writer = new StreamWriter(fileName))
+                        {
+                            writer.WriteLine(springConfigGen.generateDataSpringConfig(ns));
+                        }
+
+                        //enums
+                        foreach (Enum myEnum in ns.Declarations.OfType<Enum>())
+                        {
                             string enumDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.enumPackage);
                             string javaFileName = Path.Combine(enumDirectory, myEnum.Name + ".java");
                             if (!modules.Contains(module))
@@ -276,106 +340,41 @@ namespace MetaDslx.Soal
                             {
                                 writer.WriteLine(springClassGen.GenerateEnum(myEnum));
                             }
-
-                            writeCommonsPom = true;
                         }
 
-                        Component component = dec as Component;
-                        if (component != null)
+                        // generate persistence.xml
+                        if (entities.Any())
                         {
-                            string compDirectory = createDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.serviceFacadePackage);
-                            string javaFileName = Path.Combine(compDirectory, component.Name + ".java");
-                            modules.Add(component.Name);
+                            string metaFolder = Path.Combine(ns.Name + "-Data", "src", "main", "resources", "META - INF");
+                            Directory.CreateDirectory(metaFolder);
+                            fileName = Path.Combine(metaFolder, "persistence.xml");
+                            using (StreamWriter writer = new StreamWriter(fileName))
+                            {
+                                writer.WriteLine(springConfigGen.GeneratePersistence(ns, entities));
+                            }
+                        }
+
+                        //entities
+                        foreach (Struct entity in entities)
+                        {
+                            // entity
+                            string entityDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.entityPackage);
+                            string javaFileName = Path.Combine(entityDirectory, entity.Name + ".java");
+                            if (!modules.Contains(module))
+                                modules.Add(module);
 
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                writer.WriteLine(springClassGen.GenerateComponent(component));
+                                writer.WriteLine(springClassGen.GenerateEntity(entity));
                             }
 
-                            // generate pom.xml and spring-config.xml
-                            // TODO fill up dependencies
-                            List<string> dependencies = new List<string>();
-                            string fileName = Path.Combine(ns.Name+"-"+component.Name, "pom.xml");
-                            using (StreamWriter writer = new StreamWriter(fileName))
+                            // repository
+                            string repoDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.repositoryPackage);
+                            javaFileName = Path.Combine(repoDirectory, entity.Name + "Repository.java");
+                            using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                writer.WriteLine(springConfigGen.generateComponentPom(ns, component.Name, dependencies));
+                                writer.WriteLine(springClassGen.GenerateRepository(entity));
                             }
-
-                            fileName = Path.Combine(ns.Name + "-" + component.Name, this.mvnDir, "spring-config.xml");
-                            using (StreamWriter writer = new StreamWriter(fileName))
-                            {
-                                writer.WriteLine(springConfigGen.generateComponentSpringConfig(ns));
-                            }
-                        }
-                    }
-
-
-                    // pom.xml and spring.config.xml for Commons module
-                    if (writeCommonsPom)
-                    {
-                        string fileName = Path.Combine(ns.Name + "-Commons", "pom.xml");
-                        using (StreamWriter writer = new StreamWriter(fileName))
-                        {
-                            // TODO isn't -Data needed?
-                            writer.WriteLine(springConfigGen.generateComponentPom(ns, "Commons", new List<string>()));
-                        }
-
-                        fileName = Path.Combine(ns.Name + "-Commons", this.mvnDir, "spring-config.xml");
-                        using (StreamWriter writer = new StreamWriter(fileName))
-                        {
-                            writer.WriteLine(springConfigGen.generateComponentSpringConfig(ns));
-                        }
-                    }
-
-                    // generate persistence.xml
-                    if (entities.Any())
-                    {
-                        string metaFolder = Path.Combine(ns.Name + "-Data", "src", "main", "resources", "META - INF");
-                        Directory.CreateDirectory(metaFolder);
-                        string fileName = Path.Combine(metaFolder, "persistence.xml");
-                        using (StreamWriter writer = new StreamWriter(fileName))
-                        {
-                            writer.WriteLine(springConfigGen.GeneratePersistence(ns, entities));
-                        }
-                    }
-                    foreach (Struct entity in entities)
-                    {
-                        // entity
-                        string module = "Data";
-                        string entityDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.entityPackage);
-                        string javaFileName = Path.Combine(entityDirectory, entity.Name + ".java");
-                        if (!modules.Contains(module))
-                            modules.Add(module);
-
-                        using (StreamWriter writer = new StreamWriter(javaFileName))
-                        {
-                            writer.WriteLine(springClassGen.GenerateEntity(entity));
-                        }
-
-                        // repository
-                        string repoDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.repositoryPackage);
-                        javaFileName = Path.Combine(repoDirectory, entity.Name + "Repository.java");
-                        using (StreamWriter writer = new StreamWriter(javaFileName))
-                        {
-                            writer.WriteLine(springClassGen.GenerateRepository(entity));
-                        }
-
-                        // pom.xml
-                        if (!dataConfigWritten)
-                        {
-                            string fileName = Path.Combine(ns.Name+"-"+module, "pom.xml");
-                            using (StreamWriter writer = new StreamWriter(fileName))
-                            {
-                                writer.WriteLine(springConfigGen.generateDataPom(ns));
-                            }
-
-                            fileName = Path.Combine(ns.Name + "-" + module, this.mvnDir, "spring-config.xml");
-                            using (StreamWriter writer = new StreamWriter(fileName))
-                            {
-                                writer.WriteLine(springConfigGen.generateDataSpringConfig(ns));
-                            }
-
-                            dataConfigWritten = true;
                         }
                     }
 

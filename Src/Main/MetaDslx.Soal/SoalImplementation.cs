@@ -429,46 +429,8 @@ namespace MetaDslx.Soal
                 {
                     result.AddRange(HandleArrayType(prop.Type));
                 }
-
-                Component component = sType as Component;
-                if (component != null)
-                {
-                    List<Port> referencesAndServices = new List<Port>();
-                    referencesAndServices.AddRange(component.Services);
-                    referencesAndServices.AddRange(component.References);
-
-                    foreach (Port iref in referencesAndServices)
-                    {
-                        result.Add(iref.Interface);
-                    }
-
-                    foreach (Service service in component.Services)
-                    {
-                        foreach (Operation operation in service.Interface.Operations)
-                        {
-                            foreach(InputParameter param in operation.Parameters)
-                            {
-                                result.AddRange(HandleArrayType(param.Type));
-                            }
-                            List<SoalType> im = HandleArrayType(operation.Result.Type);
-                            string entityImport = null;
-                            foreach (SoalType s in im)
-                            {
-                                if (s != null /*&& s is Entity*/) //FIXME
-                                {
-                                    entityImport = s.GetImportString();
-                                }
-                            }
-                            if (entityImport != null)
-                            {
-                                repoImports.Add(entityImport.Replace("entity", "repository").Replace(";", "Repository;"));
-                            }
-                            result.AddRange(im);
-                        }
-                    }
-                    //result.Add(component.BaseComponent); TODO mi volt eddig?
-                }
             }
+
             Interface iface = declaration as Interface;
             if (iface != null)
             {
@@ -480,6 +442,49 @@ namespace MetaDslx.Soal
                     }
                     result.AddRange(HandleArrayType(operation.Result.Type));
                 }
+            }
+
+            Component component = declaration as Component;
+            if (component != null)
+            {
+                List<Port> referencesAndServices = new List<Port>();
+                referencesAndServices.AddRange(component.Services);
+                referencesAndServices.AddRange(component.References);
+
+                foreach (Port iref in referencesAndServices)
+                {
+                    result.Add(iref.Interface);
+                }
+
+                foreach (Service service in component.Services)
+                {
+                    foreach (Operation operation in service.Interface.Operations)
+                    {
+                        foreach (InputParameter param in operation.Parameters)
+                        {
+                            result.AddRange(HandleArrayType(param.Type));
+                        }
+                        List<SoalType> im = HandleArrayType(operation.Result.Type);
+                        string entityImport = null;
+                        foreach (SoalType s in im)
+                        {
+                            if (s != null)
+                            {
+                                Struct myStruct = s as Struct;
+                                if (myStruct != null && myStruct.IsEntity())
+                                {
+                                    entityImport = s.GetImportString();
+                                }
+                            }
+                        }
+                        if (entityImport != null)
+                        {
+                            repoImports.Add(entityImport.Replace("entity", "repository").Replace(";", "Repository;"));
+                        }
+                        result.AddRange(im);
+                    }
+                }
+                //result.Add(component.BaseComponent); TODO mi volt eddig?
             }
 
             return result;
@@ -509,21 +514,29 @@ namespace MetaDslx.Soal
         {
             if (type is Interface)
                 return ".interfaces";
-            if (type is Exception)
-                return ".exception";
             if (type is Enum)
                 return ".enums";
-            //if (type is Entity)
-            //    return ".entity"; FIXME
+            Struct str = type as Struct;
+            if (str != null)
+            {
+                if (str.IsException())
+                    return ".exception";
+                if (str.IsEntity())
+                    return ".entity";
+            }
             return null;
         }
 
         private static string GetImportString(this SoalType type)
         {
-            string result = null;
             string javaName = type.GetJavaName();
-            string package = type.GetJavaName().GetPackageOfJavaType();
-            if (package == null || !package.Any())
+            string package = null;
+
+            if (type is PrimitiveType)
+            {
+                package = javaName.GetPackageOfJavaType();
+            }
+            else
             {
                 Declaration dec = type as Declaration;
                 if (dec != null)
@@ -535,12 +548,43 @@ namespace MetaDslx.Soal
                     {
                         javaName = dec.Name;
                     }
+                } else
+                {
+                    //Console.WriteLine(type.GetJavaName() +" is not dec");
                 }
             }
             
             if (package != null)
-                result = "import " + package + "." + javaName + ";";
-            return result;
+                return "import " + package + "." + javaName + ";";
+
+            return null;
+        }
+
+        public static bool IsEntity(this Struct myStruct)
+        {
+            Namespace myNamespace = myStruct.Namespace;
+            foreach (Database db in myNamespace.Declarations.OfType<Database>())
+            {
+                if (db.Entities.Contains(myStruct)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static bool IsException(this Struct myStruct)
+        {
+            Namespace myNamespace = myStruct.Namespace;
+            foreach (Interface iface in myNamespace.Declarations.OfType<Interface>())
+            {
+                foreach (Operation op in iface.Operations)
+                {
+                    if (op.Exceptions.Contains(myStruct)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public static string GetJavaName(this SoalType type)
