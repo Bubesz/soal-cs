@@ -7,6 +7,7 @@ template GenerateInterface(Interface iface)
 package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
 ^
 [SpringGeneratorUtil.GenerateImports(iface)]
+^
 public interface [iface.Name] {
 [loop (iface->op:Operations)]
 	[op.Result.Type.GetJavaName()] [op.Name]([SpringGeneratorUtil.GetParameterList(op)]);
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 ^
 [SpringGeneratorUtil.GenerateImports(component)]
+^
 @Service
 [string interfaces = SpringGeneratorUtil.GetInterfaceList(component)]
 [if (interfaces.Any())]
@@ -45,11 +47,14 @@ public class [component.Name] {
 	//operations of [i.Name]
 		[loop(i->op:Operations)]
 	public [op.Result.Type.GetJavaName()] [op.Name]([SpringGeneratorUtil.GetParameterList(op)]) {
-	^
+	[if (op.Result.Type.GetJavaName() != "void")]
+		return null; // TODO implement method
+	[else]
+		^
+	[end if]
 	}
 	^
 		[end loop]
-		^
 [end loop]
 }
 end template
@@ -100,7 +105,6 @@ public class [ex.Name] extends Exception {
 }
 end template
 
-//TODO what is an entity?
 template GenerateEntity(Struct sType)
 package [SpringGeneratorUtil.GetPackage(sType)].[SpringGeneratorUtil.Properties.entityPackage];
 ^
@@ -125,7 +129,7 @@ public class [sType.Name] {
 	@Id
 	@GeneratedValue
 		[else if (prop.Type is Enum)]
-	@Enumarated
+	@Enumerated
 		[end if]
 	private [prop.Type.GetJavaName()] [prop.Name.ToString().ToCamelCase()];
 [end loop]
