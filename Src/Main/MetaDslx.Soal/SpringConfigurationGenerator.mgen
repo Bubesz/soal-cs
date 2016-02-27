@@ -68,9 +68,6 @@ template generateComponentPom(Namespace ns, string moduleName, List<string> modu
     <artifactId>[ns.Name]-[moduleName]</artifactId>
 
     <dependencies>
-        [SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-Commons", "1.0")]
-		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-Data", "1.0")]
-
 [loop (module:modules)]
 		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-"+module, "1.0")]
 [end loop]
