@@ -220,6 +220,13 @@ namespace MetaDslx.Soal
                     List<Struct> entities = new List<Struct>();
                     List<Struct> exceptions = new List<Struct>();
                     List<string> modules = new List<string>();
+                    string dataModule = "Data";
+
+                    foreach (Component component in ns.Declarations.OfType<Component>())
+                    {
+                        if (component.Services.OfType<Database>().Any())
+                            dataModule = component.Name;
+                    }
 
                     foreach (Database db in ns.Declarations.OfType<Database>())
                     {
@@ -234,11 +241,13 @@ namespace MetaDslx.Soal
                         }
                     }
 
+                    // Commons module
                     if (exceptions.Any() || ns.Declarations.OfType<Interface>().Any())
                     {
+                        string module = "Commons";
+
                         foreach (Struct exception in exceptions)
                         {
-                            string module = "Commons";
                             string exceptionDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.exceptionPackage);
                             string javaFileName = Path.Combine(exceptionDirectory, exception.Name + ".java");
                             if (!modules.Contains(module))
@@ -252,7 +261,6 @@ namespace MetaDslx.Soal
 
                         foreach (Interface iface in ns.Declarations.OfType<Interface>())
                         {
-                            string module = "Commons";
                             string interfaceDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.interfacePackage);
                             string javaFileName = Path.Combine(interfaceDirectory, iface.Name + ".java");
                             if (!modules.Contains(module))
@@ -265,39 +273,43 @@ namespace MetaDslx.Soal
                         }
 
                         // pom.xml and spring.config.xml for Commons module
-                        string fileName = Path.Combine(ns.Name + "-Commons", "pom.xml");
+                        string fileName = Path.Combine(ns.Name + "-"+module, "pom.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
-                            // TODO isn't -Data needed?
                             List<string> dependencies = new List<string>();
-                            dependencies.Add("Data"); // TODO name!
-                            writer.WriteLine(springConfigGen.generateComponentPom(ns, "Commons", dependencies));
+                            dependencies.Add(dataModule);
+                            writer.WriteLine(springConfigGen.generateComponentPom(ns, module, dependencies));
                         }
 
-                        fileName = Path.Combine(ns.Name + "-Commons", this.mvnDir, "spring-config.xml");
+                        fileName = Path.Combine(ns.Name + "-"+module, this.mvnDir, "spring-config.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
                             writer.WriteLine(springConfigGen.generateComponentSpringConfig(ns));
                         }
-                }
+                    }
 
 
                     foreach (Component component in ns.Declarations.OfType<Component>())
                     {
-                        string compDirectory = createDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.serviceFacadePackage);
-                        string javaFileName = Path.Combine(compDirectory, component.Name + ".java");
                         modules.Add(component.Name);
 
-                        using (StreamWriter writer = new StreamWriter(javaFileName))
+                        if (component.Name != dataModule)
                         {
-                            writer.WriteLine(springClassGen.GenerateComponent(component));
+                            string compDirectory = createDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.serviceFacadePackage);
+                            string javaFileName = Path.Combine(compDirectory, component.Name + ".java");
+                            using (StreamWriter writer = new StreamWriter(javaFileName))
+                            {
+                                writer.WriteLine(springClassGen.GenerateComponent(component));
+                            }
                         }
 
                         // generate pom.xml and spring-config.xml
-                        // TODO fill up dependencies
                         List<string> dependencies = new List<string>();
-                        dependencies.Add("Commons"); // not needed if we are "Data"
-                        dependencies.Add("Data"); // not needed if we are "Data"
+                        if (component.Name != dataModule)
+                        {
+                            dependencies.Add("Commons");
+                            dependencies.Add(dataModule);
+                        }
                         string fileName = Path.Combine(ns.Name+"-"+component.Name, "pom.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
@@ -311,18 +323,19 @@ namespace MetaDslx.Soal
                         }
                     }
 
-                    // Data module // TODO what is the name of the module with database?
+                    // data module
                     if (entities.Any() || ns.Declarations.OfType<Enum>().Any())
                     {
+                        modules.Add(dataModule);
+
                         //pom.xml
-                        string module = "Data";
-                        string fileName = Path.Combine(ns.Name + "-" + module, "pom.xml");
+                        string fileName = Path.Combine(ns.Name + "-" + dataModule, "pom.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
                             writer.WriteLine(springConfigGen.generateDataPom(ns));
                         }
 
-                        fileName = Path.Combine(ns.Name + "-" + module, this.mvnDir, "spring-config.xml");
+                        fileName = Path.Combine(ns.Name + "-" + dataModule, this.mvnDir, "spring-config.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
                             writer.WriteLine(springConfigGen.generateDataSpringConfig(ns));
@@ -331,10 +344,10 @@ namespace MetaDslx.Soal
                         //enums
                         foreach (Enum myEnum in ns.Declarations.OfType<Enum>())
                         {
-                            string enumDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.enumPackage);
+                            string enumDirectory = createDirectory(ns.Name, dataModule, innerDir, generatorUtil.Properties.enumPackage);
                             string javaFileName = Path.Combine(enumDirectory, myEnum.Name + ".java");
-                            if (!modules.Contains(module))
-                                modules.Add(module);
+                            if (!modules.Contains(dataModule))
+                                modules.Add(dataModule);
 
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
@@ -358,10 +371,8 @@ namespace MetaDslx.Soal
                         foreach (Struct entity in entities)
                         {
                             // entity
-                            string entityDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.entityPackage);
+                            string entityDirectory = createDirectory(ns.Name, dataModule, innerDir, generatorUtil.Properties.entityPackage);
                             string javaFileName = Path.Combine(entityDirectory, entity.Name + ".java");
-                            if (!modules.Contains(module))
-                                modules.Add(module);
 
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
@@ -369,7 +380,7 @@ namespace MetaDslx.Soal
                             }
 
                             // repository
-                            string repoDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.repositoryPackage);
+                            string repoDirectory = createDirectory(ns.Name, dataModule, innerDir, generatorUtil.Properties.repositoryPackage);
                             javaFileName = Path.Combine(repoDirectory, entity.Name + "Repository.java");
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
