@@ -436,15 +436,7 @@ namespace MetaDslx.Soal
             {
                 foreach (Operation operation in iface.Operations)
                 {
-                    foreach (InputParameter param in operation.Parameters)
-                    {
-                        result.AddRange(HandleArrayType(param.Type));
-                    }
-                    result.AddRange(HandleArrayType(operation.Result.Type));
-                    foreach (Struct excception in operation.Exceptions)
-                    {
-                        result.Add(excception);
-                    }
+                    GetImportsOfOperation(repoImports, result, operation);
                 }
             }
 
@@ -464,39 +456,44 @@ namespace MetaDslx.Soal
                 {
                     foreach (Operation operation in service.Interface.Operations)
                     {
-                        foreach (InputParameter param in operation.Parameters)
-                        {
-                            result.AddRange(HandleArrayType(param.Type));
-                        }
-                        List<SoalType> im = HandleArrayType(operation.Result.Type);
-                        string entityImport = null;
-                        foreach (SoalType s in im)
-                        {
-                            if (s != null)
-                            {
-                                Struct myStruct = s as Struct;
-                                if (myStruct != null && myStruct.IsEntity())
-                                {
-                                    entityImport = s.GetImportString();
-                                }
-                            }
-                        }
-                        if (entityImport != null)
-                        {
-                            repoImports.Add(entityImport.Replace("entity", "repository").Replace(";", "Repository;"));
-                        }
-                        result.AddRange(im);
-
-                        foreach (Struct excception in operation.Exceptions)
-                        {
-                            result.Add(excception);
-                        }
+                        GetImportsOfOperation(repoImports, result, operation);
                     }
                 }
                 //result.Add(component.BaseComponent); TODO mi volt eddig?
             }
 
             return result;
+        }
+
+        private static void GetImportsOfOperation(List<string> repoImports, List<SoalType> result, Operation operation)
+        {
+            foreach (InputParameter param in operation.Parameters)
+            {
+                result.AddRange(HandleArrayType(param.Type));
+            }
+            List<SoalType> im = HandleArrayType(operation.Result.Type);
+            string entityImport = null;
+            foreach (SoalType s in im)
+            {
+                if (s != null)
+                {
+                    Struct myStruct = s as Struct;
+                    if (myStruct != null && myStruct.IsEntity())
+                    {
+                        entityImport = s.GetImportString();
+                    }
+                }
+            }
+            if (entityImport != null)
+            {
+                repoImports.Add(entityImport.Replace("entity", "repository").Replace(";", "Repository;"));
+            }
+            result.AddRange(im);
+
+            foreach (Struct excception in operation.Exceptions)
+            {
+                result.Add(excception);
+            }
         }
 
         private static List<SoalType> HandleArrayType(SoalType type)
