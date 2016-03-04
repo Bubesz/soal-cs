@@ -6,7 +6,7 @@ using generator SpringGeneratorUtil;
 template GenerateInterface(Interface iface)
 package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
 ^
-[SpringGeneratorUtil.GenerateImports(iface)]
+[SpringGeneratorUtil.GenerateImports(iface, false)]
 ^
 public interface [iface.Name] {
 [loop (iface->op:Operations)]
@@ -16,6 +16,31 @@ public interface [iface.Name] {
 	[end if]
 ;
 	
+[end loop]
+}
+end template
+
+template GenerateInterfaceImplementation(Interface iface)
+package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
+^
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+^
+[SpringGeneratorUtil.GenerateImports(iface)]
+^
+@Service
+public class [iface.Name]Impl implements [iface.Name] {
+[loop (iface->repo:GetRepositories())]
+^
+	@Autowired
+	[repo];
+[end loop]
+[loop(iface->op:Operations)]
+^
+	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)]) {
+		// TODO implement method
+		throw new UnsupportedOperationException("Not yet implemented.");
+	}
 [end loop]
 }
 end template
@@ -40,8 +65,9 @@ public class [component.Name] {
 [loop (component->repo:GetRepositories())]
 	@Autowired
 	[repo];
-[end loop]
 ^
+[end loop]
+
 [loop (component->reference:References)]
 	@Autowired
 	private [reference.Interface.Name] [reference.Name];
@@ -51,12 +77,9 @@ public class [component.Name] {
 [Interface i = s.Interface]
 	//operations of [i.Name]
 		[loop(i->op:Operations)]
-	public [op.Result.Type.GetJavaName()] [op.Name]([SpringGeneratorUtil.GetParameterList(op)]) {
-	[if (op.Result.Type.GetJavaName() != "void")]
-		return null; // TODO implement method
-	[else]
-		^
-	[end if]
+	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)]) {
+		// TODO implement method
+		throw new UnsupportedOperationException("Not yet implemented.");
 	}
 	^
 		[end loop]

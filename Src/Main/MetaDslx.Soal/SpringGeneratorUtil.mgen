@@ -25,9 +25,15 @@ public void set[prop.Name.ToString().ToPascalCase()]([prop.Type.GetJavaName()] [
 end template
 
 template GenerateImports(Declaration declaration)
+[GenerateImports(declaration, true)]
+end template
+
+template GenerateImports(Declaration declaration, bool reposNeeded)
 	[if (declaration.GetImports().Any())]
 		[loop (declaration->import:GetImports())]
+			[if ( !(import.Contains("repo") && reposNeeded==false ))]
 [import]
+			[end if]
 		[end loop]
 ^
 	[end if]

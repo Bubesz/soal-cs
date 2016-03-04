@@ -245,13 +245,12 @@ namespace MetaDslx.Soal
                     if (exceptions.Any() || ns.Declarations.OfType<Interface>().Any())
                     {
                         string module = "Commons";
+                        modules.Add(module);
 
                         foreach (Struct exception in exceptions)
                         {
                             string exceptionDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.exceptionPackage);
                             string javaFileName = Path.Combine(exceptionDirectory, exception.Name + ".java");
-                            if (!modules.Contains(module))
-                                modules.Add(module);
 
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
@@ -263,8 +262,6 @@ namespace MetaDslx.Soal
                         {
                             string interfaceDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.interfacePackage);
                             string javaFileName = Path.Combine(interfaceDirectory, iface.Name + ".java");
-                            if (!modules.Contains(module))
-                                modules.Add(module);
 
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
@@ -300,6 +297,18 @@ namespace MetaDslx.Soal
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
                                 writer.WriteLine(springClassGen.GenerateComponent(component));
+                            }
+                        }
+
+                        foreach (Service service in component.Services)
+                        {
+                            Interface iface = service.Interface;
+                            string interfaceDirectory = createDirectory(ns.Name, component.Name, innerDir, component.Name.ToLower());
+                            string javaFileName = Path.Combine(interfaceDirectory, iface.Name + "Impl.java");
+
+                            using (StreamWriter writer = new StreamWriter(javaFileName))
+                            {
+                                writer.WriteLine(springClassGen.GenerateInterfaceImplementation(iface));
                             }
                         }
 
