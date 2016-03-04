@@ -58,6 +58,14 @@ function string GetParameterList(Operation op)
     return result;
 end function
 
+function string GetExceptionList(Operation op)
+    string result = "";
+    loop (op->exc:Exceptions; string delimiter = ""; delimiter = ", ")
+        result = result + delimiter + exc.GetJavaName();
+    end loop
+    return result;
+end function
+
 function string GetPropertyList(Struct sType)
     string result = "";
     loop (sType->p:Properties; string delimiter = ""; delimiter = ", ")

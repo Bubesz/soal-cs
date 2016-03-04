@@ -441,6 +441,10 @@ namespace MetaDslx.Soal
                         result.AddRange(HandleArrayType(param.Type));
                     }
                     result.AddRange(HandleArrayType(operation.Result.Type));
+                    foreach (Struct excception in operation.Exceptions)
+                    {
+                        result.Add(excception);
+                    }
                 }
             }
 
@@ -482,6 +486,11 @@ namespace MetaDslx.Soal
                             repoImports.Add(entityImport.Replace("entity", "repository").Replace(";", "Repository;"));
                         }
                         result.AddRange(im);
+
+                        foreach (Struct excception in operation.Exceptions)
+                        {
+                            result.Add(excception);
+                        }
                     }
                 }
                 //result.Add(component.BaseComponent); TODO mi volt eddig?

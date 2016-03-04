@@ -10,7 +10,12 @@ package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.
 ^
 public interface [iface.Name] {
 [loop (iface->op:Operations)]
-	[op.Result.Type.GetJavaName()] [op.Name]([SpringGeneratorUtil.GetParameterList(op)]);
+	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
+	[if (op.Exceptions.Any())]
+ throws [SpringGeneratorUtil.GetExceptionList(op)]\
+	[end if]
+;
+	
 [end loop]
 }
 end template
