@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringGeneratorUtil_98732505;
-    namespace __Hidden_SpringGeneratorUtil_98732505
+    using __Hidden_SpringGeneratorUtil_120860837;
+    namespace __Hidden_SpringGeneratorUtil_120860837
     {
         internal static class __Extensions
         {
@@ -418,104 +418,128 @@ namespace MetaDslx.Soal //1:1
             return result; //64:5
         }
 
-        public string GetExceptionList(Operation op) //67:1
+        public string GetParameterNameList(Operation op) //67:1
         {
             string result = ""; //68:5
             var __loop3_results = 
                 (from __loop3_var1 in __Enumerate((op).GetEnumerator()) //69:11
-                from exc in __Enumerate((__loop3_var1.Exceptions).GetEnumerator()) //69:15
-                select new { __loop3_var1 = __loop3_var1, exc = exc}
+                from param in __Enumerate((__loop3_var1.Parameters).GetEnumerator()) //69:15
+                select new { __loop3_var1 = __loop3_var1, param = param}
                 ).ToList(); //69:5
             int __loop3_iteration = 0;
-            string delimiter = ""; //69:31
+            string delimiter = ""; //69:33
             foreach (var __tmp1 in __loop3_results)
             {
                 ++__loop3_iteration;
-                if (__loop3_iteration >= 2) //69:54
+                if (__loop3_iteration >= 2) //69:56
                 {
-                    delimiter = ", "; //69:54
+                    delimiter = ", "; //69:56
                 }
                 var __loop3_var1 = __tmp1.__loop3_var1;
-                var exc = __tmp1.exc;
-                result = result + delimiter + exc.GetJavaName(); //70:9
+                var param = __tmp1.param;
+                result = result + delimiter + param.Name.ToString().ToCamelCase(); //70:9
             }
             return result; //72:5
         }
 
-        public string GetPropertyList(Struct sType) //75:1
+        public string GetExceptionList(Operation op) //75:1
         {
             string result = ""; //76:5
             var __loop4_results = 
-                (from __loop4_var1 in __Enumerate((sType).GetEnumerator()) //77:11
-                from p in __Enumerate((__loop4_var1.Properties).GetEnumerator()) //77:18
-                select new { __loop4_var1 = __loop4_var1, p = p}
+                (from __loop4_var1 in __Enumerate((op).GetEnumerator()) //77:11
+                from exc in __Enumerate((__loop4_var1.Exceptions).GetEnumerator()) //77:15
+                select new { __loop4_var1 = __loop4_var1, exc = exc}
                 ).ToList(); //77:5
             int __loop4_iteration = 0;
-            string delimiter = ""; //77:32
+            string delimiter = ""; //77:31
             foreach (var __tmp1 in __loop4_results)
             {
                 ++__loop4_iteration;
-                if (__loop4_iteration >= 2) //77:55
+                if (__loop4_iteration >= 2) //77:54
                 {
-                    delimiter = ", "; //77:55
+                    delimiter = ", "; //77:54
                 }
                 var __loop4_var1 = __tmp1.__loop4_var1;
-                var p = __tmp1.p;
-                result = result + delimiter + p.Type.GetJavaName() + " " + p.Name.ToString().ToCamelCase(); //78:9
+                var exc = __tmp1.exc;
+                result = result + delimiter + exc.GetJavaName(); //78:9
             }
             return result; //80:5
         }
 
-        public string GetInterfaceList(Component component) //83:1
+        public string GetPropertyList(Struct sType) //83:1
         {
             string result = ""; //84:5
-            HashSet<Service> services = new HashSet<Service>(component.Services); //85:2
             var __loop5_results = 
-                (from __loop5_var1 in __Enumerate((services).GetEnumerator()) //86:7
-                from i in __Enumerate((__loop5_var1.Interface).GetEnumerator()) //86:17
-                select new { __loop5_var1 = __loop5_var1, i = i}
-                ).ToList(); //86:2
+                (from __loop5_var1 in __Enumerate((sType).GetEnumerator()) //85:11
+                from p in __Enumerate((__loop5_var1.Properties).GetEnumerator()) //85:18
+                select new { __loop5_var1 = __loop5_var1, p = p}
+                ).ToList(); //85:5
             int __loop5_iteration = 0;
-            string delimiter = ""; //86:30
+            string delimiter = ""; //85:32
             foreach (var __tmp1 in __loop5_results)
             {
                 ++__loop5_iteration;
-                if (__loop5_iteration >= 2) //86:53
+                if (__loop5_iteration >= 2) //85:55
                 {
-                    delimiter = ", "; //86:53
+                    delimiter = ", "; //85:55
                 }
                 var __loop5_var1 = __tmp1.__loop5_var1;
-                var i = __tmp1.i;
-                result = result + delimiter + i.Name; //87:9
+                var p = __tmp1.p;
+                result = result + delimiter + p.Type.GetJavaName() + " " + p.Name.ToString().ToCamelCase(); //86:9
             }
-            return result; //89:5
+            return result; //88:5
         }
 
-        public int GetNumberOfFieldWithIdSuffix(Struct sType) //92:1
+        public string GetInterfaceList(Component component) //91:1
         {
-            int result = 0; //93:2
+            string result = ""; //92:5
+            HashSet<Service> services = new HashSet<Service>(component.Services); //93:2
             var __loop6_results = 
-                (from __loop6_var1 in __Enumerate((sType).GetEnumerator()) //94:8
-                from p in __Enumerate((__loop6_var1.Properties).GetEnumerator()) //94:15
-                select new { __loop6_var1 = __loop6_var1, p = p}
+                (from __loop6_var1 in __Enumerate((services).GetEnumerator()) //94:7
+                from i in __Enumerate((__loop6_var1.Interface).GetEnumerator()) //94:17
+                select new { __loop6_var1 = __loop6_var1, i = i}
                 ).ToList(); //94:2
             int __loop6_iteration = 0;
+            string delimiter = ""; //94:30
             foreach (var __tmp1 in __loop6_results)
             {
                 ++__loop6_iteration;
-                var __loop6_var1 = __tmp1.__loop6_var1;
-                var p = __tmp1.p;
-                if (p.Name.ToString().EndsWith("Id")) //95:3
+                if (__loop6_iteration >= 2) //94:53
                 {
-                    result++; //96:4
+                    delimiter = ", "; //94:53
                 }
+                var __loop6_var1 = __tmp1.__loop6_var1;
+                var i = __tmp1.i;
+                result = result + delimiter + i.Name; //95:9
             }
-            return result; //99:5
+            return result; //97:5
         }
 
-        public string GetPackage(Declaration d) //102:1
+        public int GetNumberOfFieldWithIdSuffix(Struct sType) //100:1
         {
-            return d.Namespace.FullName.ToLower(); //103:2
+            int result = 0; //101:2
+            var __loop7_results = 
+                (from __loop7_var1 in __Enumerate((sType).GetEnumerator()) //102:8
+                from p in __Enumerate((__loop7_var1.Properties).GetEnumerator()) //102:15
+                select new { __loop7_var1 = __loop7_var1, p = p}
+                ).ToList(); //102:2
+            int __loop7_iteration = 0;
+            foreach (var __tmp1 in __loop7_results)
+            {
+                ++__loop7_iteration;
+                var __loop7_var1 = __tmp1.__loop7_var1;
+                var p = __tmp1.p;
+                if (p.Name.ToString().EndsWith("Id")) //103:3
+                {
+                    result++; //104:4
+                }
+            }
+            return result; //107:5
+        }
+
+        public string GetPackage(Declaration d) //110:1
+        {
+            return d.Namespace.FullName.ToLower(); //111:2
         }
 
         private class StringBuilder

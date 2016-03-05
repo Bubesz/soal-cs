@@ -1,0 +1,212 @@
+﻿namespace MetaDslx.Soal;
+generator SpringInterfaceGenerator for object;
+
+using generator SpringGeneratorUtil;
+
+
+template GenerateInterface(Interface iface)
+package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
+^
+[SpringGeneratorUtil.GenerateImports(iface, false)]
+^
+public interface [iface.Name] {
+[loop (iface->op:Operations)]
+	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
+	[if (op.Exceptions.Any())]
+ throws [SpringGeneratorUtil.GetExceptionList(op)]\
+	[end if]
+;
+
+[end loop]
+}
+end template
+
+
+
+template GenerateRestInterface(Interface iface)
+package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
+^
+[SpringGeneratorUtil.GenerateImports(iface, false)]
+^
+public interface [iface.Name]Rest extends [iface.Name] {
+[loop (iface->op:Operations)]
+	@Rest //FIXME
+	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
+	[if (op.Exceptions.Any())]
+ throws [SpringGeneratorUtil.GetExceptionList(op)]\
+	[end if]
+;
+
+[end loop]
+}
+end template
+
+
+
+template GenerateWebServiceInterface(Interface iface)
+package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
+^
+[SpringGeneratorUtil.GenerateImports(iface, false)]
+^
+public interface [iface.Name]WebService extends [iface.Name] {
+[loop (iface->op:Operations)]
+	@WebService //FIXME
+	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
+	[if (op.Exceptions.Any())]
+ throws [SpringGeneratorUtil.GetExceptionList(op)]\
+	[end if]
+;
+
+[end loop]
+}
+end template
+
+
+
+template GenerateWebSocketInterface(Interface iface)
+package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
+^
+[SpringGeneratorUtil.GenerateImports(iface, false)]
+^
+public interface [iface.Name]WebSocket extends [iface.Name] {
+[loop (iface->op:Operations)]
+	@WebSocket //FIXME
+	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
+	[if (op.Exceptions.Any())]
+ throws [SpringGeneratorUtil.GetExceptionList(op)]\
+	[end if]
+;
+
+[end loop]
+}
+end template
+
+
+
+template GenerateInterfaceImplementation(Interface iface)
+package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
+^
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+^
+[SpringGeneratorUtil.GenerateImports(iface)]
+^
+@Service
+public class [iface.Name]Impl implements [iface.Name] {
+[loop (iface->repo:GetRepositories())]
+^
+	@Autowired
+	private [repo];
+[end loop]
+[loop(iface->op:Operations)]
+^
+	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
+	[if (op.Exceptions.Any())]
+ throws [SpringGeneratorUtil.GetExceptionList(op)] \
+	[end if]
+{
+		// TODO implement method
+		throw new UnsupportedOperationException("Not yet implemented.");
+	}
+[end loop]
+}
+end template
+
+
+
+template GenerateRestInterfaceImplementation(Interface iface)
+package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
+^
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+^
+[SpringGeneratorUtil.GenerateImports(iface, false)]
+^
+@Service
+public class [iface.Name]RestImpl implements [iface.Name]Rest {
+^
+	@Autowired
+	private [iface.Name]Impl [iface.Name.ToCamelCase()]Impl;
+
+[loop(iface->op:Operations)]
+^
+	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
+	[if (op.Exceptions.Any())]
+ throws [SpringGeneratorUtil.GetExceptionList(op)] \
+	[end if]
+{
+			[if (op.Result.Type.GetJavaName() != "void")]
+		return [iface.Name.ToCamelCase()]Impl.[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
+			[else]
+		[iface.Name.ToCamelCase()]Impl.[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
+			[end if]
+	}
+[end loop]
+}
+end template
+
+
+
+template GenerateWebServiceInterfaceImplementation(Interface iface)
+package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
+^
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+^
+[SpringGeneratorUtil.GenerateImports(iface, false)]
+^
+@Service
+public class [iface.Name]WebServiceImpl implements [iface.Name]WebService {
+^
+	@Autowired
+	private [iface.Name]Impl [iface.Name.ToCamelCase()]Impl;
+
+[loop(iface->op:Operations)]
+^
+	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
+	[if (op.Exceptions.Any())]
+ throws [SpringGeneratorUtil.GetExceptionList(op)] \
+	[end if]
+{
+			[if (op.Result.Type.GetJavaName() != "void")]
+		return [iface.Name.ToCamelCase()]Impl.[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
+			[else]
+		[iface.Name.ToCamelCase()]Impl.[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
+			[end if]
+	}
+[end loop]
+}
+end template
+
+
+
+template GenerateWebSocketInterfaceImplementation(Interface iface)
+package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
+^
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+^
+[SpringGeneratorUtil.GenerateImports(iface, false)]
+^
+@Service
+public class [iface.Name]WebSocketImpl implements [iface.Name]WebSocket {
+^
+	@Autowired
+	private [iface.Name]Impl [iface.Name.ToCamelCase()]Impl;
+
+[loop(iface->op:Operations)]
+^
+	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
+	[if (op.Exceptions.Any())]
+ throws [SpringGeneratorUtil.GetExceptionList(op)] \
+	[end if]
+{
+			[if (op.Result.Type.GetJavaName() != "void")]
+		return [iface.Name.ToCamelCase()]Impl.[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
+			[else]
+		[iface.Name.ToCamelCase()]Impl.[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
+			[end if]
+	}
+[end loop]
+}
+end template

@@ -3,89 +3,29 @@ generator SpringClassGenerator for object;
 
 using generator SpringGeneratorUtil;
 
-template GenerateInterface(Interface iface)
-package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
-^
-[SpringGeneratorUtil.GenerateImports(iface, false)]
-^
-public interface [iface.Name] {
-[loop (iface->op:Operations)]
-	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
-	[if (op.Exceptions.Any())]
- throws [SpringGeneratorUtil.GetExceptionList(op)]\
-	[end if]
-;
-	
-[end loop]
-}
-end template
 
-template GenerateInterfaceImplementation(Interface iface)
-package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
-^
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-^
-[SpringGeneratorUtil.GenerateImports(iface)]
-^
-@Service
-public class [iface.Name]Impl implements [iface.Name] {
-[loop (iface->repo:GetRepositories())]
-^
-	@Autowired
-	[repo];
-[end loop]
-[loop(iface->op:Operations)]
-^
-	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)]) {
-		// TODO implement method
-		throw new UnsupportedOperationException("Not yet implemented.");
-	}
-[end loop]
-}
-end template
 
-template GenerateComponent(Component component)
-package [SpringGeneratorUtil.GetPackage(component)].[SpringGeneratorUtil.Properties.serviceFacadePackage];
+template GenerateStruct(Struct sType)
+package [SpringGeneratorUtil.GetPackage(sType)].[SpringGeneratorUtil.Properties.entityPackage];
 ^
-//import [SpringGeneratorUtil.GetPackage(component)].util.ListUtil; TODO
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+[SpringGeneratorUtil.GenerateImports(sType)]
 ^
-[SpringGeneratorUtil.GenerateImports(component)]
-^
-@Service
-[string interfaces = SpringGeneratorUtil.GetInterfaceList(component)]
-[if (interfaces.Any())]
-public class [component.Name] implements [interfaces] {
-[else]
-public class [component.Name] {
-[end if]
-^
-[loop (component->repo:GetRepositories())]
-	@Autowired
-	[repo];
-^
-[end loop]
+public class [sType.Name] {
 
-[loop (component->reference:References)]
-	@Autowired
-	private [reference.Interface.Name] [reference.Name];
-[end loop]
-^
-[loop(component->s:Services)]
-[Interface i = s.Interface]
-	//operations of [i.Name]
-		[loop(i->op:Operations)]
-	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)]) {
-		// TODO implement method
-		throw new UnsupportedOperationException("Not yet implemented.");
-	}
+[loop (sType->prop:Properties)]
 	^
-		[end loop]
+	private [prop.Type.GetJavaName()] [prop.Name.ToString().ToCamelCase()];
 [end loop]
+
+[loop (sType->prop:Properties)]
+	[SpringGeneratorUtil.GenerateGetter(prop)]
+	[SpringGeneratorUtil.GenerateSetter(prop)]
+[end loop]
+
 }
 end template
+
+
 
 template GenerateEnum(Enum myEnum)
 package [SpringGeneratorUtil.GetPackage(myEnum)].[SpringGeneratorUtil.Properties.enumPackage];
@@ -106,6 +46,8 @@ public enum [myEnum.Name] {
 ^
 }
 end template
+
+
 
 template GenerateException(Struct ex)
 package [SpringGeneratorUtil.GetPackage(ex)].[SpringGeneratorUtil.Properties.exceptionPackage];
@@ -132,6 +74,23 @@ public class [ex.Name] extends Exception {
 
 }
 end template
+
+
+
+template GenerateRepository(Struct entity)
+package [SpringGeneratorUtil.GetPackage(entity)].[SpringGeneratorUtil.Properties.repositoryPackage];
+^
+import [SpringGeneratorUtil.GetPackage(entity)].[SpringGeneratorUtil.Properties.entityPackage].[entity.Name];
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+^
+@Repository
+public interface [entity.Name]Repository extends CrudRepository<[entity.Name],Long> {
+^
+}
+end template
+
+
 
 template GenerateEntity(Struct sType)
 package [SpringGeneratorUtil.GetPackage(sType)].[SpringGeneratorUtil.Properties.entityPackage];
@@ -192,36 +151,46 @@ public class [sType.Name] {
 }
 end template
 
-template GenerateRepository(Struct entity)
-package [SpringGeneratorUtil.GetPackage(entity)].[SpringGeneratorUtil.Properties.repositoryPackage];
-^
-import [SpringGeneratorUtil.GetPackage(entity)].[SpringGeneratorUtil.Properties.entityPackage].[entity.Name];
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
-^
-@Repository
-public interface [entity.Name]Repository extends CrudRepository<[entity.Name],Long> {
-^
-}
-end template
 
-template GenerateStruct(Struct sType)
-package [SpringGeneratorUtil.GetPackage(sType)].[SpringGeneratorUtil.Properties.entityPackage];
-^
-[SpringGeneratorUtil.GenerateImports(sType)]
-^
-public class [sType.Name] {
 
-[loop (sType->prop:Properties)]
+template GenerateComponent(Component component)
+package [SpringGeneratorUtil.GetPackage(component)].[SpringGeneratorUtil.Properties.serviceFacadePackage];
+^
+//import [SpringGeneratorUtil.GetPackage(component)].util.ListUtil; TODO
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+^
+[SpringGeneratorUtil.GenerateImports(component)]
+^
+@Service
+[string interfaces = SpringGeneratorUtil.GetInterfaceList(component)]
+[if (interfaces.Any())]
+public class [component.Name] implements [interfaces] {
+[else]
+public class [component.Name] {
+[end if]
+^
+[loop (component->repo:GetRepositories())]
+	@Autowired
+	[repo];
+^
+[end loop]
+
+[loop (component->reference:References)]
+	@Autowired
+	private [reference.Interface.Name] [reference.Name];
+[end loop]
+^
+[loop(component->s:Services)]
+[Interface i = s.Interface]
+	//operations of [i.Name]
+		[loop(i->op:Operations)]
+	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)]) {
+		// TODO implement method
+		throw new UnsupportedOperationException("Not yet implemented.");
+	}
 	^
-	private [prop.Type.GetJavaName()] [prop.Name.ToString().ToCamelCase()];
+		[end loop]
 [end loop]
-
-[loop (sType->prop:Properties)]
-	[SpringGeneratorUtil.GenerateGetter(prop)]
-	[SpringGeneratorUtil.GenerateSetter(prop)]
-[end loop]
-
 }
 end template
-

@@ -211,6 +211,7 @@ namespace MetaDslx.Soal
                 //string componentDir = Path.Combine(mvnDir, innerDir);
 
                 SpringClassGenerator springClassGen = new SpringClassGenerator(ns);
+                SpringInterfaceGenerator springInterfaceGen = new SpringInterfaceGenerator(ns);
                 SpringConfigurationGenerator springConfigGen = new SpringConfigurationGenerator(ns);
                 SpringGeneratorUtil generatorUtil = new SpringGeneratorUtil(ns);
                 //generatorUtil.Properties.entityPackage = "asdasd";
@@ -251,7 +252,6 @@ namespace MetaDslx.Soal
                         {
                             string exceptionDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.exceptionPackage);
                             string javaFileName = Path.Combine(exceptionDirectory, exception.Name + ".java");
-
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
                                 writer.WriteLine(springClassGen.GenerateException(exception));
@@ -260,12 +260,12 @@ namespace MetaDslx.Soal
 
                         foreach (Interface iface in ns.Declarations.OfType<Interface>())
                         {
+                            // TODO move to API
                             string interfaceDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.interfacePackage);
                             string javaFileName = Path.Combine(interfaceDirectory, iface.Name + ".java");
-
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                writer.WriteLine(springClassGen.GenerateInterface(iface));
+                                writer.WriteLine(springInterfaceGen.GenerateInterface(iface));
                             }
                         }
 
@@ -289,10 +289,11 @@ namespace MetaDslx.Soal
                     foreach (Component component in ns.Declarations.OfType<Component>())
                     {
                         modules.Add(component.Name);
+                        string compDirectory = createDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.serviceFacadePackage);
+
 
                         if (component.Name != dataModule)
                         {
-                            string compDirectory = createDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.serviceFacadePackage);
                             string javaFileName = Path.Combine(compDirectory, component.Name + ".java");
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
@@ -303,12 +304,68 @@ namespace MetaDslx.Soal
                         foreach (Service service in component.Services)
                         {
                             Interface iface = service.Interface;
-                            string interfaceDirectory = createDirectory(ns.Name, component.Name, innerDir, component.Name.ToLower());
-                            string javaFileName = Path.Combine(interfaceDirectory, iface.Name + "Impl.java");
-
+                            string functionDirectory = createDirectory(ns.Name, component.Name, innerDir, component.Name.ToLower());
+                            string javaFileName = Path.Combine(functionDirectory, iface.Name + "Impl.java");
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
-                                writer.WriteLine(springClassGen.GenerateInterfaceImplementation(iface));
+                                writer.WriteLine(springInterfaceGen.GenerateInterfaceImplementation(iface));
+                            }
+
+                            List<Binding> bindings = GetBindings(ns, service, iface);
+
+                            foreach (Binding binding in bindings)
+                            {
+                                if (binding.Transport is RestTransportBindingElement)
+                                {
+                                    // TODO move to API
+                                    string interfaceFileName = Path.Combine(compDirectory, iface.Name + "Rest.java");
+                                    using (StreamWriter writer = new StreamWriter(interfaceFileName))
+                                    {
+                                        writer.WriteLine(springInterfaceGen.GenerateRestInterface(iface));
+                                    }
+
+                                    string implFileName = Path.Combine(functionDirectory, iface.Name + "RestImpl.java");
+                                    using (StreamWriter writer = new StreamWriter(implFileName))
+                                    {
+                                        writer.WriteLine(springInterfaceGen.GenerateRestInterfaceImplementation(iface));
+                                    }
+                                }
+                                else if (binding.Transport is WebSocketTransportBindingElement)
+                                {
+                                    // TODO move to API
+                                    string interfaceFileName = Path.Combine(compDirectory, iface.Name + "WebSocket.java");
+                                    using (StreamWriter writer = new StreamWriter(interfaceFileName))
+                                    {
+                                        writer.WriteLine(springInterfaceGen.GenerateWebSocketInterface(iface));
+                                    }
+
+                                    string implFileName = Path.Combine(functionDirectory, iface.Name + "WebSocketImpl.java");
+                                    using (StreamWriter writer = new StreamWriter(implFileName))
+                                    {
+                                        writer.WriteLine(springInterfaceGen.GenerateWebSocketInterfaceImplementation(iface));
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (EncodingBindingElement encoding in binding.Encodings)
+                                    {
+                                        if (encoding is SoapEncodingBindingElement)
+                                        {
+                                            // TODO move to API
+                                            string interfaceFileName = Path.Combine(compDirectory, iface.Name + "WebService.java");
+                                            using (StreamWriter writer = new StreamWriter(interfaceFileName))
+                                            {
+                                                writer.WriteLine(springInterfaceGen.GenerateWebServiceInterface(iface));
+                                            }
+
+                                            string implFileName = Path.Combine(functionDirectory, iface.Name + "WebServiceImpl.java");
+                                            using (StreamWriter writer = new StreamWriter(implFileName))
+                                            {
+                                                writer.WriteLine(springInterfaceGen.GenerateWebServiceInterfaceImplementation(iface));
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -410,6 +467,55 @@ namespace MetaDslx.Soal
                     }
                 }
             }
+        }
+
+        private static List<Binding> GetBindings(Namespace ns, Service service, Interface iface)
+        {
+            HashSet<Binding> bindings = new HashSet<Binding>();
+
+            if (service.Binding != null)
+            {
+                bindings.Add(service.Binding);
+            }
+
+            foreach (Composite composite in ns.Declarations.OfType<Composite>())
+            {
+                foreach (Wire wire in composite.Wires)
+                {
+                    Port port = null;
+                    if (wire.Source.Equals(service))
+                    {
+                        port = wire.Target;
+                    }
+                    if (wire.Target.Equals(service))
+                    {
+                        port = wire.Source;
+                    }
+                    if (port != null)
+                    {
+                        if (port.Binding != null)
+                        {
+                            bindings.Add(port.Binding);
+                        }
+                    }
+                }
+            }
+
+            foreach (Component component in ns.Declarations.OfType<Component>())
+            {
+                foreach (Reference reference in component.References)
+                {
+                    if (reference.Interface.Equals(iface))              
+                    {
+                        if (reference.Binding != null)
+                        {                          
+                            bindings.Add(reference.Binding);
+                        }
+                    }
+                }
+            }
+
+            return new List<Binding>(bindings);
         }
 
         private string createDirectory(string namespaceName, string projectSuffix, string innerDir, string subDir)

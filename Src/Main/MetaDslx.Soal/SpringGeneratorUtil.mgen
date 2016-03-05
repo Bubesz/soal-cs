@@ -64,6 +64,14 @@ function string GetParameterList(Operation op)
     return result;
 end function
 
+function string GetParameterNameList(Operation op)
+    string result = "";
+    loop (op->param:Parameters; string delimiter = ""; delimiter = ", ")
+        result = result + delimiter + param.Name.ToString().ToCamelCase();
+    end loop
+    return result;
+end function
+
 function string GetExceptionList(Operation op)
     string result = "";
     loop (op->exc:Exceptions; string delimiter = ""; delimiter = ", ")
