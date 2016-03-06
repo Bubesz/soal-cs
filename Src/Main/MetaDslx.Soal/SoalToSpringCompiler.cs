@@ -243,7 +243,7 @@ namespace MetaDslx.Soal
                     }
 
                     // Commons module
-                    if (exceptions.Any() || ns.Declarations.OfType<Interface>().Any())
+                    if (exceptions.Any())
                     {
                         string module = "Commons";
                         modules.Add(module);
@@ -255,17 +255,6 @@ namespace MetaDslx.Soal
                             using (StreamWriter writer = new StreamWriter(javaFileName))
                             {
                                 writer.WriteLine(springClassGen.GenerateException(exception));
-                            }
-                        }
-
-                        foreach (Interface iface in ns.Declarations.OfType<Interface>())
-                        {
-                            // TODO move to API
-                            string interfaceDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.interfacePackage);
-                            string javaFileName = Path.Combine(interfaceDirectory, iface.Name + ".java");
-                            using (StreamWriter writer = new StreamWriter(javaFileName))
-                            {
-                                writer.WriteLine(springInterfaceGen.GenerateInterface(iface));
                             }
                         }
 
@@ -289,94 +278,30 @@ namespace MetaDslx.Soal
                     foreach (Component component in ns.Declarations.OfType<Component>())
                     {
                         modules.Add(component.Name);
-                        string compDirectory = createDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.serviceFacadePackage);
+                        string apiDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.interfacePackage);
+                        List<string> dependencies = new List<string>();
 
-
-                        if (component.Name != dataModule)
+                        if (component.Services.Any())
                         {
-                            string javaFileName = Path.Combine(compDirectory, component.Name + ".java");
-                            using (StreamWriter writer = new StreamWriter(javaFileName))
-                            {
-                                writer.WriteLine(springClassGen.GenerateComponent(component));
-                            }
-                        }
-
-                        foreach (Service service in component.Services)
-                        {
-                            Interface iface = service.Interface;
-                            string functionDirectory = createDirectory(ns.Name, component.Name, innerDir, component.Name.ToLower());
-                            string javaFileName = Path.Combine(functionDirectory, iface.Name + "Impl.java");
-                            using (StreamWriter writer = new StreamWriter(javaFileName))
-                            {
-                                writer.WriteLine(springInterfaceGen.GenerateInterfaceImplementation(iface));
-                            }
-
-                            List<Binding> bindings = GetBindings(ns, service, iface);
-
-                            foreach (Binding binding in bindings)
-                            {
-                                if (binding.Transport is RestTransportBindingElement)
-                                {
-                                    // TODO move to API
-                                    string interfaceFileName = Path.Combine(compDirectory, iface.Name + "Rest.java");
-                                    using (StreamWriter writer = new StreamWriter(interfaceFileName))
-                                    {
-                                        writer.WriteLine(springInterfaceGen.GenerateRestInterface(iface));
-                                    }
-
-                                    string implFileName = Path.Combine(functionDirectory, iface.Name + "RestImpl.java");
-                                    using (StreamWriter writer = new StreamWriter(implFileName))
-                                    {
-                                        writer.WriteLine(springInterfaceGen.GenerateRestInterfaceImplementation(iface));
-                                    }
-                                }
-                                else if (binding.Transport is WebSocketTransportBindingElement)
-                                {
-                                    // TODO move to API
-                                    string interfaceFileName = Path.Combine(compDirectory, iface.Name + "WebSocket.java");
-                                    using (StreamWriter writer = new StreamWriter(interfaceFileName))
-                                    {
-                                        writer.WriteLine(springInterfaceGen.GenerateWebSocketInterface(iface));
-                                    }
-
-                                    string implFileName = Path.Combine(functionDirectory, iface.Name + "WebSocketImpl.java");
-                                    using (StreamWriter writer = new StreamWriter(implFileName))
-                                    {
-                                        writer.WriteLine(springInterfaceGen.GenerateWebSocketInterfaceImplementation(iface));
-                                    }
-                                }
-                                else
-                                {
-                                    foreach (EncodingBindingElement encoding in binding.Encodings)
-                                    {
-                                        if (encoding is SoapEncodingBindingElement)
-                                        {
-                                            // TODO move to API
-                                            string interfaceFileName = Path.Combine(compDirectory, iface.Name + "WebService.java");
-                                            using (StreamWriter writer = new StreamWriter(interfaceFileName))
-                                            {
-                                                writer.WriteLine(springInterfaceGen.GenerateWebServiceInterface(iface));
-                                            }
-
-                                            string implFileName = Path.Combine(functionDirectory, iface.Name + "WebServiceImpl.java");
-                                            using (StreamWriter writer = new StreamWriter(implFileName))
-                                            {
-                                                writer.WriteLine(springInterfaceGen.GenerateWebServiceInterfaceImplementation(iface));
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            // TODO collect module dependencies
+                            GenerateServiceImplementations(ns, innerDir, springInterfaceGen, springConfigGen, modules, dataModule, component, apiDirectory, dependencies);
                         }
 
                         // generate pom.xml and spring-config.xml
-                        List<string> dependencies = new List<string>();
                         if (component.Name != dataModule)
                         {
-                            dependencies.Add("Commons");
+                            dependencies.Add("Commons"); // TODO eliminate
+                            dependencies.Add(component.Name+"-API");
                             dependencies.Add(dataModule);
+                            dependencies.Add(dataModule+"-API");
                         }
-                        string fileName = Path.Combine(ns.Name+"-"+component.Name, "pom.xml");
+                        else
+                        {
+                            GenerateDataModule(ns, innerDir, springClassGen, springConfigGen, generatorUtil, entities, modules, dataModule);
+                        }
+
+                        createDirectory(ns.Name, component.Name, innerDir, "");
+                        string fileName = Path.Combine(ns.Name + "-" + component.Name, "pom.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
                             writer.WriteLine(springConfigGen.generateComponentPom(ns, component.Name, dependencies));
@@ -389,72 +314,6 @@ namespace MetaDslx.Soal
                         }
                     }
 
-                    // data module
-                    if (entities.Any() || ns.Declarations.OfType<Enum>().Any())
-                    {
-                        modules.Add(dataModule);
-
-                        //pom.xml
-                        string fileName = Path.Combine(ns.Name + "-" + dataModule, "pom.xml");
-                        using (StreamWriter writer = new StreamWriter(fileName))
-                        {
-                            writer.WriteLine(springConfigGen.generateDataPom(ns));
-                        }
-
-                        fileName = Path.Combine(ns.Name + "-" + dataModule, this.mvnDir, "spring-config.xml");
-                        using (StreamWriter writer = new StreamWriter(fileName))
-                        {
-                            writer.WriteLine(springConfigGen.generateDataSpringConfig(ns));
-                        }
-
-                        //enums
-                        foreach (Enum myEnum in ns.Declarations.OfType<Enum>())
-                        {
-                            string enumDirectory = createDirectory(ns.Name, dataModule, innerDir, generatorUtil.Properties.enumPackage);
-                            string javaFileName = Path.Combine(enumDirectory, myEnum.Name + ".java");
-                            if (!modules.Contains(dataModule))
-                                modules.Add(dataModule);
-
-                            using (StreamWriter writer = new StreamWriter(javaFileName))
-                            {
-                                writer.WriteLine(springClassGen.GenerateEnum(myEnum));
-                            }
-                        }
-
-                        // generate persistence.xml
-                        if (entities.Any())
-                        {
-                            string metaFolder = Path.Combine(ns.Name + "-Data", "src", "main", "resources", "META - INF");
-                            Directory.CreateDirectory(metaFolder);
-                            fileName = Path.Combine(metaFolder, "persistence.xml");
-                            using (StreamWriter writer = new StreamWriter(fileName))
-                            {
-                                writer.WriteLine(springConfigGen.GeneratePersistence(ns, entities));
-                            }
-                        }
-
-                        //entities
-                        foreach (Struct entity in entities)
-                        {
-                            // entity
-                            string entityDirectory = createDirectory(ns.Name, dataModule, innerDir, generatorUtil.Properties.entityPackage);
-                            string javaFileName = Path.Combine(entityDirectory, entity.Name + ".java");
-
-                            using (StreamWriter writer = new StreamWriter(javaFileName))
-                            {
-                                writer.WriteLine(springClassGen.GenerateEntity(entity));
-                            }
-
-                            // repository
-                            string repoDirectory = createDirectory(ns.Name, dataModule, innerDir, generatorUtil.Properties.repositoryPackage);
-                            javaFileName = Path.Combine(repoDirectory, entity.Name + "Repository.java");
-                            using (StreamWriter writer = new StreamWriter(javaFileName))
-                            {
-                                writer.WriteLine(springClassGen.GenerateRepository(entity));
-                            }
-                        }
-                    }
-
                     // generate master pom.xml
                     if (modules.Any())
                     {
@@ -463,6 +322,182 @@ namespace MetaDslx.Soal
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
                             writer.WriteLine(springConfigGen.generateMasterPom(ns, modules));
+                        }
+                    }
+                }
+            }
+        }
+
+        private void GenerateDataModule(Namespace ns, string innerDir, SpringClassGenerator springClassGen, SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil, List<Struct> entities, List<string> modules, string dataModule)
+        {
+            //pom.xml
+            string filename = Path.Combine(ns.Name + "-" + dataModule, "pom.xml");
+            using (StreamWriter writer = new StreamWriter(filename))
+            {
+                writer.WriteLine(springConfigGen.generateDataPom(ns, dataModule, ""));
+            }
+
+            filename = Path.Combine(ns.Name + "-" + dataModule, this.mvnDir, "spring-config.xml");
+            using (StreamWriter writer = new StreamWriter(filename))
+            {
+                writer.WriteLine(springConfigGen.generateDataSpringConfig(ns));
+            }
+
+            //enums
+            foreach (Enum myEnum in ns.Declarations.OfType<Enum>())
+            {
+                string enumDirectory = createDirectory(ns.Name, dataModule, innerDir, generatorUtil.Properties.enumPackage);
+                string javaFileName = Path.Combine(enumDirectory, myEnum.Name + ".java");
+                if (!modules.Contains(dataModule))
+                    modules.Add(dataModule);
+
+                using (StreamWriter writer = new StreamWriter(javaFileName))
+                {
+                    writer.WriteLine(springClassGen.GenerateEnum(myEnum));
+                }
+            }
+
+            // generate persistence.xml
+            if (entities.Any())
+            {
+                string metaFolder = Path.Combine(ns.Name + "-" + dataModule, "src", "main", "resources", "META - INF");
+                Directory.CreateDirectory(metaFolder);
+                filename = Path.Combine(metaFolder, "persistence.xml");
+                using (StreamWriter writer = new StreamWriter(filename))
+                {
+                    writer.WriteLine(springConfigGen.GeneratePersistence(ns, entities));
+                }
+            }
+
+            //entities
+            foreach (Struct entity in entities)
+            {
+                // entity
+                string entityDirectory = createDirectory(ns.Name, dataModule, innerDir, generatorUtil.Properties.entityPackage);
+                string javaFileName = Path.Combine(entityDirectory, entity.Name + ".java");
+
+                using (StreamWriter writer = new StreamWriter(javaFileName))
+                {
+                    writer.WriteLine(springClassGen.GenerateEntity(entity));
+                }
+
+                // repository TODO bindings
+                string repoDirectory = createDirectory(ns.Name, dataModule+"-API", innerDir, generatorUtil.Properties.repositoryPackage);
+                javaFileName = Path.Combine(repoDirectory, entity.Name + "Repository.java");
+                using (StreamWriter writer = new StreamWriter(javaFileName))
+                {
+                    writer.WriteLine(springClassGen.GenerateRepository(entity));
+                }
+            }
+        }
+
+        private void GenerateServiceImplementations(Namespace ns, string innerDir, SpringInterfaceGenerator springInterfaceGen, SpringConfigurationGenerator springConfigGen, List<string> modules, string dataModule, Component component, string apiDirectory, List<string> dependencies)
+        {
+            modules.Add(component.Name + "-API");
+            string functionDirectory = createDirectory(ns.Name, component.Name, innerDir, component.Name.ToLower());
+
+            // pom.xml
+            dependencies.Add(dataModule);
+
+            string fileName = Path.Combine(ns.Name + "-" + component.Name + "-API", "pom.xml");
+            using (StreamWriter writer = new StreamWriter(fileName))
+            {
+                if (component.Name == dataModule)
+                {
+                    writer.WriteLine(springConfigGen.generateDataPom(ns, component.Name + "-API", dataModule));
+                }
+                else
+                {
+                    writer.WriteLine(springConfigGen.generateComponentPom(ns, component.Name + "-API", dependencies));
+                }
+            }
+
+            dependencies.Remove(dataModule);
+
+            // TODO collect repo interfaces!
+            foreach (Service service in component.Services)
+            {
+                Interface iface = service.Interface;
+
+                if (iface is Database) { continue; }
+
+                // interface goes to API
+                string interfaceFileName = Path.Combine(apiDirectory, iface.Name + ".java");
+                using (StreamWriter writer = new StreamWriter(interfaceFileName))
+                {
+                    writer.WriteLine(springInterfaceGen.GenerateInterface(iface));
+                }
+
+                // implementaton goes to component
+                string javaFileName = Path.Combine(functionDirectory, iface.Name + "Impl.java");
+                using (StreamWriter writer = new StreamWriter(javaFileName))
+                {
+                    writer.WriteLine(springInterfaceGen.GenerateInterfaceImplementation(iface, component.Name.ToLower()));
+                }
+
+                CheckAndCreateBindings(ns, springInterfaceGen, component, apiDirectory, functionDirectory, service, iface);
+            }
+        }
+
+        private static void CheckAndCreateBindings(Namespace ns, SpringInterfaceGenerator springInterfaceGen, Component component, string apiDirectory, string functionDirectory, Service service, Interface iface)
+        {
+            List<string> bindings = new List<string>();
+            foreach (Binding binding in GetBindings(ns, service, iface))
+            {
+                if (binding.Transport is RestTransportBindingElement)
+                {
+                    bindings.Add("Rest");
+                    // interface extension goes to API
+                    string interfaceExtFileName = Path.Combine(apiDirectory, iface.Name + "Rest.java");
+                    using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
+                    {
+                        writer.WriteLine(springInterfaceGen.GenerateRestInterface(iface));
+                    }
+
+                    // implementation of the above goes to component
+                    string implFileName = Path.Combine(functionDirectory, iface.Name + "RestImpl.java");
+                    using (StreamWriter writer = new StreamWriter(implFileName))
+                    {
+                        writer.WriteLine(springInterfaceGen.GenerateRestInterfaceImplementation(iface, component.Name.ToLower()));
+                    }
+                }
+                else if (binding.Transport is WebSocketTransportBindingElement)
+                {
+                    bindings.Add("WebSocket");
+                    // interface extension goes to API
+                    string interfaceExtFileName = Path.Combine(apiDirectory, iface.Name + "WebSocket.java");
+                    using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
+                    {
+                        writer.WriteLine(springInterfaceGen.GenerateWebSocketInterface(iface));
+                    }
+
+                    // implementation of the above goes to component
+                    string implFileName = Path.Combine(functionDirectory, iface.Name + "WebSocketImpl.java");
+                    using (StreamWriter writer = new StreamWriter(implFileName))
+                    {
+                        writer.WriteLine(springInterfaceGen.GenerateWebSocketInterfaceImplementation(iface, component.Name.ToLower()));
+                    }
+                }
+                else
+                {
+                    foreach (EncodingBindingElement encoding in binding.Encodings)
+                    {
+                        if (encoding is SoapEncodingBindingElement)
+                        {
+                            bindings.Add("WebService");
+                            // interface extension goes to API
+                            string interfaceExtFileName = Path.Combine(apiDirectory, iface.Name + "WebService.java");
+                            using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
+                            {
+                                writer.WriteLine(springInterfaceGen.GenerateWebServiceInterface(iface));
+                            }
+
+                            // implementation of the above goes to component
+                            string implFileName = Path.Combine(functionDirectory, iface.Name + "WebServiceImpl.java");
+                            using (StreamWriter writer = new StreamWriter(implFileName))
+                            {
+                                writer.WriteLine(springInterfaceGen.GenerateWebServiceInterfaceImplementation(iface, component.Name.ToLower()));
+                            }
                         }
                     }
                 }
