@@ -83,12 +83,13 @@ end template
 
 
 
-template GenerateInterfaceImplementation(Interface iface)
-package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
+template GenerateInterfaceImplementation(Interface iface, string functionName)
+package [SpringGeneratorUtil.GetPackage(iface)].[functionName];
 ^
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 ^
+import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage].[iface.Name];
 [SpringGeneratorUtil.GenerateImports(iface)]
 ^
 @Service
@@ -114,12 +115,13 @@ end template
 
 
 
-template GenerateRestInterfaceImplementation(Interface iface)
-package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
+template GenerateRestInterfaceImplementation(Interface iface, string functionName)
+package [SpringGeneratorUtil.GetPackage(iface)].[functionName];
 ^
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 ^
+import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage].[iface.Name]Rest;
 [SpringGeneratorUtil.GenerateImports(iface, false)]
 ^
 @Service
@@ -147,12 +149,13 @@ end template
 
 
 
-template GenerateWebServiceInterfaceImplementation(Interface iface)
-package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
+template GenerateWebServiceInterfaceImplementation(Interface iface, string functionName)
+package [SpringGeneratorUtil.GetPackage(iface)].[functionName];
 ^
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 ^
+import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage].[iface.Name]WebService;
 [SpringGeneratorUtil.GenerateImports(iface, false)]
 ^
 @Service
@@ -180,12 +183,13 @@ end template
 
 
 
-template GenerateWebSocketInterfaceImplementation(Interface iface)
-package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
+template GenerateWebSocketInterfaceImplementation(Interface iface, string functionName)
+package [SpringGeneratorUtil.GetPackage(iface)].[functionName];
 ^
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 ^
+import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage].[iface.Name]WebSocket;
 [SpringGeneratorUtil.GenerateImports(iface, false)]
 ^
 @Service
