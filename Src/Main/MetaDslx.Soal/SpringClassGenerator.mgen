@@ -178,9 +178,10 @@ public class [component.Name] {
 
 [loop (component->reference:References)]
 	@Autowired
-	private [reference.Interface.Name] [reference.Name];
+	private [reference.Interface.Name][SpringGeneratorUtil.GetBindingType(reference)] [reference.Name.ToCamelCase()];
+	^
 [end loop]
-^
+
 [loop(component->s:Services)]
 [Interface i = s.Interface]
 	//operations of [i.Name]

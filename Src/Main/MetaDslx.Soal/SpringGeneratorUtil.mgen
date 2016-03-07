@@ -110,3 +110,22 @@ end function
 function string GetPackage(Declaration d)
 	return d.Namespace.FullName.ToLower();
 end function
+
+function string GetBindingType(Reference reference)
+	Binding binding = reference.Binding;
+	if (binding == null)
+		return "";
+	end if
+	if (binding.Transport is RestTransportBindingElement)
+		return "Rest";
+	end if
+	if (binding.Transport is WebSocketTransportBindingElement)
+		return "WebSocket";
+	end if
+	loop (binding->encoding:Encodings)
+		if (encoding is SoapEncodingBindingElement)
+			return "WebService";
+		end if
+	end loop
+	return "";
+end function

@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringGeneratorUtil_120860837;
-    namespace __Hidden_SpringGeneratorUtil_120860837
+    using __Hidden_SpringGeneratorUtil_1764347085;
+    namespace __Hidden_SpringGeneratorUtil_1764347085
     {
         internal static class __Extensions
         {
@@ -540,6 +540,40 @@ namespace MetaDslx.Soal //1:1
         public string GetPackage(Declaration d) //110:1
         {
             return d.Namespace.FullName.ToLower(); //111:2
+        }
+
+        public string GetBindingType(Reference reference) //114:1
+        {
+            Binding binding = reference.Binding; //115:2
+            if (binding == null) //116:2
+            {
+                return ""; //117:3
+            }
+            if (binding.Transport is RestTransportBindingElement) //119:2
+            {
+                return "Rest"; //120:3
+            }
+            if (binding.Transport is WebSocketTransportBindingElement) //122:2
+            {
+                return "WebSocket"; //123:3
+            }
+            var __loop8_results = 
+                (from __loop8_var1 in __Enumerate((binding).GetEnumerator()) //125:8
+                from encoding in __Enumerate((__loop8_var1.Encodings).GetEnumerator()) //125:17
+                select new { __loop8_var1 = __loop8_var1, encoding = encoding}
+                ).ToList(); //125:2
+            int __loop8_iteration = 0;
+            foreach (var __tmp1 in __loop8_results)
+            {
+                ++__loop8_iteration;
+                var __loop8_var1 = __tmp1.__loop8_var1;
+                var encoding = __tmp1.encoding;
+                if (encoding is SoapEncodingBindingElement) //126:3
+                {
+                    return "WebService"; //127:4
+                }
+            }
+            return ""; //130:2
         }
 
         private class StringBuilder
