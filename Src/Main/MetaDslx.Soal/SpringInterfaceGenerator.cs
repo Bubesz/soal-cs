@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringInterfaceGenerator_1433169146;
-    namespace __Hidden_SpringInterfaceGenerator_1433169146
+    using __Hidden_SpringInterfaceGenerator_999577240;
+    namespace __Hidden_SpringInterfaceGenerator_999577240
     {
         internal static class __Extensions
         {
@@ -335,8 +335,8 @@ namespace MetaDslx.Soal //1:1
                 ++__loop2_iteration;
                 var __loop2_var1 = __tmp15.__loop2_var1;
                 var op = __tmp15.op;
-                __out.Append("	@Rest //FIXME"); //33:1
-                __out.AppendLine(false); //33:15
+                __out.Append("	//@Rest //FIXME"); //33:1
+                __out.AppendLine(false); //33:17
                 string __tmp16Prefix = "	"; //34:1
                 StringBuilder __tmp17 = new StringBuilder();
                 __tmp17.Append(op.Result.Type.GetJavaName());
@@ -524,8 +524,8 @@ namespace MetaDslx.Soal //1:1
                 ++__loop3_iteration;
                 var __loop3_var1 = __tmp15.__loop3_var1;
                 var op = __tmp15.op;
-                __out.Append("	@WebService //FIXME"); //53:1
-                __out.AppendLine(false); //53:21
+                __out.Append("	//@WebService //FIXME"); //53:1
+                __out.AppendLine(false); //53:23
                 string __tmp16Prefix = "	"; //54:1
                 StringBuilder __tmp17 = new StringBuilder();
                 __tmp17.Append(op.Result.Type.GetJavaName());
@@ -713,8 +713,8 @@ namespace MetaDslx.Soal //1:1
                 ++__loop4_iteration;
                 var __loop4_var1 = __tmp15.__loop4_var1;
                 var op = __tmp15.op;
-                __out.Append("	@WebSocket //FIXME"); //73:1
-                __out.AppendLine(false); //73:20
+                __out.Append("	//@WebSocket //FIXME"); //73:1
+                __out.AppendLine(false); //73:22
                 string __tmp16Prefix = "	"; //74:1
                 StringBuilder __tmp17 = new StringBuilder();
                 __tmp17.Append(op.Result.Type.GetJavaName());

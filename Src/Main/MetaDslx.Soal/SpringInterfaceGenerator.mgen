@@ -30,7 +30,7 @@ package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.
 ^
 public interface [iface.Name]Rest extends [iface.Name] {
 [loop (iface->op:Operations)]
-	@Rest //FIXME
+	//@Rest //FIXME
 	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
 	[if (op.Exceptions.Any())]
  throws [SpringGeneratorUtil.GetExceptionList(op)]\
@@ -50,7 +50,7 @@ package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.
 ^
 public interface [iface.Name]WebService extends [iface.Name] {
 [loop (iface->op:Operations)]
-	@WebService //FIXME
+	//@WebService //FIXME
 	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
 	[if (op.Exceptions.Any())]
  throws [SpringGeneratorUtil.GetExceptionList(op)]\
@@ -70,7 +70,7 @@ package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.
 ^
 public interface [iface.Name]WebSocket extends [iface.Name] {
 [loop (iface->op:Operations)]
-	@WebSocket //FIXME
+	//@WebSocket //FIXME
 	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
 	[if (op.Exceptions.Any())]
  throws [SpringGeneratorUtil.GetExceptionList(op)]\
