@@ -219,7 +219,6 @@ namespace MetaDslx.Soal
                 if (ns.Uri != null)
                 {
                     List<Struct> entities = new List<Struct>();
-                    List<Struct> exceptions = new List<Struct>();
                     List<string> modules = new List<string>();
                     string dataModule = "Data";
 
@@ -234,14 +233,6 @@ namespace MetaDslx.Soal
                         entities.AddRange(db.Entities);
                     }
 
-                    foreach (Struct exception in ns.Declarations.OfType<Struct>())
-                    {
-                        if (exception.IsException())
-                        {
-                            exceptions.Add(exception);
-                        }
-                    }
-
                     foreach (Component component in ns.Declarations.OfType<Component>())
                     {
                         modules.Add(component.Name);
@@ -251,6 +242,23 @@ namespace MetaDslx.Soal
                         {
                             // TODO collect module dependencies
                             GenerateServiceImplementations(ns, innerDir, springInterfaceGen, springClassGen, springConfigGen, generatorUtil, modules, dataModule, component, dependencies);
+                        }
+                        else
+                        {
+                            if (component.Implementation != null && component.Implementation.Name.Equals("JSF"))
+                            {
+                                // generate web tier
+                                Console.WriteLine("web tier: "+component.Name);
+                            }
+                            if (component is Composite)
+                            {
+                                string facadeDir = createDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.serviceFacadePackage);
+                                string facadeFile = Path.Combine(facadeDir, component.Name+"Facade.java");
+                                using (StreamWriter writer = new StreamWriter(facadeFile))
+                                {
+                                    writer.WriteLine(springClassGen.GenerateComponent(component));
+                                }
+                            }
                         }
 
                         // generate pom.xml and spring-config.xml
@@ -268,7 +276,7 @@ namespace MetaDslx.Soal
                             GenerateDataModule(ns, innerDir, springClassGen, springConfigGen, generatorUtil, entities, modules, dataModule);
                         }
 
-                        createDirectory(ns.Name, component.Name, innerDir, "");
+                        createDirectory(ns.Name, component.Name, "", "");
                         string fileName = Path.Combine(ns.Name + "-" + component.Name, "pom.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
@@ -296,7 +304,9 @@ namespace MetaDslx.Soal
             }
         }
 
-        private void GenerateDataModule(Namespace ns, string innerDir, SpringClassGenerator springClassGen, SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil, List<Struct> entities, List<string> modules, string dataModule)
+        private void GenerateDataModule(Namespace ns, string innerDir, SpringClassGenerator springClassGen,
+            SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil,
+            List<Struct> entities, List<string> modules, string dataModule)
         {
             //pom.xml
             string filename = Path.Combine(ns.Name + "-" + dataModule, "pom.xml");
@@ -424,7 +434,8 @@ namespace MetaDslx.Soal
             }
         }
 
-        private static void CheckAndCreateBindings(Namespace ns, SpringInterfaceGenerator springInterfaceGen, Component component, string apiDirectory, string functionDirectory, Service service, Interface iface)
+        private static void CheckAndCreateBindings(Namespace ns, SpringInterfaceGenerator springInterfaceGen,
+            Component component, string apiDirectory, string functionDirectory, Service service, Interface iface)
         {
             List<string> bindings = new List<string>();
             foreach (Binding binding in GetBindings(ns, service, iface))
