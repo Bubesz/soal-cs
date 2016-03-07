@@ -242,56 +242,24 @@ namespace MetaDslx.Soal
                         }
                     }
 
-                    // Commons module
-                    if (exceptions.Any())
-                    {
-                        string module = "Commons";
-                        modules.Add(module);
-
-                        foreach (Struct exception in exceptions)
-                        {
-                            string exceptionDirectory = createDirectory(ns.Name, module, innerDir, generatorUtil.Properties.exceptionPackage);
-                            string javaFileName = Path.Combine(exceptionDirectory, exception.Name + ".java");
-                            using (StreamWriter writer = new StreamWriter(javaFileName))
-                            {
-                                writer.WriteLine(springClassGen.GenerateException(exception));
-                            }
-                        }
-
-                        // pom.xml and spring.config.xml for Commons module
-                        string fileName = Path.Combine(ns.Name + "-"+module, "pom.xml");
-                        using (StreamWriter writer = new StreamWriter(fileName))
-                        {
-                            List<string> dependencies = new List<string>();
-                            dependencies.Add(dataModule);
-                            writer.WriteLine(springConfigGen.generateComponentPom(ns, module, dependencies));
-                        }
-
-                        fileName = Path.Combine(ns.Name + "-"+module, this.mvnDir, "spring-config.xml");
-                        using (StreamWriter writer = new StreamWriter(fileName))
-                        {
-                            writer.WriteLine(springConfigGen.generateComponentSpringConfig(ns));
-                        }
-                    }
-
-
                     foreach (Component component in ns.Declarations.OfType<Component>())
                     {
                         modules.Add(component.Name);
-                        string apiDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.interfacePackage);
                         List<string> dependencies = new List<string>();
 
                         if (component.Services.Any())
                         {
                             // TODO collect module dependencies
-                            GenerateServiceImplementations(ns, innerDir, springInterfaceGen, springConfigGen, modules, dataModule, component, apiDirectory, dependencies);
+                            GenerateServiceImplementations(ns, innerDir, springInterfaceGen, springClassGen, springConfigGen, generatorUtil, modules, dataModule, component, dependencies);
                         }
 
                         // generate pom.xml and spring-config.xml
                         if (component.Name != dataModule)
                         {
-                            dependencies.Add("Commons"); // TODO eliminate
-                            dependencies.Add(component.Name+"-API");
+                            if (component.Services.Any())
+                            {
+                                dependencies.Add(component.Name+"-API");
+                            }
                             dependencies.Add(dataModule);
                             dependencies.Add(dataModule+"-API");
                         }
@@ -391,14 +359,19 @@ namespace MetaDslx.Soal
             }
         }
 
-        private void GenerateServiceImplementations(Namespace ns, string innerDir, SpringInterfaceGenerator springInterfaceGen, SpringConfigurationGenerator springConfigGen, List<string> modules, string dataModule, Component component, string apiDirectory, List<string> dependencies)
+        private void GenerateServiceImplementations(Namespace ns, string innerDir,
+            SpringInterfaceGenerator springInterfaceGen, SpringClassGenerator springClassGen,
+            SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil,
+            List<string> modules, string dataModule, Component component, List<string> dependencies)
         {
             modules.Add(component.Name + "-API");
             string functionDirectory = createDirectory(ns.Name, component.Name, innerDir, component.Name.ToLower());
+            string apiIfDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.interfacePackage);
+            string apiExDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.exceptionPackage);
+
 
             // pom.xml
             dependencies.Add(dataModule);
-
             string fileName = Path.Combine(ns.Name + "-" + component.Name + "-API", "pom.xml");
             using (StreamWriter writer = new StreamWriter(fileName))
             {
@@ -411,8 +384,8 @@ namespace MetaDslx.Soal
                     writer.WriteLine(springConfigGen.generateComponentPom(ns, component.Name + "-API", dependencies));
                 }
             }
-
             dependencies.Remove(dataModule);
+
 
             // TODO collect repo interfaces!
             foreach (Service service in component.Services)
@@ -422,7 +395,7 @@ namespace MetaDslx.Soal
                 if (iface is Database) { continue; }
 
                 // interface goes to API
-                string interfaceFileName = Path.Combine(apiDirectory, iface.Name + ".java");
+                string interfaceFileName = Path.Combine(apiIfDirectory, iface.Name + ".java");
                 using (StreamWriter writer = new StreamWriter(interfaceFileName))
                 {
                     writer.WriteLine(springInterfaceGen.GenerateInterface(iface));
@@ -435,7 +408,19 @@ namespace MetaDslx.Soal
                     writer.WriteLine(springInterfaceGen.GenerateInterfaceImplementation(iface, component.Name.ToLower()));
                 }
 
-                CheckAndCreateBindings(ns, springInterfaceGen, component, apiDirectory, functionDirectory, service, iface);
+                CheckAndCreateBindings(ns, springInterfaceGen, component, apiIfDirectory, functionDirectory, service, iface);
+
+                foreach (Operation op in iface.Operations)
+                {
+                    foreach(Struct exception in op.Exceptions)
+                    {
+                        string exFileName = Path.Combine(apiExDirectory, exception.Name + ".java");
+                        using (StreamWriter writer = new StreamWriter(exFileName))
+                        {
+                            writer.WriteLine(springClassGen.GenerateException(exception));
+                        }
+                    }
+                }
             }
         }
 
