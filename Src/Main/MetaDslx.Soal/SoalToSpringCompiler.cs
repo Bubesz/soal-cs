@@ -220,12 +220,19 @@ namespace MetaDslx.Soal
                 {
                     List<Struct> entities = new List<Struct>();
                     List<string> modules = new List<string>();
-                    string dataModule = "Data";
+                    string dataModule = "";
 
                     foreach (Component component in ns.Declarations.OfType<Component>())
                     {
                         if (component.Services.OfType<Database>().Any())
+                        {
+                            if (dataModule != "")
+                            {
+                                Console.WriteLine("Multiple data components are not allowed.");
+                                return;
+                            }
                             dataModule = component.Name;
+                        }
                     }
 
                     foreach (Database db in ns.Declarations.OfType<Database>())
@@ -273,7 +280,7 @@ namespace MetaDslx.Soal
                         }
                         else
                         {
-                            GenerateDataModule(ns, innerDir, springClassGen, springConfigGen, generatorUtil, entities, modules, dataModule);
+                            GenerateDataModule(ns, component, innerDir, springClassGen, springConfigGen, generatorUtil, entities, modules, dataModule);
                         }
 
                         createDirectory(ns.Name, component.Name, "", "");
@@ -304,7 +311,7 @@ namespace MetaDslx.Soal
             }
         }
 
-        private void GenerateDataModule(Namespace ns, string innerDir, SpringClassGenerator springClassGen,
+        private void GenerateDataModule(Namespace ns, Component component, string innerDir, SpringClassGenerator springClassGen,
             SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil,
             List<Struct> entities, List<string> modules, string dataModule)
         {
@@ -346,6 +353,16 @@ namespace MetaDslx.Soal
                     writer.WriteLine(springConfigGen.GeneratePersistence(ns, entities));
                 }
             }
+
+            Service dbService = null;
+            foreach (Service s in component.Services)
+            {
+                if (s.Interface is Database)
+                {
+                    dbService = s;
+                }
+            }
+            List<Binding> bindings = GetBindings(ns, dbService, dbService.Interface);
 
             //entities
             foreach (Struct entity in entities)
