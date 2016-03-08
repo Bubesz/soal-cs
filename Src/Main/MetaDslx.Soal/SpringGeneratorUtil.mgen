@@ -88,15 +88,6 @@ function string GetPropertyList(Struct sType)
     return result;
 end function
 
-function string GetInterfaceList(Component component)
-    string result = ""; // TODO kidobni, implementációk külön
-	HashSet<Service> services = new HashSet<Service>(component.Services);
-	loop(services->i:Interface; string delimiter = ""; delimiter = ", ")
-        result = result + delimiter + i.Name;
-    end loop
-    return result;
-end function
-
 function int GetNumberOfFieldWithIdSuffix(Struct sType)
 	int result = 0;
 	loop (sType->p:Properties)

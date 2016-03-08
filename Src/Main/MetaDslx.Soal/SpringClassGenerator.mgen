@@ -163,12 +163,7 @@ import org.springframework.stereotype.Service;
 [SpringGeneratorUtil.GenerateImports(component)]
 ^
 @Service
-[string interfaces = SpringGeneratorUtil.GetInterfaceList(component)]
-[if (interfaces.Any())]
-public class [component.Name] implements [interfaces] {
-[else]
 public class [component.Name] {
-[end if]
 ^
 [loop (component->repo:GetRepositories())]
 	@Autowired

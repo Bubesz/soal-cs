@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringGeneratorUtil_1764347085;
-    namespace __Hidden_SpringGeneratorUtil_1764347085
+    using __Hidden_SpringGeneratorUtil_1456256281;
+    namespace __Hidden_SpringGeneratorUtil_1456256281
     {
         internal static class __Extensions
         {
@@ -490,90 +490,65 @@ namespace MetaDslx.Soal //1:1
             return result; //88:5
         }
 
-        public string GetInterfaceList(Component component) //91:1
+        public int GetNumberOfFieldWithIdSuffix(Struct sType) //91:1
         {
-            string result = ""; //92:5
-            HashSet<Service> services = new HashSet<Service>(component.Services); //93:2
+            int result = 0; //92:2
             var __loop6_results = 
-                (from __loop6_var1 in __Enumerate((services).GetEnumerator()) //94:7
-                from i in __Enumerate((__loop6_var1.Interface).GetEnumerator()) //94:17
-                select new { __loop6_var1 = __loop6_var1, i = i}
-                ).ToList(); //94:2
+                (from __loop6_var1 in __Enumerate((sType).GetEnumerator()) //93:8
+                from p in __Enumerate((__loop6_var1.Properties).GetEnumerator()) //93:15
+                select new { __loop6_var1 = __loop6_var1, p = p}
+                ).ToList(); //93:2
             int __loop6_iteration = 0;
-            string delimiter = ""; //94:30
             foreach (var __tmp1 in __loop6_results)
             {
                 ++__loop6_iteration;
-                if (__loop6_iteration >= 2) //94:53
-                {
-                    delimiter = ", "; //94:53
-                }
                 var __loop6_var1 = __tmp1.__loop6_var1;
-                var i = __tmp1.i;
-                result = result + delimiter + i.Name; //95:9
+                var p = __tmp1.p;
+                if (p.Name.ToString().EndsWith("Id")) //94:3
+                {
+                    result++; //95:4
+                }
             }
-            return result; //97:5
+            return result; //98:5
         }
 
-        public int GetNumberOfFieldWithIdSuffix(Struct sType) //100:1
+        public string GetPackage(Declaration d) //101:1
         {
-            int result = 0; //101:2
+            return d.Namespace.FullName.ToLower(); //102:2
+        }
+
+        public string GetBindingType(Reference reference) //105:1
+        {
+            Binding binding = reference.Binding; //106:2
+            if (binding == null) //107:2
+            {
+                return ""; //108:3
+            }
+            if (binding.Transport is RestTransportBindingElement) //110:2
+            {
+                return "Rest"; //111:3
+            }
+            if (binding.Transport is WebSocketTransportBindingElement) //113:2
+            {
+                return "WebSocket"; //114:3
+            }
             var __loop7_results = 
-                (from __loop7_var1 in __Enumerate((sType).GetEnumerator()) //102:8
-                from p in __Enumerate((__loop7_var1.Properties).GetEnumerator()) //102:15
-                select new { __loop7_var1 = __loop7_var1, p = p}
-                ).ToList(); //102:2
+                (from __loop7_var1 in __Enumerate((binding).GetEnumerator()) //116:8
+                from encoding in __Enumerate((__loop7_var1.Encodings).GetEnumerator()) //116:17
+                select new { __loop7_var1 = __loop7_var1, encoding = encoding}
+                ).ToList(); //116:2
             int __loop7_iteration = 0;
             foreach (var __tmp1 in __loop7_results)
             {
                 ++__loop7_iteration;
                 var __loop7_var1 = __tmp1.__loop7_var1;
-                var p = __tmp1.p;
-                if (p.Name.ToString().EndsWith("Id")) //103:3
-                {
-                    result++; //104:4
-                }
-            }
-            return result; //107:5
-        }
-
-        public string GetPackage(Declaration d) //110:1
-        {
-            return d.Namespace.FullName.ToLower(); //111:2
-        }
-
-        public string GetBindingType(Reference reference) //114:1
-        {
-            Binding binding = reference.Binding; //115:2
-            if (binding == null) //116:2
-            {
-                return ""; //117:3
-            }
-            if (binding.Transport is RestTransportBindingElement) //119:2
-            {
-                return "Rest"; //120:3
-            }
-            if (binding.Transport is WebSocketTransportBindingElement) //122:2
-            {
-                return "WebSocket"; //123:3
-            }
-            var __loop8_results = 
-                (from __loop8_var1 in __Enumerate((binding).GetEnumerator()) //125:8
-                from encoding in __Enumerate((__loop8_var1.Encodings).GetEnumerator()) //125:17
-                select new { __loop8_var1 = __loop8_var1, encoding = encoding}
-                ).ToList(); //125:2
-            int __loop8_iteration = 0;
-            foreach (var __tmp1 in __loop8_results)
-            {
-                ++__loop8_iteration;
-                var __loop8_var1 = __tmp1.__loop8_var1;
                 var encoding = __tmp1.encoding;
-                if (encoding is SoapEncodingBindingElement) //126:3
+                if (encoding is SoapEncodingBindingElement) //117:3
                 {
-                    return "WebService"; //127:4
+                    return "WebService"; //118:4
                 }
             }
-            return ""; //130:2
+            return ""; //121:2
         }
 
         private class StringBuilder
