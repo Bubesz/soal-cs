@@ -35,7 +35,9 @@ template generateMasterPom(Namespace ns, List<string> modules)
 ^
     <properties>
         <springframework.version>4.1.6.RELEASE</springframework.version>
+		<springframework.ws.version>2.2.4.RELEASE</springframework.ws.version>
         <spring-data-jpa.version>1.9.0.RELEASE</spring-data-jpa.version>
+		<wsdl4j.version>1.6.3</wsdl4j.version>
         <!--<spring-security.version>4.0.2.RELEASE</spring-security.version>-->
     </properties>
 ^
@@ -57,7 +59,7 @@ template generateMasterPom(Namespace ns, List<string> modules)
 </project>
 end template
 
-template generateComponentPom(Namespace ns, string moduleName, List<string> modules)
+template generateComponentPom(Namespace ns, string moduleName, List<string> modules, bool rest, bool webService, bool webSocket)
 [SpringGeneratorUtil.GeneratePomStart()]
     <parent>
         <artifactId>[ns.Name]App</artifactId>
@@ -72,7 +74,20 @@ template generateComponentPom(Namespace ns, string moduleName, List<string> modu
 		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-"+module, "1.0")]
 [end loop]
 
-        [SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-context", "${springframework.version}")]
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-context", "${springframework.version}")]
+[if (rest)]
+		<!-- for rest -->
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-webmvc", "${springframework.version}")]
+[end if]
+[if (webService)]
+		<!-- for SOAP -->
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework.ws", "spring-ws-core", "${springframework.ws.version}")]
+		[SpringGeneratorUtil.GeneratePomDependency("wsdl4j", "wsdl4j", "${wsdl4j.version}")]
+[end if]
+[if (webSocket)]
+		<!-- for web socket -->
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-messaging", "${springframework.version}")]
+[end if]
     </dependencies>
 </project>
 end template

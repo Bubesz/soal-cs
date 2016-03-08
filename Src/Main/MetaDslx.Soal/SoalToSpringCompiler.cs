@@ -224,14 +224,17 @@ namespace MetaDslx.Soal
 
                     foreach (Component component in ns.Declarations.OfType<Component>())
                     {
-                        if (component.Services.OfType<Database>().Any())
+                        foreach (Service service in component.Services)
                         {
-                            if (dataModule != "")
+                            if (service.Interface is Database)
                             {
-                                Console.WriteLine("Multiple data components are not allowed.");
-                                return;
+                                if (dataModule != "")
+                                {
+                                    Console.WriteLine("Multiple data components are not allowed.");
+                                    return;
+                                }
+                                dataModule = component.Name;
                             }
-                            dataModule = component.Name;
                         }
                     }
 
@@ -287,7 +290,9 @@ namespace MetaDslx.Soal
                         string fileName = Path.Combine(ns.Name + "-" + component.Name, "pom.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
-                            writer.WriteLine(springConfigGen.generateComponentPom(ns, component.Name, dependencies));
+                            // bindingsOfModule.HasRestBinding, bindingsOfModule.HasWebServiceBinding, bindingsOfModule.HasWebSocketBinding
+                            string s = springConfigGen.generateComponentPom(ns, component.Name, dependencies, false, false, false);
+                            writer.WriteLine(s);
                         }
 
                         fileName = Path.Combine(ns.Name + "-" + component.Name, this.mvnDir, "spring-config.xml");
@@ -396,23 +401,7 @@ namespace MetaDslx.Soal
             string apiIfDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.interfacePackage);
             string apiExDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.exceptionPackage);
 
-
-            // pom.xml
-            dependencies.Add(dataModule);
-            string fileName = Path.Combine(ns.Name + "-" + component.Name + "-API", "pom.xml");
-            using (StreamWriter writer = new StreamWriter(fileName))
-            {
-                if (component.Name == dataModule)
-                {
-                    writer.WriteLine(springConfigGen.generateDataPom(ns, component.Name + "-API", dataModule));
-                }
-                else
-                {
-                    writer.WriteLine(springConfigGen.generateComponentPom(ns, component.Name + "-API", dependencies));
-                }
-            }
-            dependencies.Remove(dataModule);
-
+            BindingTypeHolder bindingsOfModule = new BindingTypeHolder();
 
             // TODO collect repo interfaces!
             foreach (Service service in component.Services)
@@ -435,7 +424,13 @@ namespace MetaDslx.Soal
                     writer.WriteLine(springInterfaceGen.GenerateInterfaceImplementation(iface, component.Name.ToLower()));
                 }
 
-                CheckAndCreateBindings(ns, springInterfaceGen, component, apiIfDirectory, functionDirectory, service, iface);
+                BindingTypeHolder bindingsOfService = CheckAndCreateBindings(ns, springInterfaceGen, component, apiIfDirectory, functionDirectory, service, iface);
+                if (bindingsOfService.HasWebServiceBinding)
+                    bindingsOfModule.HasWebServiceBinding = true;
+                if (bindingsOfService.HasWebSocketBinding)
+                    bindingsOfModule.HasWebSocketBinding = true;
+                if (bindingsOfService.HasRestBinding)
+                    bindingsOfModule.HasRestBinding = true;
 
                 foreach (Operation op in iface.Operations)
                 {
@@ -449,17 +444,35 @@ namespace MetaDslx.Soal
                     }
                 }
             }
+
+            // pom.xml of API
+            dependencies.Add(dataModule);
+            string fileName = Path.Combine(ns.Name + "-" + component.Name + "-API", "pom.xml");
+            using (StreamWriter writer = new StreamWriter(fileName))
+            {
+                if (component.Name == dataModule)
+                {
+                    writer.WriteLine(springConfigGen.generateDataPom(ns, component.Name + "-API", dataModule));
+                }
+                else
+                {
+                    string s = springConfigGen.generateComponentPom(ns, component.Name + "-API", dependencies,
+                        bindingsOfModule.HasRestBinding, bindingsOfModule.HasWebServiceBinding, bindingsOfModule.HasWebSocketBinding);
+                    writer.WriteLine(s);
+                }
+            }
+            dependencies.Remove(dataModule);
         }
 
-        private static void CheckAndCreateBindings(Namespace ns, SpringInterfaceGenerator springInterfaceGen,
+        private static BindingTypeHolder CheckAndCreateBindings(Namespace ns, SpringInterfaceGenerator springInterfaceGen,
             Component component, string apiDirectory, string functionDirectory, Service service, Interface iface)
         {
-            List<string> bindings = new List<string>();
+            BindingTypeHolder bindings = new BindingTypeHolder();
             foreach (Binding binding in GetBindings(ns, service, iface))
             {
                 if (binding.Transport is RestTransportBindingElement)
                 {
-                    bindings.Add("Rest");
+                    bindings.HasRestBinding = true;
                     // interface extension goes to API
                     string interfaceExtFileName = Path.Combine(apiDirectory, iface.Name + "Rest.java");
                     using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
@@ -476,7 +489,7 @@ namespace MetaDslx.Soal
                 }
                 else if (binding.Transport is WebSocketTransportBindingElement)
                 {
-                    bindings.Add("WebSocket");
+                    bindings.HasWebSocketBinding = true;
                     // interface extension goes to API
                     string interfaceExtFileName = Path.Combine(apiDirectory, iface.Name + "WebSocket.java");
                     using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
@@ -497,7 +510,7 @@ namespace MetaDslx.Soal
                     {
                         if (encoding is SoapEncodingBindingElement)
                         {
-                            bindings.Add("WebService");
+                            bindings.HasWebServiceBinding = true;
                             // interface extension goes to API
                             string interfaceExtFileName = Path.Combine(apiDirectory, iface.Name + "WebService.java");
                             using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
@@ -515,6 +528,8 @@ namespace MetaDslx.Soal
                     }
                 }
             }
+
+            return bindings;
         }
 
         private static List<Binding> GetBindings(Namespace ns, Service service, Interface iface)
