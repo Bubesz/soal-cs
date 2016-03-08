@@ -26,17 +26,27 @@ end template
 template GenerateRestInterface(Interface iface)
 package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
 ^
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+^
 [SpringGeneratorUtil.GenerateImports(iface, false)]
 ^
+@RestController
 public interface [iface.Name]Rest extends [iface.Name] {
+^
 [loop (iface->op:Operations)]
-	//@Rest //FIXME
-	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
+	@RequestMapping(value="[op.Name.ToCamelCase()]")
+	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()](\
+	[loop (op->param:Parameters; string delimiter = ""; delimiter = ", ")]
+[delimiter]@PathVariable [param.Type.GetJavaName()] [param.Name.ToString().ToCamelCase()]\
+    [end loop]
+)\
 	[if (op.Exceptions.Any())]
  throws [SpringGeneratorUtil.GetExceptionList(op)]\
 	[end if]
 ;
-
+^
 [end loop]
 }
 end template
