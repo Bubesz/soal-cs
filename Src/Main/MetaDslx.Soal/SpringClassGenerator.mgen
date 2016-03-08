@@ -118,6 +118,10 @@ public class [sType.Name] {
 		[else if (prop.Type is Enum)]
 	@Enumerated
 		[end if]
+	[string mapping = sType.GetEntityMappingString(prop.Type)]
+		[if (mapping.Any())]
+	[mapping]
+		[end if]
 	private [prop.Type.GetJavaName()] [prop.Name.ToString().ToCamelCase()];
 [end loop]
 

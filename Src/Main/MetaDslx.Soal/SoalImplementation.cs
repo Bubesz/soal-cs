@@ -374,6 +374,67 @@ namespace MetaDslx.Soal
             return null;
         }
 
+        public static string GetEntityMappingString(this Struct me, SoalType field)
+        {
+            Struct property = field as Struct;
+            if (property != null && property.IsEntity())
+            {
+                // field typed entity is conatied in me
+                string mapping = "@OneToOne";
+
+                foreach (Property prop in property.Properties)
+                {
+                    SoalType type = prop.Type;
+                    if (type.Equals(me))
+                    {
+                        return mapping;
+                    }
+
+                    ArrayType foraignArray = type as ArrayType;
+                    if (foraignArray != null)
+                    {
+                        if (foraignArray.InnerType.Equals(me))
+                        {
+                            return "@ManyToOne";
+                        }
+                    }
+                }
+                return mapping;
+            }
+
+            ArrayType array = field as ArrayType;
+            if (array != null)
+            {
+                Struct innerProperty = array.InnerType as Struct;
+                if (innerProperty != null && innerProperty.IsEntity())
+                {
+                    // I have a list of an entity
+                    string mapping = "@OneToMany";
+
+                    foreach (Property prop in innerProperty.Properties)
+                    {
+                        SoalType type = prop.Type;
+                        if (type.Equals(me))
+                        {
+                            return mapping;
+                        }
+
+                        ArrayType foraignArray = type as ArrayType;
+                        if (foraignArray != null)
+                        {
+                            if (foraignArray.InnerType.Equals(me))
+                            {
+                                return "@ManyToMany";
+                            }
+                        }
+                    }
+
+                    return mapping;
+                }
+            }
+            return "";
+        }
+
         public static List<string> GetRepositories(this Declaration type)
         {
             List<string> repos = new List<string>();
