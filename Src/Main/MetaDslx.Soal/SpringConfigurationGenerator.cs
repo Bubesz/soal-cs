@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringConfigurationGenerator_1192213140;
-    namespace __Hidden_SpringConfigurationGenerator_1192213140
+    using __Hidden_SpringConfigurationGenerator_623579834;
+    namespace __Hidden_SpringConfigurationGenerator_623579834
     {
         internal static class __Extensions
         {
@@ -647,7 +647,7 @@ namespace MetaDslx.Soal //1:1
             return __out.ToString();
         }
 
-        public string generateDataPom(Namespace ns, string moduleName, string dependency) //108:1
+        public string generateDataPom(Namespace ns, string moduleName) //108:1
         {
             StringBuilder __out = new StringBuilder();
             StringBuilder __tmp2 = new StringBuilder();
@@ -751,11 +751,11 @@ namespace MetaDslx.Soal //1:1
             __out.AppendLine(false); //116:52
             __out.Append("    <dependencies>"); //118:1
             __out.AppendLine(false); //118:19
-            if (dependency.Any()) //119:3
+            if (moduleName != "Model") //119:3
             {
                 string __tmp17Prefix = "		"; //120:1
                 StringBuilder __tmp18 = new StringBuilder();
-                __tmp18.Append(SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name + "-" + dependency, "1.0"));
+                __tmp18.Append(SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name + "-Model", "1.0"));
                 using(StreamReader __tmp18Reader = new StreamReader(this.__ToStream(__tmp18.ToString())))
                 {
                     bool __tmp18_first = true;
@@ -768,7 +768,7 @@ namespace MetaDslx.Soal //1:1
                         __out.Append(__tmp17Prefix);
                         if (__tmp18Line != null) __out.Append(__tmp18Line);
                         if (!__tmp18_last) __out.AppendLine(true);
-                        __out.AppendLine(false); //120:86
+                        __out.AppendLine(false); //120:80
                     }
                 }
             }

@@ -243,6 +243,12 @@ namespace MetaDslx.Soal
                         entities.AddRange(db.Entities);
                     }
 
+                    if (entities.Any() || ns.Declarations.OfType<Enum>().Any())
+                    {
+                        modules.Add("Model");
+                        GenerateModelModule(ns, entities, innerDir, springClassGen, springConfigGen, generatorUtil);
+                    }
+
                     foreach (Component component in ns.Declarations.OfType<Component>())
                     {
                         modules.Add(component.Name);
@@ -271,6 +277,8 @@ namespace MetaDslx.Soal
                             }
                         }
 
+                        dependencies.Add("Model");
+
                         // generate pom.xml and spring-config.xml
                         if (component.Name != dataModule)
                         {
@@ -278,7 +286,7 @@ namespace MetaDslx.Soal
                             {
                                 dependencies.Add(component.Name+"-API");
                             }
-                            dependencies.Add(dataModule);
+                            // if uses DB TODO
                             dependencies.Add(dataModule+"-API");
                         }
                         else
@@ -324,39 +332,13 @@ namespace MetaDslx.Soal
             string filename = Path.Combine(ns.Name + "-" + dataModule, "pom.xml");
             using (StreamWriter writer = new StreamWriter(filename))
             {
-                writer.WriteLine(springConfigGen.generateDataPom(ns, dataModule, ""));
+                writer.WriteLine(springConfigGen.generateDataPom(ns, dataModule));
             }
 
             filename = Path.Combine(ns.Name + "-" + dataModule, this.mvnDir, "spring-config.xml");
             using (StreamWriter writer = new StreamWriter(filename))
             {
                 writer.WriteLine(springConfigGen.generateDataSpringConfig(ns));
-            }
-
-            //enums
-            foreach (Enum myEnum in ns.Declarations.OfType<Enum>())
-            {
-                string enumDirectory = createDirectory(ns.Name, dataModule, innerDir, generatorUtil.Properties.enumPackage);
-                string javaFileName = Path.Combine(enumDirectory, myEnum.Name + ".java");
-                if (!modules.Contains(dataModule))
-                    modules.Add(dataModule);
-
-                using (StreamWriter writer = new StreamWriter(javaFileName))
-                {
-                    writer.WriteLine(springClassGen.GenerateEnum(myEnum));
-                }
-            }
-
-            // generate persistence.xml
-            if (entities.Any())
-            {
-                string metaFolder = Path.Combine(ns.Name + "-" + dataModule, "src", "main", "resources", "META - INF");
-                Directory.CreateDirectory(metaFolder);
-                filename = Path.Combine(metaFolder, "persistence.xml");
-                using (StreamWriter writer = new StreamWriter(filename))
-                {
-                    writer.WriteLine(springConfigGen.GeneratePersistence(ns, entities));
-                }
             }
 
             Service dbService = null;
@@ -372,21 +354,62 @@ namespace MetaDslx.Soal
             //entities
             foreach (Struct entity in entities)
             {
+                // repository TODO bindings
+                string repoDirectory = createDirectory(ns.Name, dataModule+"-API", innerDir, generatorUtil.Properties.repositoryPackage);
+                string javaFileName = Path.Combine(repoDirectory, entity.Name + "Repository.java");
+                using (StreamWriter writer = new StreamWriter(javaFileName))
+                {
+                    writer.WriteLine(springClassGen.GenerateRepository(entity));
+                }
+            }
+             
+        }
+
+        private void GenerateModelModule(Namespace ns, List<Struct> entities, string innerDir, SpringClassGenerator springClassGen,
+            SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil)
+        {
+            //pom.xml
+            string filename = Path.Combine(ns.Name + "-Model", "pom.xml");
+            using (StreamWriter writer = new StreamWriter(filename))
+            {
+                writer.WriteLine(springConfigGen.generateDataPom(ns, "Model"));
+            }
+
+            // generate persistence.xml
+            if (entities.Any())
+            {
+                string metaFolder = Path.Combine(ns.Name + "-Model", "src", "main", "resources", "META - INF");
+                Directory.CreateDirectory(metaFolder);
+                filename = Path.Combine(metaFolder, "persistence.xml");
+                using (StreamWriter writer = new StreamWriter(filename))
+                {
+                    writer.WriteLine(springConfigGen.GeneratePersistence(ns, entities));
+                }
+            }
+
+            //entities
+            foreach (Struct entity in entities)
+            {
                 // entity
-                string entityDirectory = createDirectory(ns.Name, dataModule, innerDir, generatorUtil.Properties.entityPackage);
+                string entityDirectory = createDirectory(ns.Name, "Model", innerDir, generatorUtil.Properties.entityPackage);
                 string javaFileName = Path.Combine(entityDirectory, entity.Name + ".java");
 
                 using (StreamWriter writer = new StreamWriter(javaFileName))
                 {
                     writer.WriteLine(springClassGen.GenerateEntity(entity));
                 }
+            }
 
-                // repository TODO bindings
-                string repoDirectory = createDirectory(ns.Name, dataModule+"-API", innerDir, generatorUtil.Properties.repositoryPackage);
-                javaFileName = Path.Combine(repoDirectory, entity.Name + "Repository.java");
+            //enums
+            foreach (Enum myEnum in ns.Declarations.OfType<Enum>())
+            {
+                string enumDirectory = createDirectory(ns.Name, "Model", innerDir, generatorUtil.Properties.enumPackage);
+                string javaFileName = Path.Combine(enumDirectory, myEnum.Name + ".java");
+
                 using (StreamWriter writer = new StreamWriter(javaFileName))
                 {
-                    writer.WriteLine(springClassGen.GenerateRepository(entity));
+                    writer.WriteLine(springClassGen.GenerateEnum(myEnum));
+
                 }
             }
         }
@@ -452,7 +475,7 @@ namespace MetaDslx.Soal
             {
                 if (component.Name == dataModule)
                 {
-                    writer.WriteLine(springConfigGen.generateDataPom(ns, component.Name + "-API", dataModule));
+                    writer.WriteLine(springConfigGen.generateDataPom(ns, component.Name + "-API"));
                 }
                 else
                 {

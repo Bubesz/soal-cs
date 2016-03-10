@@ -105,7 +105,7 @@ template generateComponentPom(Namespace ns, string moduleName, List<string> modu
 </project>
 end template
 
-template generateDataPom(Namespace ns, string moduleName, string dependency)
+template generateDataPom(Namespace ns, string moduleName)
 [SpringGeneratorUtil.GeneratePomStart()]
     <parent>
         <artifactId>[ns.Name]App</artifactId>
@@ -116,8 +116,8 @@ template generateDataPom(Namespace ns, string moduleName, string dependency)
     <artifactId>[ns.Name]-[moduleName]</artifactId>
 
     <dependencies>
-	[if (dependency.Any())]
-		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-"+dependency, "1.0")]
+	[if (moduleName != "Model")]
+		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-Model", "1.0")]
 	[end if]
 		<!-- spring data -->
 		[SpringGeneratorUtil.GeneratePomDependency("org.springframework","spring-orm", "${springframework.version}")]
