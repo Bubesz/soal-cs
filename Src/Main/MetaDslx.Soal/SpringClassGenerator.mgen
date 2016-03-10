@@ -167,7 +167,7 @@ import org.springframework.stereotype.Service;
 [SpringGeneratorUtil.GenerateImports(component)]
 ^
 @Service
-public class [component.Name] {
+public class [component.Name]Facade {
 ^
 [loop (component->repo:GetRepositories())]
 	@Autowired

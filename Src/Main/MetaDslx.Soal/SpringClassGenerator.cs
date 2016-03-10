@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringClassGenerator_154877980;
-    namespace __Hidden_SpringClassGenerator_154877980
+    using __Hidden_SpringClassGenerator_168167343;
+    namespace __Hidden_SpringClassGenerator_168167343
     {
         internal static class __Extensions
         {
@@ -1455,9 +1455,9 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp15_last) __out.AppendLine(true);
                 }
             }
-            string __tmp16Line = " {"; //170:30
+            string __tmp16Line = "Facade {"; //170:30
             if (__tmp16Line != null) __out.Append(__tmp16Line);
-            __out.AppendLine(false); //170:32
+            __out.AppendLine(false); //170:38
             __out.AppendLine(true); //171:1
             var __loop11_results = 
                 (from __loop11_var1 in __Enumerate((component).GetEnumerator()) //172:8
