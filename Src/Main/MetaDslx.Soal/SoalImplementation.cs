@@ -416,7 +416,7 @@ namespace MetaDslx.Soal
                         SoalType type = prop.Type;
                         if (type.Equals(me))
                         {
-                            return mapping;
+                            return mapping + "(mappedBy=\"" + prop.Name.ToCamelCase() + "\")";
                         }
 
                         ArrayType foraignArray = type as ArrayType;
@@ -424,12 +424,12 @@ namespace MetaDslx.Soal
                         {
                             if (foraignArray.InnerType.Equals(me))
                             {
-                                return "@ManyToMany";
+                                return "@ManyToMany // TODO add @JoinTable";
                             }
                         }
                     }
 
-                    return mapping;
+                    return mapping + " // TODO add @JoinColumn";
                 }
             }
             return "";
