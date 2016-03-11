@@ -420,10 +420,6 @@ namespace MetaDslx.Soal
             List<string> modules, string dataModule, Component component, List<string> dependencies)
         {
             modules.Add(component.Name + "-API");
-            string functionDirectory = createDirectory(ns.Name, component.Name, innerDir, component.Name.ToLower());
-            string apiIfDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.interfacePackage);
-            string apiExDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.exceptionPackage);
-
             BindingTypeHolder bindingsOfModule = new BindingTypeHolder();
 
             // TODO collect repo interfaces!
@@ -431,9 +427,10 @@ namespace MetaDslx.Soal
             {
                 Interface iface = service.Interface;
 
-                if (iface is Database) { continue; }
+                if (iface is Database) { continue; } //handle very differently
 
                 // interface goes to API
+                string apiIfDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.interfacePackage);
                 string interfaceFileName = Path.Combine(apiIfDirectory, iface.Name + ".java");
                 using (StreamWriter writer = new StreamWriter(interfaceFileName))
                 {
@@ -441,6 +438,7 @@ namespace MetaDslx.Soal
                 }
 
                 // implementaton goes to component
+                string functionDirectory = createDirectory(ns.Name, component.Name, innerDir, component.Name.ToLower());
                 string javaFileName = Path.Combine(functionDirectory, iface.Name + "Impl.java");
                 using (StreamWriter writer = new StreamWriter(javaFileName))
                 {
@@ -450,17 +448,15 @@ namespace MetaDslx.Soal
                 BindingTypeHolder bindingsOfService = CheckForBindings(ns, service, iface);
                 CreateBindings(bindingsOfService, springInterfaceGen, component, apiIfDirectory, functionDirectory, iface);
 
-                if (bindingsOfService.HasWebServiceBinding)
-                    bindingsOfModule.HasWebServiceBinding = true;
-                if (bindingsOfService.HasWebSocketBinding)
-                    bindingsOfModule.HasWebSocketBinding = true;
-                if (bindingsOfService.HasRestBinding)
-                    bindingsOfModule.HasRestBinding = true;
+                bindingsOfModule.HasRestBinding         |= bindingsOfService.HasRestBinding;
+                bindingsOfModule.HasWebServiceBinding   |= bindingsOfService.HasWebServiceBinding;
+                bindingsOfModule.HasWebSocketBinding    |= bindingsOfService.HasWebSocketBinding;
 
                 foreach (Operation op in iface.Operations)
                 {
                     foreach(Struct exception in op.Exceptions)
                     {
+                        string apiExDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.exceptionPackage);
                         string exFileName = Path.Combine(apiExDirectory, exception.Name + ".java");
                         using (StreamWriter writer = new StreamWriter(exFileName))
                         {
