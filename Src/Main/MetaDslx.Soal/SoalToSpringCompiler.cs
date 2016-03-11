@@ -290,7 +290,7 @@ namespace MetaDslx.Soal
                         }
                         else
                         {
-                            GenerateDataModule(ns, component, innerDir, springClassGen, springConfigGen, generatorUtil, entities, modules, dataModule);
+                            GenerateDataModule(ns, component, innerDir, springClassGen, springConfigGen, generatorUtil, springInterfaceGen, entities, modules);
                         }
 
                         createDirectory(ns.Name, component.Name, "", "");
@@ -324,17 +324,18 @@ namespace MetaDslx.Soal
         }
 
         private void GenerateDataModule(Namespace ns, Component component, string innerDir, SpringClassGenerator springClassGen,
-            SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil,
-            List<Struct> entities, List<string> modules, string dataModule)
+            SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil, SpringInterfaceGenerator springInterfaceGen,
+            List<Struct> entities, List<string> modules)
         {
             //pom.xml
-            string filename = Path.Combine(ns.Name + "-" + dataModule, "pom.xml");
+            createDirectory(ns.Name, component.Name, "", "");
+            string filename = Path.Combine(ns.Name + "-" + component.Name, "pom.xml");
             using (StreamWriter writer = new StreamWriter(filename))
             {
-                writer.WriteLine(springConfigGen.generateDataPom(ns, dataModule));
+                writer.WriteLine(springConfigGen.generateDataPom(ns, component.Name));
             }
 
-            filename = Path.Combine(ns.Name + "-" + dataModule, this.mvnDir, "spring-config.xml");
+            filename = Path.Combine(ns.Name + "-" + component.Name, this.mvnDir, "spring-config.xml");
             using (StreamWriter writer = new StreamWriter(filename))
             {
                 writer.WriteLine(springConfigGen.generateDataSpringConfig(ns));
@@ -348,17 +349,72 @@ namespace MetaDslx.Soal
                     dbService = s;
                 }
             }
-            List<Binding> bindings = GetBindings(ns, dbService, dbService.Interface);
+            BindingTypeHolder bindings = CheckForBindings(ns, dbService, dbService.Interface);
 
             //entities
             foreach (Struct entity in entities)
             {
                 // repository TODO bindings
-                string repoDirectory = createDirectory(ns.Name, dataModule+"-API", innerDir, generatorUtil.Properties.repositoryPackage);
+                string repoDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.repositoryPackage);
                 string javaFileName = Path.Combine(repoDirectory, entity.Name + "Repository.java");
                 using (StreamWriter writer = new StreamWriter(javaFileName))
                 {
                     writer.WriteLine(springClassGen.GenerateRepository(entity));
+                }
+
+                string apiDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.interfacePackage);
+                string functionDirectory = createDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.repositoryPackage);
+
+
+                if (bindings.HasRestBinding)
+                {
+                    // interface copy goes to API
+                    string interfaceExtFileName = Path.Combine(apiDirectory, entity.Name + "RepositoryRest.java");
+                    using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
+                    {
+                        writer.WriteLine(springInterfaceGen.GenerateCrudRepositoryCopy(ns.FullName, entity.Name, "Rest"));
+                    }
+
+                    // implementation of the above goes to component
+                    string implFileName = Path.Combine(functionDirectory, entity.Name + "RepositoryRestImpl.java");
+                    using (StreamWriter writer = new StreamWriter(implFileName))
+                    {
+                        writer.WriteLine(springInterfaceGen.GenerateRepositoryProxyImpl(ns.FullName, entity.Name, "Rest"));
+                    }
+                }
+
+                if (bindings.HasWebServiceBinding)
+                {
+                    // interface extension goes to API
+                    string interfaceExtFileName = Path.Combine(apiDirectory, entity.Name + "RepositoryWebService.java");
+                    using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
+                    {
+                        writer.WriteLine(springInterfaceGen.GenerateCrudRepositoryCopy(ns.FullName, entity.Name, "WebService"));
+                    }
+
+                    // implementation of the above goes to component
+                    string implFileName = Path.Combine(functionDirectory, entity.Name + "RepositoryWebServiceImpl.java");
+                    using (StreamWriter writer = new StreamWriter(implFileName))
+                    {
+                        writer.WriteLine(springInterfaceGen.GenerateRepositoryProxyImpl(ns.FullName, entity.Name, "WebService"));
+                    }
+                }
+
+                if (bindings.HasWebSocketBinding)
+                {
+                    // interface extension goes to API
+                    string interfaceExtFileName = Path.Combine(apiDirectory, entity.Name + "RepositoryWebSocket.java");
+                    using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
+                    {
+                        writer.WriteLine(springInterfaceGen.GenerateCrudRepositoryCopy(ns.FullName, entity.Name, "WebSocket"));
+                    }
+
+                    // implementation of the above goes to component
+                    string implFileName = Path.Combine(functionDirectory, entity.Name + "RepositoryWebSocketImpl.java");
+                    using (StreamWriter writer = new StreamWriter(implFileName))
+                    {
+                        writer.WriteLine(springInterfaceGen.GenerateRepositoryProxyImpl(ns.FullName, entity.Name, "WebSocket"));
+                    }
                 }
             }
              
@@ -468,6 +524,7 @@ namespace MetaDslx.Soal
 
             // pom.xml of API
             dependencies.Add("Model");
+            createDirectory(ns.Name, component.Name + "-API", "", "");
             string fileName = Path.Combine(ns.Name + "-" + component.Name + "-API", "pom.xml");
             using (StreamWriter writer = new StreamWriter(fileName))
             {

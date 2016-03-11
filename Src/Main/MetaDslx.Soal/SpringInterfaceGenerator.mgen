@@ -107,6 +107,112 @@ public class [iface.Name][bindingType]Impl implements [iface.Name][bindingType] 
 end template
 
 
+template GenerateCrudRepositoryCopy(string namespaceName, string entityName, string bindingType)
+package [namespaceName.ToLower()].[SpringGeneratorUtil.Properties.interfacePackage];
+^
+import [namespaceName.ToLower()].[SpringGeneratorUtil.Properties.entityPackage].[entityName];
+^
+public interface [entityName]Repository[bindingType] {
+	// should copy CrudRepository<[entityName], Long>
+^
+	public long count();
+^
+	public void delete(Long id);
+^
+	public void delete([entityName] entity);
+^
+	public void delete(Iterable<? extends [entityName]> entities);
+^
+	public void deleteAll();
+^
+	public boolean exists(Long id) ;
+^
+	public Iterable<[entityName]> findAll();
+^
+	public Iterable<[entityName]> findAll(Iterable<Long> entities);
+^
+	public [entityName] findOne(Long id);
+^
+	public <S extends [entityName]> S save(S entity);
+^
+	public <S extends [entityName]> Iterable<S> save(Iterable<S> entities);
+^
+}
+end template
+
+
+template GenerateRepositoryProxyImpl(string namespaceName, string entityName, string bindingType)
+package [namespaceName.ToLower()].[SpringGeneratorUtil.Properties.repositoryPackage];
+^
+import org.springframework.beans.factory.annotation.Autowired;
+^
+import [namespaceName.ToLower()].[SpringGeneratorUtil.Properties.entityPackage].[entityName];
+import [namespaceName.ToLower()].[SpringGeneratorUtil.Properties.repositoryPackage].[entityName]Repository;
+import [namespaceName.ToLower()].[SpringGeneratorUtil.Properties.interfacePackage].[entityName]Repository[bindingType];
+^
+public class [entityName]Repository[bindingType]Impl implements [entityName]Repository[bindingType] {
+^
+	@Autowired
+	[entityName]Repository repository;
+^
+	@Override
+	public long count() {
+		return repository.count();
+	}
+^
+	@Override
+	public void delete(Long id) {
+		repository.delete(id);
+	}
+^
+	@Override
+	public void delete([entityName] entity) {
+		repository.delete(entity);
+	}
+^
+	@Override
+	public void delete(Iterable<? extends [entityName]> entities) {
+		repository.delete(entities);
+	}
+^
+	@Override
+	public void deleteAll() {
+		repository.deleteAll();
+	}
+^
+	@Override
+	public boolean exists(Long id) {
+		return repository.exists(id);
+	}
+^
+	@Override
+	public Iterable<[entityName]> findAll() {
+		return repository.findAll();
+	}
+^
+	@Override
+	public Iterable<[entityName]> findAll(Iterable<Long> entities) {
+		return repository.findAll(entities);
+	}
+^
+	@Override
+	public [entityName] findOne(Long id) {
+		return repository.findOne(id);
+	}
+^
+	@Override
+	public <S extends [entityName]> S save(S entity) {
+		return repository.save(entity);
+	}
+^
+	@Override
+	public <S extends [entityName]> Iterable<S> save(Iterable<S> entities) {
+		return repository.save(entities);
+	}
+^
+}
+end template
+
 
 template InterfaceAnnotation(string bindingType)
 	[if (bindingType.Equals("Rest"))]
