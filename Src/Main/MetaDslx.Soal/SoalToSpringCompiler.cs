@@ -277,15 +277,14 @@ namespace MetaDslx.Soal
                             }
                         }
 
-                        dependencies.Add("Model");
+                        if (component.Services.Any())
+                        {
+                            dependencies.Add(component.Name + "-API");
+                        }
 
                         // generate pom.xml and spring-config.xml
                         if (component.Name != dataModule)
                         {
-                            if (component.Services.Any())
-                            {
-                                dependencies.Add(component.Name+"-API");
-                            }
                             // if uses DB TODO
                             dependencies.Add(dataModule+"-API");
                         }
@@ -368,6 +367,7 @@ namespace MetaDslx.Soal
         private void GenerateModelModule(Namespace ns, List<Struct> entities, string innerDir, SpringClassGenerator springClassGen,
             SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil)
         {
+            createDirectory(ns.Name, "Model", "", "");
             //pom.xml
             string filename = Path.Combine(ns.Name + "-Model", "pom.xml");
             using (StreamWriter writer = new StreamWriter(filename))
@@ -471,13 +471,13 @@ namespace MetaDslx.Soal
             }
 
             // pom.xml of API
-            dependencies.Add(dataModule);
+            dependencies.Add("Model");
             string fileName = Path.Combine(ns.Name + "-" + component.Name + "-API", "pom.xml");
             using (StreamWriter writer = new StreamWriter(fileName))
             {
                 if (component.Name == dataModule)
                 {
-                    writer.WriteLine(springConfigGen.generateDataPom(ns, component.Name + "-API"));
+                    writer.WriteLine(springConfigGen.generateDataPom(ns, component.Name + "-API")); // TODO think it through
                 }
                 else
                 {
@@ -486,7 +486,7 @@ namespace MetaDslx.Soal
                     writer.WriteLine(s);
                 }
             }
-            dependencies.Remove(dataModule);
+            dependencies.Remove("Model");
         }
 
         private static void CreateBindings(BindingTypeHolder bindings, SpringInterfaceGenerator springInterfaceGen,
