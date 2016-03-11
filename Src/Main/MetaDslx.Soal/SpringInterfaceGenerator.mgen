@@ -4,84 +4,33 @@ generator SpringInterfaceGenerator for object;
 using generator SpringGeneratorUtil;
 
 
-template GenerateInterface(Interface iface)
+template GenerateInterface(Interface iface, string bindingType)
 package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
 ^
-[SpringGeneratorUtil.GenerateImports(iface, false)]
-^
-public interface [iface.Name] {
-[loop (iface->op:Operations)]
-	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
-	[if (op.Exceptions.Any())]
- throws [SpringGeneratorUtil.GetExceptionList(op)]\
-	[end if]
-;
-
-[end loop]
-}
-end template
-
-
-
-template GenerateRestInterface(Interface iface)
-package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
-^
+[if (bindingType.Equals("Rest"))]
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-^
+[end if]
+[if (bindingType.Equals("WebService"))]
+//import ?;
+[end if]
+[if (bindingType.Equals("WebSockett"))]
+//import ?;
+[end if]
+
 [SpringGeneratorUtil.GenerateImports(iface, false)]
 ^
-@RestController
-public interface [iface.Name]Rest extends [iface.Name] {
-^
+[InterfaceAnnotation(bindingType)]
+public interface [iface.Name][bindingType] {
 [loop (iface->op:Operations)]
-	@RequestMapping(value="[op.Name.ToCamelCase()]")
+^
+[OperationAnnotation(bindingType, op)]
 	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()](\
 	[loop (op->param:Parameters; string delimiter = ""; delimiter = ", ")]
-[delimiter]@PathVariable [param.Type.GetJavaName()] [param.Name.ToString().ToCamelCase()]\
+[delimiter][ParameterAnnotation(bindingType)][param.Type.GetJavaName()] [param.Name.ToString().ToCamelCase()]\
     [end loop]
 )\
-	[if (op.Exceptions.Any())]
- throws [SpringGeneratorUtil.GetExceptionList(op)]\
-	[end if]
-;
-^
-[end loop]
-}
-end template
-
-
-
-template GenerateWebServiceInterface(Interface iface)
-package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
-^
-[SpringGeneratorUtil.GenerateImports(iface, false)]
-^
-public interface [iface.Name]WebService extends [iface.Name] {
-[loop (iface->op:Operations)]
-	//@WebService //FIXME
-	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
-	[if (op.Exceptions.Any())]
- throws [SpringGeneratorUtil.GetExceptionList(op)]\
-	[end if]
-;
-
-[end loop]
-}
-end template
-
-
-
-template GenerateWebSocketInterface(Interface iface)
-package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
-^
-[SpringGeneratorUtil.GenerateImports(iface, false)]
-^
-public interface [iface.Name]WebSocket extends [iface.Name] {
-[loop (iface->op:Operations)]
-	//@WebSocket //FIXME
-	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
 	[if (op.Exceptions.Any())]
  throws [SpringGeneratorUtil.GetExceptionList(op)]\
 	[end if]
@@ -125,7 +74,7 @@ end template
 
 
 
-template GenerateRestInterfaceImplementation(Interface iface, string functionName)
+template GenerateProxyInterfaceImplementation(Interface iface, string functionName, string bindingType)
 package [SpringGeneratorUtil.GetPackage(iface)].[functionName];
 ^
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,7 +84,7 @@ import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.i
 [SpringGeneratorUtil.GenerateImports(iface, false)]
 ^
 @Service
-public class [iface.Name]RestImpl implements [iface.Name]Rest {
+public class [iface.Name][bindingType]Impl implements [iface.Name][bindingType] {
 ^
 	@Autowired
 	private [iface.Name]Impl [iface.Name.ToCamelCase()]Impl;
@@ -159,68 +108,36 @@ end template
 
 
 
-template GenerateWebServiceInterfaceImplementation(Interface iface, string functionName)
-package [SpringGeneratorUtil.GetPackage(iface)].[functionName];
-^
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-^
-import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage].[iface.Name]WebService;
-[SpringGeneratorUtil.GenerateImports(iface, false)]
-^
-@Service
-public class [iface.Name]WebServiceImpl implements [iface.Name]WebService {
-^
-	@Autowired
-	private [iface.Name]Impl [iface.Name.ToCamelCase()]Impl;
-
-[loop(iface->op:Operations)]
-^
-	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
-	[if (op.Exceptions.Any())]
- throws [SpringGeneratorUtil.GetExceptionList(op)] \
+template InterfaceAnnotation(string bindingType)
+	[if (bindingType.Equals("Rest"))]
+@RestController
+	[else if (bindingType.Equals("WebService"))]
+//@WebService
+	[else if (bindingType.Equals("WebSockett"))]
+//@WebSocket
 	[end if]
-{
-			[if (op.Result.Type.GetJavaName() != "void")]
-		return [iface.Name.ToCamelCase()]Impl.[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
-			[else]
-		[iface.Name.ToCamelCase()]Impl.[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
-			[end if]
-	}
-[end loop]
-}
 end template
 
 
 
-template GenerateWebSocketInterfaceImplementation(Interface iface, string functionName)
-package [SpringGeneratorUtil.GetPackage(iface)].[functionName];
-^
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-^
-import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage].[iface.Name]WebSocket;
-[SpringGeneratorUtil.GenerateImports(iface, false)]
-^
-@Service
-public class [iface.Name]WebSocketImpl implements [iface.Name]WebSocket {
-^
-	@Autowired
-	private [iface.Name]Impl [iface.Name.ToCamelCase()]Impl;
-
-[loop(iface->op:Operations)]
-^
-	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
-	[if (op.Exceptions.Any())]
- throws [SpringGeneratorUtil.GetExceptionList(op)] \
+template OperationAnnotation(string bindingType, Operation op)
+	[if (bindingType.Equals("Rest"))]
+	@RequestMapping(value="[op.Name.ToCamelCase()]")
+	[else if (bindingType.Equals("WebService"))]
+	//@WebService
+	[else if (bindingType.Equals("WebSockett"))]
+	//@WebSocket
 	[end if]
-{
-			[if (op.Result.Type.GetJavaName() != "void")]
-		return [iface.Name.ToCamelCase()]Impl.[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
-			[else]
-		[iface.Name.ToCamelCase()]Impl.[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
-			[end if]
-	}
-[end loop]
-}
+end template
+
+
+
+template ParameterAnnotation(string bindingType)
+	[if (bindingType.Equals("Rest"))]
+@PathVariable \
+	[else if (bindingType.Equals("WebService"))]
+		
+	[else if (bindingType.Equals("WebSockett"))]
+		
+	[end if]
 end template

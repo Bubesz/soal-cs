@@ -437,7 +437,7 @@ namespace MetaDslx.Soal
                 string interfaceFileName = Path.Combine(apiIfDirectory, iface.Name + ".java");
                 using (StreamWriter writer = new StreamWriter(interfaceFileName))
                 {
-                    writer.WriteLine(springInterfaceGen.GenerateInterface(iface));
+                    writer.WriteLine(springInterfaceGen.GenerateInterface(iface, ""));
                 }
 
                 // implementaton goes to component
@@ -447,7 +447,9 @@ namespace MetaDslx.Soal
                     writer.WriteLine(springInterfaceGen.GenerateInterfaceImplementation(iface, component.Name.ToLower()));
                 }
 
-                BindingTypeHolder bindingsOfService = CheckAndCreateBindings(ns, springInterfaceGen, component, apiIfDirectory, functionDirectory, service, iface);
+                BindingTypeHolder bindingsOfService = CheckForBindings(ns, service, iface);
+                CreateBindings(bindingsOfService, springInterfaceGen, component, apiIfDirectory, functionDirectory, iface);
+
                 if (bindingsOfService.HasWebServiceBinding)
                     bindingsOfModule.HasWebServiceBinding = true;
                 if (bindingsOfService.HasWebSocketBinding)
@@ -487,8 +489,62 @@ namespace MetaDslx.Soal
             dependencies.Remove(dataModule);
         }
 
-        private static BindingTypeHolder CheckAndCreateBindings(Namespace ns, SpringInterfaceGenerator springInterfaceGen,
-            Component component, string apiDirectory, string functionDirectory, Service service, Interface iface)
+        private static void CreateBindings(BindingTypeHolder bindings, SpringInterfaceGenerator springInterfaceGen,
+            Component component, string apiDirectory, string functionDirectory, Interface iface)
+        {
+            if (bindings.HasRestBinding)
+            {
+                // interface extension goes to API
+                string interfaceExtFileName = Path.Combine(apiDirectory, iface.Name + "Rest.java");
+                using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
+                {
+                    writer.WriteLine(springInterfaceGen.GenerateInterface(iface, "Rest"));
+                }
+
+                // implementation of the above goes to component
+                string implFileName = Path.Combine(functionDirectory, iface.Name + "RestImpl.java");
+                using (StreamWriter writer = new StreamWriter(implFileName))
+                {
+                    writer.WriteLine(springInterfaceGen.GenerateProxyInterfaceImplementation(iface, component.Name.ToLower(), "Rest"));
+                }
+            }
+
+            if (bindings.HasWebServiceBinding)
+            {
+                // interface extension goes to API
+                string interfaceExtFileName = Path.Combine(apiDirectory, iface.Name + "WebService.java");
+                using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
+                {
+                    writer.WriteLine(springInterfaceGen.GenerateInterface(iface, "WebService"));
+                }
+
+                // implementation of the above goes to component
+                string implFileName = Path.Combine(functionDirectory, iface.Name + "WebServiceImpl.java");
+                using (StreamWriter writer = new StreamWriter(implFileName))
+                {
+                    writer.WriteLine(springInterfaceGen.GenerateProxyInterfaceImplementation(iface, component.Name.ToLower(), "WebService"));
+                }
+            }
+
+            if (bindings.HasWebSocketBinding)
+            {
+                // interface extension goes to API
+                string interfaceExtFileName = Path.Combine(apiDirectory, iface.Name + "WebSocket.java");
+                using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
+                {
+                    writer.WriteLine(springInterfaceGen.GenerateInterface(iface, "WebSocket"));
+                }
+
+                // implementation of the above goes to component
+                string implFileName = Path.Combine(functionDirectory, iface.Name + "WebSocketImpl.java");
+                using (StreamWriter writer = new StreamWriter(implFileName))
+                {
+                    writer.WriteLine(springInterfaceGen.GenerateProxyInterfaceImplementation(iface, component.Name.ToLower(), "WebSocket"));
+                }
+            }
+        }
+
+        private static BindingTypeHolder CheckForBindings(Namespace ns, Service service, Interface iface)
         {
             BindingTypeHolder bindings = new BindingTypeHolder();
             foreach (Binding binding in GetBindings(ns, service, iface))
@@ -496,36 +552,10 @@ namespace MetaDslx.Soal
                 if (binding.Transport is RestTransportBindingElement)
                 {
                     bindings.HasRestBinding = true;
-                    // interface extension goes to API
-                    string interfaceExtFileName = Path.Combine(apiDirectory, iface.Name + "Rest.java");
-                    using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
-                    {
-                        writer.WriteLine(springInterfaceGen.GenerateRestInterface(iface));
-                    }
-
-                    // implementation of the above goes to component
-                    string implFileName = Path.Combine(functionDirectory, iface.Name + "RestImpl.java");
-                    using (StreamWriter writer = new StreamWriter(implFileName))
-                    {
-                        writer.WriteLine(springInterfaceGen.GenerateRestInterfaceImplementation(iface, component.Name.ToLower()));
-                    }
                 }
                 else if (binding.Transport is WebSocketTransportBindingElement)
                 {
                     bindings.HasWebSocketBinding = true;
-                    // interface extension goes to API
-                    string interfaceExtFileName = Path.Combine(apiDirectory, iface.Name + "WebSocket.java");
-                    using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
-                    {
-                        writer.WriteLine(springInterfaceGen.GenerateWebSocketInterface(iface));
-                    }
-
-                    // implementation of the above goes to component
-                    string implFileName = Path.Combine(functionDirectory, iface.Name + "WebSocketImpl.java");
-                    using (StreamWriter writer = new StreamWriter(implFileName))
-                    {
-                        writer.WriteLine(springInterfaceGen.GenerateWebSocketInterfaceImplementation(iface, component.Name.ToLower()));
-                    }
                 }
                 else
                 {
@@ -534,19 +564,6 @@ namespace MetaDslx.Soal
                         if (encoding is SoapEncodingBindingElement)
                         {
                             bindings.HasWebServiceBinding = true;
-                            // interface extension goes to API
-                            string interfaceExtFileName = Path.Combine(apiDirectory, iface.Name + "WebService.java");
-                            using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
-                            {
-                                writer.WriteLine(springInterfaceGen.GenerateWebServiceInterface(iface));
-                            }
-
-                            // implementation of the above goes to component
-                            string implFileName = Path.Combine(functionDirectory, iface.Name + "WebServiceImpl.java");
-                            using (StreamWriter writer = new StreamWriter(implFileName))
-                            {
-                                writer.WriteLine(springInterfaceGen.GenerateWebServiceInterfaceImplementation(iface, component.Name.ToLower()));
-                            }
                         }
                     }
                 }
