@@ -80,7 +80,7 @@ package [SpringGeneratorUtil.GetPackage(iface)].[functionName];
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 ^
-import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage].[iface.Name]Rest;
+import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage].[iface.Name][bindingType];
 [SpringGeneratorUtil.GenerateImports(iface, false)]
 ^
 @Service
