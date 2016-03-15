@@ -10,8 +10,6 @@ namespace MetaDslx.Soal
 {
     public class SoalToSpringCompiler : SoalCompilerBase
     {
-        public static Namespace XsdNamespace;
-
         private string mvnDir;
 
         public SoalToSpringCompiler(string source, string outputDirectory, string fileName)
@@ -30,16 +28,10 @@ namespace MetaDslx.Soal
             this.GlobalScope.BuiltInEntries.Add((ModelObject)SoalInstance.Time);
             this.GlobalScope.BuiltInEntries.Add((ModelObject)SoalInstance.DateTime);
             this.GlobalScope.BuiltInEntries.Add((ModelObject)SoalInstance.TimeSpan);
-
-            this.SeparateXsdWsdl = false;
-            this.SingleFileWsdl = false;
         }
 
         protected override void DoCompile()
         {
-            XsdNamespace = SoalFactory.Instance.CreateNamespace();
-            XsdNamespace.Prefix = "xs";
-            XsdNamespace.Uri = "http://www.w3.org/2001/XMLSchema";
             base.DoCompile();
             if (!this.Diagnostics.HasErrors())
             {
@@ -50,9 +42,6 @@ namespace MetaDslx.Soal
                 }
             }
         }
-
-        public bool SeparateXsdWsdl { get; set; }
-        public bool SingleFileWsdl { get; set; }
 
         private void PrepareGeneration()
         {
@@ -148,54 +137,11 @@ namespace MetaDslx.Soal
                     }
                 }
             }
-            foreach (var ns in namespaces)
-            {
-                if (ns.Uri != null)
-                {
-                    foreach (var decl in ns.Declarations)
-                    {
-                        Interface intf = decl as Interface;
-                        if (intf != null)
-                        {
-                            foreach (var op in intf.Operations)
-                            {
-                                this.CheckXsdNamespace(op.Result.Type, (ModelObject)op);
-                                foreach (var param in op.Parameters)
-                                {
-                                    this.CheckXsdNamespace(param.Type, (ModelObject)param);
-                                }
-                            }
-                        }
-                        Struct stype = decl as Struct;
-                        if (stype != null)
-                        {
-                            foreach (var prop in stype.Properties)
-                            {
-                                this.CheckXsdNamespace(prop.Type, (ModelObject)prop);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void CheckXsdNamespace(SoalType type, ModelObject symbol)
-        {
-            if (!type.HasXsdNamespace())
-            {
-                this.Diagnostics.AddError("The type of this element has no XSD namespace.", this.FileName, symbol);
-            }
         }
 
 
         private void Generate()
         {
-            if (this.SingleFileWsdl)
-            {
-                this.SeparateXsdWsdl = false;
-            }
-
-
             var namespaces = this.Data.GetSymbols().OfType<Namespace>().ToList();
             foreach (var ns in namespaces)
             {
