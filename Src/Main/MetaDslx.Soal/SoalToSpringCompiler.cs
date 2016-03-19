@@ -221,7 +221,7 @@ namespace MetaDslx.Soal
                                     {
                                         foreach (Service serv in comp.Services)
                                         {
-                                            if (reference.Interface.Equals(serv.Interface))
+                                            if (wire.Target.Equals(serv))
                                             {
                                                 if (!dependencies.Contains(comp.Name))
                                                 {
