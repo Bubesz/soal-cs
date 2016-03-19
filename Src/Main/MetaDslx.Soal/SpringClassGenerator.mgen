@@ -165,6 +165,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 ^
 [SpringGeneratorUtil.GenerateImports(component)]
+[loop (component->reference:References)]
+import [SpringGeneratorUtil.GetPackage(reference.Interface)].[SpringGeneratorUtil.Properties.interfacePackage].[reference.Interface.Name][SpringGeneratorUtil.GetBindingType(reference)];
+[end loop]
 ^
 @Service
 public class [component.Name]Facade {
