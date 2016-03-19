@@ -78,8 +78,6 @@ namespace Soal
                 {
                     string source = reader.ReadToEnd();
                     SoalToSpringCompiler compiler = new SoalToSpringCompiler(source, outputDirectory, Path.GetFileName(fileName));
-                    compiler.SeparateXsdWsdl = separateXsdWsdl;
-                    compiler.SingleFileWsdl = singleFileWsdl;
                     compiler.Compile();
                     if (!compiler.Diagnostics.HasErrors())
                     {
