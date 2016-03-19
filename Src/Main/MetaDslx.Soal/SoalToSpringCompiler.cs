@@ -195,14 +195,47 @@ namespace MetaDslx.Soal
                         GenerateModelModule(ns, entities, innerDir, springClassGen, springConfigGen, generatorUtil);
                     }
 
+                    List<Wire> wires = new List<Wire>();
+
+                    foreach (Composite comppsoite in ns.Declarations.OfType<Composite>())
+                    {
+                        foreach (Wire wire in comppsoite.Wires)
+                        {
+                            wires.Add(wire);
+                        }
+                    }
+
                     foreach (Component component in ns.Declarations.OfType<Component>())
                     {
                         modules.Add(component.Name);
                         List<string> dependencies = new List<string>();
 
+                        // collecting module dependencies
+                        foreach (Reference reference in component.References)
+                        {
+                            foreach (Wire wire in wires)
+                            {
+                                if (wire.Source.Equals(reference))
+                                {
+                                    foreach (Component comp in ns.Declarations.OfType<Component>())
+                                    {
+                                        foreach (Service serv in comp.Services)
+                                        {
+                                            if (reference.Interface.Equals(serv.Interface))
+                                            {
+                                                if (!dependencies.Contains(comp.Name))
+                                                {
+                                                    dependencies.Add(comp.Name);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         if (component.Services.Any())
                         {
-                            // TODO collect module dependencies
                             GenerateServiceImplementations(ns, innerDir, springInterfaceGen, springClassGen, springConfigGen, generatorUtil, modules, dataModule, component, dependencies);
                         }
                         else
