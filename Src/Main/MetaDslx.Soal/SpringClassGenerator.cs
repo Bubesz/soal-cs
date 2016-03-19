@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringClassGenerator_168167343;
-    namespace __Hidden_SpringClassGenerator_168167343
+    using __Hidden_SpringClassGenerator_1512925128;
+    namespace __Hidden_SpringClassGenerator_1512925128
     {
         internal static class __Extensions
         {
@@ -492,6 +492,8 @@ namespace MetaDslx.Soal //1:1
             string __tmp12Line = " extends Exception {"; //57:23
             if (__tmp12Line != null) __out.Append(__tmp12Line);
             __out.AppendLine(false); //57:43
+            __out.Append("	private static final long serialVersionUID = 1L;"); //58:1
+            __out.AppendLine(false); //58:50
             var __loop5_results = 
                 (from __loop5_var1 in __Enumerate((ex).GetEnumerator()) //59:8
                 from prop in __Enumerate((__loop5_var1.Properties).GetEnumerator()) //59:12

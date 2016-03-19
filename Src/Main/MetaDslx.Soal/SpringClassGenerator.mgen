@@ -55,7 +55,7 @@ package [SpringGeneratorUtil.GetPackage(ex)].[SpringGeneratorUtil.Properties.exc
 [SpringGeneratorUtil.GenerateImports(ex)]
 ^
 public class [ex.Name] extends Exception {
-
+	private static final long serialVersionUID = 1L;
 [loop (ex->prop:Properties)]
 	^
 	private [prop.Type.GetJavaName()] [prop.Name.ToString().ToCamelCase()];
