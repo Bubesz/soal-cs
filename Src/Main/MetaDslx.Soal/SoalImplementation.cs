@@ -504,15 +504,6 @@ namespace MetaDslx.Soal
             Component component = declaration as Component;
             if (component != null)
             {
-                List<Port> referencesAndServices = new List<Port>();
-                referencesAndServices.AddRange(component.Services);
-                referencesAndServices.AddRange(component.References);
-
-                foreach (Port iref in referencesAndServices)
-                {
-                    result.Add(iref.Interface);
-                }
-
                 foreach (Service service in component.Services)
                 {
                     foreach (Operation operation in service.Interface.Operations)
@@ -522,7 +513,6 @@ namespace MetaDslx.Soal
                 }
                 //result.Add(component.BaseComponent); TODO mi volt eddig?
             }
-
             return result;
         }
 
