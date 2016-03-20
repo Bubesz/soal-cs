@@ -10,7 +10,8 @@ namespace MetaDslx.Soal
 {
     public class SoalToSpringCompiler : SoalCompilerBase
     {
-        private string mvnDir;
+        private string mvnJavaDir;
+        private string mvnWebDir;
 
         public SoalToSpringCompiler(string source, string outputDirectory, string fileName)
             : base(source, fileName)
@@ -46,7 +47,8 @@ namespace MetaDslx.Soal
         private void PrepareGeneration()
         {
             //standard maven path
-            this.mvnDir = Path.Combine("src", "main", "java");
+            this.mvnJavaDir = Path.Combine("src", "main", "java");
+            this.mvnWebDir = Path.Combine("src", "main", "webapp");
 
             HashSet<string> prefixes = new HashSet<string>();
             prefixes.Add("xs");
@@ -159,6 +161,7 @@ namespace MetaDslx.Soal
                 SpringClassGenerator springClassGen = new SpringClassGenerator(ns);
                 SpringInterfaceGenerator springInterfaceGen = new SpringInterfaceGenerator(ns);
                 SpringConfigurationGenerator springConfigGen = new SpringConfigurationGenerator(ns);
+                SpringViewGenerator springViewGen = new SpringViewGenerator(ns);
                 SpringGeneratorUtil generatorUtil = new SpringGeneratorUtil(ns);
                 //generatorUtil.Properties.entityPackage = "asdasd";
 
@@ -208,31 +211,8 @@ namespace MetaDslx.Soal
                     foreach (Component component in ns.Declarations.OfType<Component>())
                     {
                         modules.Add(component.Name);
-                        List<string> dependencies = new List<string>();
 
-                        // collecting module dependencies
-                        foreach (Reference reference in component.References)
-                        {
-                            foreach (Wire wire in wires)
-                            {
-                                if (wire.Source.Equals(reference))
-                                {
-                                    foreach (Component comp in ns.Declarations.OfType<Component>())
-                                    {
-                                        foreach (Service serv in comp.Services)
-                                        {
-                                            if (wire.Target.Equals(serv))
-                                            {
-                                                if (!dependencies.Contains(comp.Name))
-                                                {
-                                                    dependencies.Add(comp.Name);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        List<string> dependencies = GetherDependencies(ns, wires, component);
 
                         if (component.Services.Any())
                         {
@@ -242,13 +222,12 @@ namespace MetaDslx.Soal
                         {
                             if (component.Implementation != null && component.Implementation.Name.Equals("JSF"))
                             {
-                                // generate web tier
-                                Console.WriteLine("web tier: "+component.Name);
+                                GenerateWebTier(ns, innerDir, springViewGen, generatorUtil, component);
                             }
                             if (component is Composite)
                             {
-                                string facadeDir = createDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.serviceFacadePackage);
-                                string facadeFile = Path.Combine(facadeDir, component.Name+"Facade.java");
+                                string facadeDir = createJavaDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.serviceFacadePackage);
+                                string facadeFile = Path.Combine(facadeDir, component.Name + "Facade.java");
                                 using (StreamWriter writer = new StreamWriter(facadeFile))
                                 {
                                     writer.WriteLine(springClassGen.GenerateComponent(component));
@@ -265,14 +244,14 @@ namespace MetaDslx.Soal
                         if (component.Name != dataModule)
                         {
                             // if uses DB TODO
-                            dependencies.Add(dataModule+"-API");
+                            dependencies.Add(dataModule + "-API");
                         }
                         else
                         {
                             GenerateDataModule(ns, component, innerDir, springClassGen, springConfigGen, generatorUtil, springInterfaceGen, entities, modules);
                         }
 
-                        createDirectory(ns.Name, component.Name, "", "");
+                        createJavaDirectory(ns.Name, component.Name, "", "");
                         string fileName = Path.Combine(ns.Name + "-" + component.Name, "pom.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
@@ -281,7 +260,7 @@ namespace MetaDslx.Soal
                             writer.WriteLine(s);
                         }
 
-                        fileName = Path.Combine(ns.Name + "-" + component.Name, this.mvnDir, "spring-config.xml");
+                        fileName = Path.Combine(ns.Name + "-" + component.Name, this.mvnJavaDir, "spring-config.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
                             writer.WriteLine(springConfigGen.generateComponentSpringConfig(ns));
@@ -302,19 +281,79 @@ namespace MetaDslx.Soal
             }
         }
 
+        private List<string> GetherDependencies(Namespace ns, List<Wire> wires, Component component)
+        {
+            // collecting module dependencies
+            List<string> dependencies = new List<string>();
+            foreach (Reference reference in component.References)
+            {
+                foreach (Wire wire in wires)
+                {
+                    // Component comp = (Component)((ModelObject)port).MParent;
+                    if (wire.Source.Equals(reference))
+                    {
+                        foreach (Component comp in ns.Declarations.OfType<Component>())
+                        {
+                            foreach (Service serv in comp.Services)
+                            {
+                                if (wire.Target.Equals(serv))
+                                {
+                                    if (!dependencies.Contains(comp.Name))
+                                    {
+                                        dependencies.Add(comp.Name);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return dependencies;
+        }
+
+        private void GenerateWebTier(Namespace ns, string innerDir, SpringViewGenerator springViewGen, SpringGeneratorUtil generatorUtil, Component component)
+        {
+            if (component.References.Any())
+            {
+                string viewDir = createWebDirectory(ns.Name, component.Name, "view");
+                string viewFile = Path.Combine(viewDir, "_master.html");
+                using (StreamWriter writer = new StreamWriter(viewFile))
+                {
+                    writer.WriteLine(springViewGen.GenerateMasterView());
+                }
+            }
+
+            foreach (Reference reference in component.References)
+            {
+                string contollerDir = createJavaDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.controllerPackage);
+                string contollerFile = Path.Combine(contollerDir, component.Name + "Controller.java");
+                using (StreamWriter writer = new StreamWriter(contollerFile))
+                {
+                    writer.WriteLine(springViewGen.GenerateController(reference));
+                }
+
+                string viewDir = createWebDirectory(ns.Name, component.Name, "view");
+                string viewFile = Path.Combine(viewDir, reference.Name + "View.html");
+                using (StreamWriter writer = new StreamWriter(viewFile))
+                {
+                    writer.WriteLine(springViewGen.GenerateView(reference));
+                }
+            }
+        }
+
         private void GenerateDataModule(Namespace ns, Component component, string innerDir, SpringClassGenerator springClassGen,
             SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil, SpringInterfaceGenerator springInterfaceGen,
             List<Struct> entities, List<string> modules)
         {
             //pom.xml
-            createDirectory(ns.Name, component.Name, "", "");
+            createJavaDirectory(ns.Name, component.Name, "", "");
             string filename = Path.Combine(ns.Name + "-" + component.Name, "pom.xml");
             using (StreamWriter writer = new StreamWriter(filename))
             {
                 writer.WriteLine(springConfigGen.generateDataPom(ns, component.Name));
             }
 
-            filename = Path.Combine(ns.Name + "-" + component.Name, this.mvnDir, "spring-config.xml");
+            filename = Path.Combine(ns.Name + "-" + component.Name, this.mvnJavaDir, "spring-config.xml");
             using (StreamWriter writer = new StreamWriter(filename))
             {
                 writer.WriteLine(springConfigGen.generateDataSpringConfig(ns));
@@ -334,15 +373,15 @@ namespace MetaDslx.Soal
             foreach (Struct entity in entities)
             {
                 // repository TODO bindings
-                string repoDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.repositoryPackage);
+                string repoDirectory = createJavaDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.repositoryPackage);
                 string javaFileName = Path.Combine(repoDirectory, entity.Name + "Repository.java");
                 using (StreamWriter writer = new StreamWriter(javaFileName))
                 {
                     writer.WriteLine(springClassGen.GenerateRepository(entity));
                 }
 
-                string apiDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.interfacePackage);
-                string functionDirectory = createDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.repositoryPackage);
+                string apiDirectory = createJavaDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.interfacePackage);
+                string functionDirectory = createJavaDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.repositoryPackage);
 
 
                 if (bindings.HasRestBinding)
@@ -402,7 +441,7 @@ namespace MetaDslx.Soal
         private void GenerateModelModule(Namespace ns, List<Struct> entities, string innerDir, SpringClassGenerator springClassGen,
             SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil)
         {
-            createDirectory(ns.Name, "Model", "", "");
+            createJavaDirectory(ns.Name, "Model", "", "");
             //pom.xml
             string filename = Path.Combine(ns.Name + "-Model", "pom.xml");
             using (StreamWriter writer = new StreamWriter(filename))
@@ -426,7 +465,7 @@ namespace MetaDslx.Soal
             foreach (Struct entity in entities)
             {
                 // entity
-                string entityDirectory = createDirectory(ns.Name, "Model", innerDir, generatorUtil.Properties.entityPackage);
+                string entityDirectory = createJavaDirectory(ns.Name, "Model", innerDir, generatorUtil.Properties.entityPackage);
                 string javaFileName = Path.Combine(entityDirectory, entity.Name + ".java");
 
                 using (StreamWriter writer = new StreamWriter(javaFileName))
@@ -438,7 +477,7 @@ namespace MetaDslx.Soal
             //enums
             foreach (Enum myEnum in ns.Declarations.OfType<Enum>())
             {
-                string enumDirectory = createDirectory(ns.Name, "Model", innerDir, generatorUtil.Properties.enumPackage);
+                string enumDirectory = createJavaDirectory(ns.Name, "Model", innerDir, generatorUtil.Properties.enumPackage);
                 string javaFileName = Path.Combine(enumDirectory, myEnum.Name + ".java");
 
                 using (StreamWriter writer = new StreamWriter(javaFileName))
@@ -465,7 +504,7 @@ namespace MetaDslx.Soal
                 if (iface is Database) { continue; } //handle very differently
 
                 // interface goes to API
-                string apiIfDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.interfacePackage);
+                string apiIfDirectory = createJavaDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.interfacePackage);
                 string interfaceFileName = Path.Combine(apiIfDirectory, iface.Name + ".java");
                 using (StreamWriter writer = new StreamWriter(interfaceFileName))
                 {
@@ -473,7 +512,7 @@ namespace MetaDslx.Soal
                 }
 
                 // implementaton goes to component
-                string functionDirectory = createDirectory(ns.Name, component.Name, innerDir, component.Name.ToLower());
+                string functionDirectory = createJavaDirectory(ns.Name, component.Name, innerDir, component.Name.ToLower());
                 string javaFileName = Path.Combine(functionDirectory, iface.Name + "Impl.java");
                 using (StreamWriter writer = new StreamWriter(javaFileName))
                 {
@@ -491,7 +530,7 @@ namespace MetaDslx.Soal
                 {
                     foreach(Struct exception in op.Exceptions)
                     {
-                        string apiExDirectory = createDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.exceptionPackage);
+                        string apiExDirectory = createJavaDirectory(ns.Name, component.Name + "-API", innerDir, generatorUtil.Properties.exceptionPackage);
                         string exFileName = Path.Combine(apiExDirectory, exception.Name + ".java");
                         using (StreamWriter writer = new StreamWriter(exFileName))
                         {
@@ -503,7 +542,7 @@ namespace MetaDslx.Soal
 
             // pom.xml of API
             dependencies.Add("Model");
-            createDirectory(ns.Name, component.Name + "-API", "", "");
+            createJavaDirectory(ns.Name, component.Name + "-API", "", "");
             string fileName = Path.Combine(ns.Name + "-" + component.Name + "-API", "pom.xml");
             using (StreamWriter writer = new StreamWriter(fileName))
             {
@@ -653,7 +692,7 @@ namespace MetaDslx.Soal
             return new List<Binding>(bindings);
         }
 
-        private string createDirectory(string namespaceName, string projectSuffix, string innerDir, string subDir)
+        private string createJavaDirectory(string namespaceName, string projectSuffix, string innerDir, string subDir)
         {
             string projectDir = "";
             if (projectSuffix != null)
@@ -661,8 +700,24 @@ namespace MetaDslx.Soal
             else
                 projectDir = namespaceName;
 
-            string directory = Path.Combine(projectDir, this.mvnDir, innerDir, subDir);
+            string directory = Path.Combine(projectDir, this.mvnJavaDir, innerDir, subDir);
             //string directory = Path.Combine(projectDir, subDir); // TODO change
+
+            Directory.CreateDirectory(directory);
+
+            return directory;
+        }
+
+        private string createWebDirectory(string namespaceName, string projectSuffix, string subDir)
+        {
+            string projectDir = "";
+            if (projectSuffix != null)
+                projectDir = namespaceName + "-" + projectSuffix;
+            else
+                projectDir = namespaceName;
+
+            string directory = Path.Combine(projectDir, this.mvnWebDir, "WEB-INF", subDir);
+            //string directory = Path.Combine(projectDir, "WEB-INF", subDir); // TODO change
 
             Directory.CreateDirectory(directory);
 
