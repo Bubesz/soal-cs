@@ -62,6 +62,11 @@
     <Compile Include="SoalParserVisitor.cs">
       <DependentUpon>SoalParser.ag4</DependentUpon>
     </Compile>
+    <Compile Include="SpringViewGenerator.cs">
+      <DependentUpon>SpringViewGenerator.mgen</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="SpringInterfaceGenerator.cs">
       <DependentUpon>SpringInterfaceGenerator.mgen</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -152,6 +157,10 @@
     <None Include="SoalPrinter.mgen">
       <Generator>MetaGenerator</Generator>
       <LastGenOutput>SoalPrinter.cs</LastGenOutput>
+    </None>
+    <None Include="SpringViewGenerator.mgen">
+      <Generator>MetaGenerator</Generator>
+      <LastGenOutput>SpringViewGenerator.cs</LastGenOutput>
     </None>
     <None Include="SpringInterfaceGenerator.mgen">
       <Generator>MetaGenerator</Generator>

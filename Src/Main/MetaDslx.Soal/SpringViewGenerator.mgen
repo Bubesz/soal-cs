@@ -1,0 +1,259 @@
+﻿namespace MetaDslx.Soal;
+generator SpringViewGenerator for object;
+
+using generator SpringGeneratorUtil;
+
+
+
+template GenerateController(Reference reference)
+package [SpringGeneratorUtil.GetPackage(reference.Interface)].[SpringGeneratorUtil.Properties.controllerPackage];
+^
+import [SpringGeneratorUtil.GetPackage(reference.Interface)].[SpringGeneratorUtil.Properties.interfacePackage].[reference.Interface.Name][SpringGeneratorUtil.GetBindingType(reference)];
+^
+@Controller
+public class [reference.Name]Controller {
+^
+	@Autowired
+	private [reference.Interface.Name][SpringGeneratorUtil.GetBindingType(reference)] [reference.Name.ToCamelCase()];
+	^
+		[loop(reference.Interface->op:Operations)]
+	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)]) {
+		// TODO implement method
+		throw new UnsupportedOperationException("Not yet implemented.");
+	}
+	^
+		[end loop]
+}
+end template
+
+
+
+template GenerateView(Reference reference)
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:substituteby="_master :: head">
+    <title>Simple</title>
+    <link rel="stylesheet" href="../resources/css/foundation.min.css"/>
+    <link rel="stylesheet" href="../resources/css/style.css"/>
+</head>
+<body>
+^
+<header class="template row" th:substituteby="_master :: header">
+    <div class="small-10 columns">
+        <h1>//Title///h1>
+    </div>
+</header>
+^
+<div class="row">
+    <div class="small-10 columns">
+        <h2>List of users in database</h2>
+^
+        <table>
+            <tr>
+                <th>UserId</th>
+                <th>Name</th>
+            </tr>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.userId}">12</td>
+                <td th:text="${user.useName}">Attila</td>
+                <!--<td th:text="${#aggregates.sum(o.orderLines.{purchasePrice * amount})}">23.32</td>-->
+                <!--<td>-->
+                    <!--<a href="details.html" th:href="@{/order/details(orderId=${o.id})}">view</a>-->
+                <!--</td>-->
+            </tr>
+        </table>
+    </div>
+    <div class="small-2 columns template" th:substituteby="_master :: sidebar">
+        //side-nav menu//
+    </div>
+</div>
+^
+<footer class="template row" th:substituteby="_master :: footer">
+    <div class="large-12 columns">
+        <hr/>
+        <div class="row">
+            <div class="small-4 columns">
+                //copyright//
+            </div>
+            <div class="small-8 columns">
+                <span class="right">//powered by//</span>
+            </div>
+        </div>
+    </div>
+</footer>
+^
+</body>
+</html>
+end template
+
+
+
+template GenerateMasterView()
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+^
+<head th:fragment="head">
+    <title>Simple</title>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="stylesheet" href="../resources/css/normalize.css"
+          th:href="@{/resources/css/normalize.css}"/>
+    <link rel="stylesheet" href="../resources/css/foundation.min.css"
+          th:href="@{/resources/css/foundation.min.css}"/>
+    <link rel="stylesheet" href="../resources/css/style.css"
+          th:href="@{/resources/css/style.css}"/>
+    <script type="text/javascript" src="../resources/js/vendor/custom.modernizr.js"
+            th:src="@{/resources/js/vendor/custom.modernizr.js}" />
+    <script type="text/javascript" src="../resources/js/vendor/jquery.js"
+            th:src="@{/resources/js/vendor/jquery.js}" />
+    <script type="text/javascript" src="../resources/js/foundation.min.js"
+            th:src="@{/resources/js/foundation.min.js}" />
+    <script type="text/javascript" src="../resources/js/app.js"
+            th:src="@{/resources/js/app.js}" />
+</head>
+^
+<body>
+^
+<header class="row" th:fragment="header">
+    <div class="small-10 columns">
+        <h1>App Name</h1>
+    </div>
+</header>
+^
+<div class="row">
+    <div class="small-10 columns template">
+        <h2>//content title//</h2>
+
+        <p>//content//</p>
+    </div>
+^
+    <div class="small-2 columns" th:fragment="sidebar">
+        <div style="width: 140px; margin: 0 auto">
+            <ul class="side-nav">
+                <!--<li><a href="post/list.html" th:href="@{/refresh}">Refresh</a></li>-->
+                <li><a href="users.html" th:href="@{/users}" >Users</a></li>
+                       <!--th:text="#{page.users}">Users</a></li>-->
+                <li class="divider"></li>
+                <li><a href="about.html" th:href="@{/about}">About</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+^
+<footer class="row" th:fragment="footer">
+    <div class="large-12 columns">
+        <hr/>
+        <div class="row">
+            <div class="small-4 columns">
+                <p>&copy; Copyright BME IIT</p>
+            </div>
+            <div class="small-8 columns">
+                <ul class="inline-list right">
+                    <li>Powered by</li>
+                    <li><a href="http://www.springsource.org/">Spring</a></li>
+                    <li><a href="http://www.thymeleaf.org/">Thymeleaf</a></li>
+                    <li><a href="http://foundation.zurb.com/">Foundation</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+^
+</body>
+</html>
+end template
+
+
+
+template GenerateWebXml()
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+		                     http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+^
+    <servlet>
+        <servlet-name>spring</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+^
+    <servlet-mapping>
+        <servlet-name>spring</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+^
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/spring-config.xml</param-value>
+    </context-param>
+^
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+^
+    <filter>
+        <filter-name>characterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </filter>
+^
+    <filter-mapping>
+        <filter-name>characterEncodingFilter</filter-name>
+        <servlet-name>spring</servlet-name>
+    </filter-mapping>
+^
+</web-app>
+end template
+
+
+template GenerateServlet(Namespace ns)
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/mvc
+                           http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+^
+    <context:component-scan base-package="[ns.FullName].[SpringGeneratorUtil.controllerPackage]"/>
+^
+    <mvc:annotation-driven/>
+^
+    <!--<mvc:resources mapping="/favicon.ico" location="/WEB-INF/resources/img/"/>-->
+    <mvc:resources mapping="/resources/**" location="/WEB-INF/resources/"/>
+^
+    <mvc:interceptors>
+        <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+            <property name="paramName" value="lang"/>
+        </bean>
+    </mvc:interceptors>
+^
+    <bean id="templateResolver" class="org.thymeleaf.templateresolver.ServletContextTemplateResolver">
+        <property name="prefix" value="/WEB-INF/view/"/>
+        <property name="suffix" value=".html"/>
+        <property name="characterEncoding" value="UTF-8"/>
+        <property name="templateMode" value="HTML5"/>
+        <property name="cacheable" value="false"/>
+    </bean>
+^
+    <bean id="templateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
+        <property name="templateResolver" ref="templateResolver"/>
+    </bean>
+^
+    <bean class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
+        <property name="templateEngine" ref="templateEngine"/>
+        <property name="contentType" value="text/html; charset=UTF-8"/>
+        <property name="characterEncoding" value="UTF-8"/>
+    </bean>
+^
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"/>
+^
+</beans>
+end template
