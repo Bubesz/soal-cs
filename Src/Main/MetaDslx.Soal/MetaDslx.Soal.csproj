@@ -43,6 +43,7 @@
     <Reference Include="Antlr4.Runtime" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ViewInfoHolder.cs" />
     <Compile Include="BindingTypeHolder.cs" />
     <Compile Include="SoalParser.cs">
       <DependentUpon>SoalParser.ag4</DependentUpon>
