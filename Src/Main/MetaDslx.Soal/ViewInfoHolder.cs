@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal
 {
-    class ViewInfoHolder
+    public class ViewInfoHolder
     {
         private string fileName;
         private string mapping;
