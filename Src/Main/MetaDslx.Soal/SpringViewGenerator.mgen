@@ -11,15 +11,45 @@ package [SpringGeneratorUtil.GetPackage(reference.Interface)].[SpringGeneratorUt
 import [SpringGeneratorUtil.GetPackage(reference.Interface)].[SpringGeneratorUtil.Properties.interfacePackage].[reference.Interface.Name][SpringGeneratorUtil.GetBindingType(reference)];
 ^
 @Controller
+@RequestMapping(method = RequestMethod.GET)
 public class [reference.Name]Controller {
 ^
 	@Autowired
 	private [reference.Interface.Name][SpringGeneratorUtil.GetBindingType(reference)] [reference.Name.ToCamelCase()];
 	^
 		[loop(reference.Interface->op:Operations)]
-	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)]) {
-		// TODO implement method
-		throw new UnsupportedOperationException("Not yet implemented.");
+	
+			[string javaReturn = op.Result.Type.GetJavaName()]
+			[string name = op.Name]
+			[if (name.StartsWith("Get"))]
+				[name = op.Name.Substring(3)]
+			[end if]
+
+			[if (javaReturn.Contains("List"))]
+	@RequestMapping("/[name]")
+			[else if (javaReturn != "void")]
+	@RequestMapping(path="/", params={action=[name]})
+			[else]
+	@RequestMapping("/") // + POST
+			[end if]
+	public String [op.Name.ToCamelCase()](Model model\
+			[loop (op->param:Parameters)]
+,
+		@RequestParam(value="[param.Name.ToString().ToCamelCase()]") [param.Type.GetJavaName()] [param.Name.ToString().ToCamelCase()]\
+			[end loop]
+) {
+		[op.Result.Type.GetJavaName()] result = [reference.Name.ToCamelCase()].[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
+        [ArrayType array = (op.Result.Type as ArrayType)]
+		[if (array != null)]
+		model.addAttribute("[array.InnerType.GetJavaName()]List", result);
+		[else]
+		model.addAttribute("[op.Result.Type.GetJavaName()]", result);
+		[end if]
+		[if (javaReturn.Contains("List"))]
+		return "[name]";
+			[else]
+		return "[reference.Name]View";
+			[end if]
 	}
 	^
 		[end loop]
@@ -40,26 +70,114 @@ template GenerateView(Reference reference)
 ^
 <header class="template row" th:substituteby="_master :: header">
     <div class="small-10 columns">
-        <h1>//Title///h1>
+        <h1>//Title//</h1>
     </div>
 </header>
 ^
 <div class="row">
     <div class="small-10 columns">
-        <h2>List of users in database</h2>
+		<h2>[reference.Interface.Name]</h2>
+^
+[int ids = 0]
+[loop(reference.Interface->action:Operations)]
+	[string actionName = action.Name]
+	[if (actionName.StartsWith("Get"))]
+		[actionName = actionName.Substring(3)]
+	[end if]
+
+	[string javaReturn = action.Result.Type.GetJavaName()]
+
+	[if (javaReturn.Contains("List") && !action.Parameters.Any())]
+		<a href="[actionName].html">[actionName]</a>
+	[else]
+		[if (javaReturn.Contains("List"))]
+		<form action="[actionName].html">
+		[else]
+		<form>
+		[end if]
+
+		[if(action.Parameters.Any())]
+			<fieldset>
+				<legend>[actionName]</legend>
+		[end if]
+
+		[if (javaReturn != "void" && !javaReturn.Contains("List"))]
+				<input type="hidden" name="action" value="[actionName]" />
+		[end if]
+
+		[loop(action->input:Parameters)]
+			[string id = (ids++).ToString()]
+				<label for="[id]">[input.Name]: </label>
+				<input id="[id]" type="text" name="[input.Name]" />
+		[end loop]
+				<input type="submit" value="[action.Name]" />
+
+		[if (javaReturn != "void" && !javaReturn.Contains("List"))]
+			[string id = (ids++).ToString()]
+				<input id="[id]" type="text" name="[actionName]Result" disabled />
+		[end if]
+		[if(action.Parameters.Any())]
+			</fieldset>
+		[end if]
+		</form>
+	[end if]
+		<br/>
+[end loop]
+    <div class="small-2 columns template" th:substituteby="_master :: sidebar">
+        //side-nav menu//
+    </div>
+</div>
+^
+<footer class="template row" th:substituteby="_master :: footer">
+    <div class="large-12 columns">
+        <hr/>
+        <div class="row">
+            <div class="small-4 columns">
+                //copyright//
+            </div>
+            <div class="small-8 columns">
+                <span class="right">//powered by//</span>
+            </div>
+        </div>
+    </div>
+</footer>
+^
+</body>
+</html>
+end template
+
+
+
+template GenerateListView(Struct entity)
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:substituteby="_master :: head">
+    <title>Simple</title>
+    <link rel="stylesheet" href="../resources/css/foundation.min.css"/>
+    <link rel="stylesheet" href="../resources/css/style.css"/>
+</head>
+<body>
+^
+<header class="template row" th:substituteby="_master :: header">
+    <div class="small-10 columns">
+        <h1>//Title//</h1>
+    </div>
+</header>
+^
+<div class="row">
+    <div class="small-10 columns">
+        <h2>[entity.Name] list</h2>
 ^
         <table>
             <tr>
-                <th>UserId</th>
-                <th>Name</th>
+		[loop(entity->property:Properties)]
+                <th>[property.Name]</th>
+		[end loop]
             </tr>
-            <tr th:each="user : ${users}">
-                <td th:text="${user.userId}">12</td>
-                <td th:text="${user.useName}">Attila</td>
-                <!--<td th:text="${#aggregates.sum(o.orderLines.{purchasePrice * amount})}">23.32</td>-->
-                <!--<td>-->
-                    <!--<a href="details.html" th:href="@{/order/details(orderId=${o.id})}">view</a>-->
-                <!--</td>-->
+            <tr th:each="[entity.Name.ToCamelCase()] : ${[entity.Name.ToCamelCase()]List}">
+		[loop(entity->property:Properties)]
+				<td th:text="${[entity.Name.ToCamelCase()].[property.Name.ToCamelCase()]}">Data</td>
+		[end loop]
             </tr>
         </table>
     </div>
@@ -88,12 +206,12 @@ end template
 
 
 
-template GenerateMasterView()
+template GenerateMasterView(string applicationName, List<ViewInfoHolder> views)
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 ^
 <head th:fragment="head">
-    <title>Simple</title>
+    <title>[applicationName]</title>
     <meta name="viewport" content="width=device-width"/>
     <link rel="stylesheet" href="../resources/css/normalize.css"
           th:href="@{/resources/css/normalize.css}"/>
@@ -102,20 +220,20 @@ template GenerateMasterView()
     <link rel="stylesheet" href="../resources/css/style.css"
           th:href="@{/resources/css/style.css}"/>
     <script type="text/javascript" src="../resources/js/vendor/custom.modernizr.js"
-            th:src="@{/resources/js/vendor/custom.modernizr.js}" />
+            th:src="@{/resources/js/vendor/custom.modernizr.js}"></script>
     <script type="text/javascript" src="../resources/js/vendor/jquery.js"
-            th:src="@{/resources/js/vendor/jquery.js}" />
+            th:src="@{/resources/js/vendor/jquery.js}"></script>
     <script type="text/javascript" src="../resources/js/foundation.min.js"
-            th:src="@{/resources/js/foundation.min.js}" />
+            th:src="@{/resources/js/foundation.min.js}"></script>
     <script type="text/javascript" src="../resources/js/app.js"
-            th:src="@{/resources/js/app.js}" />
+            th:src="@{/resources/js/app.js}"></script>
 </head>
 ^
 <body>
 ^
 <header class="row" th:fragment="header">
     <div class="small-10 columns">
-        <h1>App Name</h1>
+        <h1>[applicationName]</h1>
     </div>
 </header>
 ^
@@ -129,11 +247,9 @@ template GenerateMasterView()
     <div class="small-2 columns" th:fragment="sidebar">
         <div style="width: 140px; margin: 0 auto">
             <ul class="side-nav">
-                <!--<li><a href="post/list.html" th:href="@{/refresh}">Refresh</a></li>-->
-                <li><a href="users.html" th:href="@{/users}" >Users</a></li>
-                       <!--th:text="#{page.users}">Users</a></li>-->
-                <li class="divider"></li>
-                <li><a href="about.html" th:href="@{/about}">About</a></li>
+			[loop(view:views)]
+                <li><a href="[view.FileName]" th:href="@{/[view.Mapping]}" th:text="#{page.[view.Name]}">[view.Name]</a></li>
+			[end loop]
             </ul>
         </div>
     </div>
@@ -149,7 +265,7 @@ template GenerateMasterView()
             <div class="small-8 columns">
                 <ul class="inline-list right">
                     <li>Powered by</li>
-                    <li><a href="http://www.springsource.org/">Spring</a></li>
+                    <li><a href="http://www.spring.io/">Spring</a></li>
                     <li><a href="http://www.thymeleaf.org/">Thymeleaf</a></li>
                     <li><a href="http://foundation.zurb.com/">Foundation</a></li>
                 </ul>
@@ -169,7 +285,7 @@ template GenerateWebXml()
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
-		                     http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+		 http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
 ^
     <servlet>
         <servlet-name>spring</servlet-name>
@@ -222,7 +338,7 @@ template GenerateServlet(Namespace ns)
                            http://www.springframework.org/schema/mvc
                            http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 ^
-    <context:component-scan base-package="[ns.FullName].[SpringGeneratorUtil.controllerPackage]"/>
+    <context:component-scan base-package="[ns.FullName].[SpringGeneratorUtil.Properties.controllerPackage]"/>
 ^
     <mvc:annotation-driven/>
 ^

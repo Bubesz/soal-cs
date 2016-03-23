@@ -313,20 +313,11 @@ namespace MetaDslx.Soal
 
         private void GenerateWebTier(Namespace ns, string innerDir, SpringViewGenerator springViewGen, SpringGeneratorUtil generatorUtil, Component component)
         {
-            if (component.References.Any())
-            {
-                string viewDir = createWebDirectory(ns.Name, component.Name, "view");
-                string viewFile = Path.Combine(viewDir, "_master.html");
-                using (StreamWriter writer = new StreamWriter(viewFile))
-                {
-                    writer.WriteLine(springViewGen.GenerateMasterView());
-                }
-            }
-
+            List<ViewInfoHolder> views = new List<ViewInfoHolder>();
             foreach (Reference reference in component.References)
             {
                 string contollerDir = createJavaDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.controllerPackage);
-                string contollerFile = Path.Combine(contollerDir, component.Name + "Controller.java");
+                string contollerFile = Path.Combine(contollerDir, reference.Name + "Controller.java");
                 using (StreamWriter writer = new StreamWriter(contollerFile))
                 {
                     writer.WriteLine(springViewGen.GenerateController(reference));
@@ -337,6 +328,46 @@ namespace MetaDslx.Soal
                 using (StreamWriter writer = new StreamWriter(viewFile))
                 {
                     writer.WriteLine(springViewGen.GenerateView(reference));
+                }
+
+                foreach (Operation operation in reference.Interface.Operations)
+                {
+                    SoalType type = operation.Result.Type;
+                    if (type.IsArrayType())
+                    {
+                        ArrayType array = type as ArrayType;
+                        Struct entity = array.InnerType as Struct;
+                        if (entity != null)
+                        {
+                            string actionName = operation.Name;
+                            if (actionName.Contains("Get"))
+                            {
+                                actionName = actionName.Substring(3);
+                            }
+                            string listFile = Path.Combine(viewDir, actionName + ".html");
+                            using (StreamWriter writer = new StreamWriter(listFile))
+                            {
+                                writer.WriteLine(springViewGen.GenerateListView(entity));
+                            }
+                        }
+                    }
+                }
+
+                ViewInfoHolder view = new ViewInfoHolder();
+                view.FileName = reference.Name + "View.html";
+                string name = reference.Name; // TODO get rid of I, etc
+                view.Mapping = name; // TODO mapping separately?
+                view.Name = name;
+                views.Add(view);
+            }
+
+            if (views.Any())
+            {
+                string viewDir = createWebDirectory(ns.Name, component.Name, "view");
+                string viewFile = Path.Combine(viewDir, "_master.html");
+                using (StreamWriter writer = new StreamWriter(viewFile))
+                {
+                    writer.WriteLine(springViewGen.GenerateMasterView(component.Name, views));
                 }
             }
         }

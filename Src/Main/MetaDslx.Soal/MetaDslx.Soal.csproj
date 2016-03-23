@@ -43,6 +43,11 @@
     <Reference Include="Antlr4.Runtime" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SpringViewGenerator1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SpringViewGenerator.mgen</DependentUpon>
+    </Compile>
     <Compile Include="ViewInfoHolder.cs" />
     <Compile Include="BindingTypeHolder.cs" />
     <Compile Include="SoalParser.cs">
@@ -62,11 +67,6 @@
     </Compile>
     <Compile Include="SoalParserVisitor.cs">
       <DependentUpon>SoalParser.ag4</DependentUpon>
-    </Compile>
-    <Compile Include="SpringViewGenerator.cs">
-      <DependentUpon>SpringViewGenerator.mgen</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="SpringInterfaceGenerator.cs">
       <DependentUpon>SpringInterfaceGenerator.mgen</DependentUpon>
@@ -161,7 +161,7 @@
     </None>
     <None Include="SpringViewGenerator.mgen">
       <Generator>MetaGenerator</Generator>
-      <LastGenOutput>SpringViewGenerator.cs</LastGenOutput>
+      <LastGenOutput>SpringViewGenerator1.cs</LastGenOutput>
     </None>
     <None Include="SpringInterfaceGenerator.mgen">
       <Generator>MetaGenerator</Generator>
