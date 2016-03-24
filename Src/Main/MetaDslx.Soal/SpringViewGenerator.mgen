@@ -8,7 +8,15 @@ using generator SpringGeneratorUtil;
 template GenerateController(Reference reference)
 package [SpringGeneratorUtil.GetPackage(reference.Interface)].[SpringGeneratorUtil.Properties.controllerPackage];
 ^
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+^
 import [SpringGeneratorUtil.GetPackage(reference.Interface)].[SpringGeneratorUtil.Properties.interfacePackage].[reference.Interface.Name][SpringGeneratorUtil.GetBindingType(reference)];
+[SpringGeneratorUtil.GenerateImports(reference.Interface, false)]
 ^
 @Controller
 @RequestMapping(method = RequestMethod.GET)
@@ -28,7 +36,7 @@ public class [reference.Name]Controller {
 			[if (javaReturn.Contains("List"))]
 	@RequestMapping("/[name]")
 			[else if (javaReturn != "void")]
-	@RequestMapping(path="/", params={action=[name]})
+	@RequestMapping(value="/", params={"action=[name]"})
 			[else]
 	@RequestMapping("/") // + POST
 			[end if]
@@ -38,13 +46,17 @@ public class [reference.Name]Controller {
 		@RequestParam(value="[param.Name.ToString().ToCamelCase()]") [param.Type.GetJavaName()] [param.Name.ToString().ToCamelCase()]\
 			[end loop]
 ) {
-		[op.Result.Type.GetJavaName()] result = [reference.Name.ToCamelCase()].[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
-        [ArrayType array = (op.Result.Type as ArrayType)]
-		[if (array != null)]
-		model.addAttribute("[array.InnerType.GetJavaName()]List", result);
-		[else]
-		model.addAttribute("[op.Result.Type.GetJavaName()]", result);
-		[end if]
+	[if(op.Exceptions.Any())]
+		try {
+			[ControllerMethodImpl(reference, op)]
+		[loop(op->ex:Exceptions)]
+		} catch ([ex.GetJavaName()] e) {
+			throw new RuntimeException(e);
+		[end loop]
+		}
+	[else]
+		[ControllerMethodImpl(reference, op)]
+	[end if]
 		[if (javaReturn.Contains("List"))]
 		return "[name]";
 			[else]
@@ -54,6 +66,22 @@ public class [reference.Name]Controller {
 	^
 		[end loop]
 }
+end template
+
+
+
+template ControllerMethodImpl(Reference reference, Operation op)
+	[if(op.Result.Type.GetJavaName() == "void")]
+[reference.Name.ToCamelCase()].[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
+	[else]
+[op.Result.Type.GetJavaName()] result = [reference.Name.ToCamelCase()].[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
+[ArrayType array = (op.Result.Type as ArrayType)]
+		[if (array != null)]
+model.addAttribute("[array.InnerType.GetJavaName()]List", result);
+		[else]
+model.addAttribute("[op.Result.Type.GetJavaName()]", result);
+	[end if]
+[end if]
 end template
 
 
