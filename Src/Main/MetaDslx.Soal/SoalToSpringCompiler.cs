@@ -256,7 +256,7 @@ namespace MetaDslx.Soal
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
                             // bindingsOfModule.HasRestBinding, bindingsOfModule.HasWebServiceBinding, bindingsOfModule.HasWebSocketBinding
-                            string s = springConfigGen.generateComponentPom(ns, component.Name, dependencies, false, false, false);
+                            string s = springConfigGen.generateComponentPom(ns, component, dependencies, false, false, false);
                             writer.WriteLine(s);
                         }
 
@@ -316,6 +316,7 @@ namespace MetaDslx.Soal
             List<ViewInfoHolder> views = new List<ViewInfoHolder>();
             foreach (Reference reference in component.References)
             {
+                // controllers
                 string contollerDir = createJavaDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.controllerPackage);
                 string contollerFile = Path.Combine(contollerDir, reference.Name + "Controller.java");
                 using (StreamWriter writer = new StreamWriter(contollerFile))
@@ -323,6 +324,7 @@ namespace MetaDslx.Soal
                     writer.WriteLine(springViewGen.GenerateController(reference));
                 }
 
+                // views
                 string viewDir = createWebDirectory(ns.Name, component.Name, "view");
                 string viewFile = Path.Combine(viewDir, reference.Name + "View.html");
                 using (StreamWriter writer = new StreamWriter(viewFile))
@@ -330,6 +332,7 @@ namespace MetaDslx.Soal
                     writer.WriteLine(springViewGen.GenerateView(reference));
                 }
 
+                // list views
                 foreach (Operation operation in reference.Interface.Operations)
                 {
                     SoalType type = operation.Result.Type;
@@ -361,6 +364,7 @@ namespace MetaDslx.Soal
                 views.Add(view);
             }
 
+            // master view
             if (views.Any())
             {
                 string viewDir = createWebDirectory(ns.Name, component.Name, "view");
@@ -369,6 +373,35 @@ namespace MetaDslx.Soal
                 {
                     writer.WriteLine(springViewGen.GenerateMasterView(component.Name, views));
                 }
+            }
+
+            // web.xml
+            string webinfDir = createWebDirectory(ns.Name, component.Name, "");
+            string webxmlFile = Path.Combine(webinfDir, "web.xml");
+            using (StreamWriter writer = new StreamWriter(webxmlFile))
+            {
+                writer.WriteLine(springViewGen.GenerateWebXml());
+            }
+
+            // deployment-struture
+            string jbossFile = Path.Combine(webinfDir, "jboss-deployment-structure.xml");
+            using (StreamWriter writer = new StreamWriter(jbossFile))
+            {
+                writer.WriteLine(springViewGen.GenerateJboss());
+            }
+
+            // appCtx
+            string ctxFile = Path.Combine(webinfDir, "applicationContext.xml");
+            using (StreamWriter writer = new StreamWriter(ctxFile))
+            {
+                writer.WriteLine(springViewGen.GenerateAppCtx(ns));
+            }
+
+            // appCtx
+            string servletFile = Path.Combine(webinfDir, "spring-servlet.xml");
+            using (StreamWriter writer = new StreamWriter(servletFile))
+            {
+                writer.WriteLine(springViewGen.GenerateServlet(ns));
             }
         }
 
@@ -483,7 +516,7 @@ namespace MetaDslx.Soal
             // generate persistence.xml
             if (entities.Any())
             {
-                string metaFolder = Path.Combine(ns.Name + "-Model", "src", "main", "resources", "META - INF");
+                string metaFolder = Path.Combine(ns.Name + "-Model", "src", "main", "resources", "META-INF");
                 Directory.CreateDirectory(metaFolder);
                 filename = Path.Combine(metaFolder, "persistence.xml");
                 using (StreamWriter writer = new StreamWriter(filename))
@@ -583,7 +616,9 @@ namespace MetaDslx.Soal
                 }
                 else
                 {
-                    string s = springConfigGen.generateComponentPom(ns, component.Name + "-API", dependencies,
+                    Component c = new ComponentImpl();
+                    c.Name = component.Name + "-API";
+                    string s = springConfigGen.generateComponentPom(ns, c, dependencies,
                         bindingsOfModule.HasRestBinding, bindingsOfModule.HasWebServiceBinding, bindingsOfModule.HasWebSocketBinding);
                     writer.WriteLine(s);
                 }

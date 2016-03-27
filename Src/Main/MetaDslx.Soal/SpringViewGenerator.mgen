@@ -38,7 +38,7 @@ public class [reference.Name]Controller {
 			[else if (javaReturn != "void")]
 	@RequestMapping(value="/", params={"action=[name]"})
 			[else]
-	@RequestMapping("/") // + POST
+	//@RequestMapping("/") // + POST
 			[end if]
 	public String [op.Name.ToCamelCase()](Model model\
 			[loop (op->param:Parameters)]
@@ -326,11 +326,6 @@ template GenerateWebXml()
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
 ^
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>/WEB-INF/spring-config.xml</param-value>
-    </context-param>
-^
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
@@ -366,7 +361,7 @@ template GenerateServlet(Namespace ns)
                            http://www.springframework.org/schema/mvc
                            http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 ^
-    <context:component-scan base-package="[ns.FullName].[SpringGeneratorUtil.Properties.controllerPackage]"/>
+    <context:component-scan base-package="[ns.FullName.ToLower()].[SpringGeneratorUtil.Properties.controllerPackage]"/>
 ^
     <mvc:annotation-driven/>
 ^
@@ -399,5 +394,48 @@ template GenerateServlet(Namespace ns)
 ^
     <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"/>
 ^
+</beans>
+end template
+
+
+
+template GenerateJboss()
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure>
+    <deployment>
+        <dependencies>
+            <module name="com.h2database.h2" />
+			<module name="org.eclipse.persistence" />
+        </dependencies>
+    </deployment>
+</jboss-deployment-structure>
+end template
+
+
+template GenerateAppCtx(Namespace ns)
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/data/jpa
+       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+	   ^
+       <jpa:repositories base-package="[ns.FullName.ToLower()].[SpringGeneratorUtil.Properties.repositoryPackage]"/>
+       <context:component-scan base-package="[ns.FullName.ToLower()]"/>
+       ^
+	   ^
+       <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter"/>
+       <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
+              <property name="persistenceUnitName" value="[ns.Name]PU"/>
+              <property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
+       </bean>
+       <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+              <property name="entityManagerFactory" ref="entityManagerFactory"/>
+       </bean>
 </beans>
 end template

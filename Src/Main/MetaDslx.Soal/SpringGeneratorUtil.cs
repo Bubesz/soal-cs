@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringGeneratorUtil_350892412;
-    namespace __Hidden_SpringGeneratorUtil_350892412
+    using __Hidden_SpringGeneratorUtil_733860003;
+    namespace __Hidden_SpringGeneratorUtil_733860003
     {
         internal static class __Extensions
         {
@@ -326,7 +326,7 @@ namespace MetaDslx.Soal //1:1
             return __out.ToString();
         }
 
-        public string GeneratePomDependency(string group, string artifact, string version) //66:1
+        public string GeneratePomDependency(string group, string artifact, string version, bool provided) //66:1
         {
             StringBuilder __out = new StringBuilder();
             __out.Append("<dependency>"); //67:1
@@ -391,166 +391,171 @@ namespace MetaDslx.Soal //1:1
             string __tmp12Line = "</version>"; //70:23
             if (__tmp12Line != null) __out.Append(__tmp12Line);
             __out.AppendLine(false); //70:33
-            __out.Append("</dependency>"); //71:1
-            __out.AppendLine(false); //71:14
+            if (provided) //71:3
+            {
+                __out.Append("	<scope>provided</scope>"); //72:1
+                __out.AppendLine(false); //72:25
+            }
+            __out.Append("</dependency>"); //74:1
+            __out.AppendLine(false); //74:14
             return __out.ToString();
         }
 
-        public string GetParameterList(Operation op) //76:1
+        public string GetParameterList(Operation op) //79:1
         {
-            string result = ""; //77:5
+            string result = ""; //80:5
             var __loop2_results = 
-                (from __loop2_var1 in __Enumerate((op).GetEnumerator()) //78:11
-                from param in __Enumerate((__loop2_var1.Parameters).GetEnumerator()) //78:15
+                (from __loop2_var1 in __Enumerate((op).GetEnumerator()) //81:11
+                from param in __Enumerate((__loop2_var1.Parameters).GetEnumerator()) //81:15
                 select new { __loop2_var1 = __loop2_var1, param = param}
-                ).ToList(); //78:5
+                ).ToList(); //81:5
             int __loop2_iteration = 0;
-            string delimiter = ""; //78:33
+            string delimiter = ""; //81:33
             foreach (var __tmp1 in __loop2_results)
             {
                 ++__loop2_iteration;
-                if (__loop2_iteration >= 2) //78:56
+                if (__loop2_iteration >= 2) //81:56
                 {
-                    delimiter = ", "; //78:56
+                    delimiter = ", "; //81:56
                 }
                 var __loop2_var1 = __tmp1.__loop2_var1;
                 var param = __tmp1.param;
-                result = result + delimiter + param.Type.GetJavaName() + " " + param.Name.ToString().ToCamelCase(); //79:9
+                result = result + delimiter + param.Type.GetJavaName() + " " + param.Name.ToString().ToCamelCase(); //82:9
             }
-            return result; //81:5
+            return result; //84:5
         }
 
-        public string GetParameterNameList(Operation op) //86:1
+        public string GetParameterNameList(Operation op) //89:1
         {
-            string result = ""; //87:5
+            string result = ""; //90:5
             var __loop3_results = 
-                (from __loop3_var1 in __Enumerate((op).GetEnumerator()) //88:11
-                from param in __Enumerate((__loop3_var1.Parameters).GetEnumerator()) //88:15
+                (from __loop3_var1 in __Enumerate((op).GetEnumerator()) //91:11
+                from param in __Enumerate((__loop3_var1.Parameters).GetEnumerator()) //91:15
                 select new { __loop3_var1 = __loop3_var1, param = param}
-                ).ToList(); //88:5
+                ).ToList(); //91:5
             int __loop3_iteration = 0;
-            string delimiter = ""; //88:33
+            string delimiter = ""; //91:33
             foreach (var __tmp1 in __loop3_results)
             {
                 ++__loop3_iteration;
-                if (__loop3_iteration >= 2) //88:56
+                if (__loop3_iteration >= 2) //91:56
                 {
-                    delimiter = ", "; //88:56
+                    delimiter = ", "; //91:56
                 }
                 var __loop3_var1 = __tmp1.__loop3_var1;
                 var param = __tmp1.param;
-                result = result + delimiter + param.Name.ToString().ToCamelCase(); //89:9
+                result = result + delimiter + param.Name.ToString().ToCamelCase(); //92:9
             }
-            return result; //91:5
+            return result; //94:5
         }
 
-        public string GetExceptionList(Operation op) //96:1
+        public string GetExceptionList(Operation op) //99:1
         {
-            string result = ""; //97:5
+            string result = ""; //100:5
             var __loop4_results = 
-                (from __loop4_var1 in __Enumerate((op).GetEnumerator()) //98:11
-                from exc in __Enumerate((__loop4_var1.Exceptions).GetEnumerator()) //98:15
+                (from __loop4_var1 in __Enumerate((op).GetEnumerator()) //101:11
+                from exc in __Enumerate((__loop4_var1.Exceptions).GetEnumerator()) //101:15
                 select new { __loop4_var1 = __loop4_var1, exc = exc}
-                ).ToList(); //98:5
+                ).ToList(); //101:5
             int __loop4_iteration = 0;
-            string delimiter = ""; //98:31
+            string delimiter = ""; //101:31
             foreach (var __tmp1 in __loop4_results)
             {
                 ++__loop4_iteration;
-                if (__loop4_iteration >= 2) //98:54
+                if (__loop4_iteration >= 2) //101:54
                 {
-                    delimiter = ", "; //98:54
+                    delimiter = ", "; //101:54
                 }
                 var __loop4_var1 = __tmp1.__loop4_var1;
                 var exc = __tmp1.exc;
-                result = result + delimiter + exc.GetJavaName(); //99:9
+                result = result + delimiter + exc.GetJavaName(); //102:9
             }
-            return result; //101:5
+            return result; //104:5
         }
 
-        public string GetPropertyList(Struct sType) //106:1
+        public string GetPropertyList(Struct sType) //109:1
         {
-            string result = ""; //107:5
+            string result = ""; //110:5
             var __loop5_results = 
-                (from __loop5_var1 in __Enumerate((sType).GetEnumerator()) //108:11
-                from p in __Enumerate((__loop5_var1.Properties).GetEnumerator()) //108:18
+                (from __loop5_var1 in __Enumerate((sType).GetEnumerator()) //111:11
+                from p in __Enumerate((__loop5_var1.Properties).GetEnumerator()) //111:18
                 select new { __loop5_var1 = __loop5_var1, p = p}
-                ).ToList(); //108:5
+                ).ToList(); //111:5
             int __loop5_iteration = 0;
-            string delimiter = ""; //108:32
+            string delimiter = ""; //111:32
             foreach (var __tmp1 in __loop5_results)
             {
                 ++__loop5_iteration;
-                if (__loop5_iteration >= 2) //108:55
+                if (__loop5_iteration >= 2) //111:55
                 {
-                    delimiter = ", "; //108:55
+                    delimiter = ", "; //111:55
                 }
                 var __loop5_var1 = __tmp1.__loop5_var1;
                 var p = __tmp1.p;
-                result = result + delimiter + p.Type.GetJavaName() + " " + p.Name.ToString().ToCamelCase(); //109:9
+                result = result + delimiter + p.Type.GetJavaName() + " " + p.Name.ToString().ToCamelCase(); //112:9
             }
-            return result; //111:5
+            return result; //114:5
         }
 
-        public int GetNumberOfFieldWithIdSuffix(Struct sType) //116:1
+        public int GetNumberOfFieldWithIdSuffix(Struct sType) //119:1
         {
-            int result = 0; //117:2
+            int result = 0; //120:2
             var __loop6_results = 
-                (from __loop6_var1 in __Enumerate((sType).GetEnumerator()) //118:8
-                from p in __Enumerate((__loop6_var1.Properties).GetEnumerator()) //118:15
+                (from __loop6_var1 in __Enumerate((sType).GetEnumerator()) //121:8
+                from p in __Enumerate((__loop6_var1.Properties).GetEnumerator()) //121:15
                 select new { __loop6_var1 = __loop6_var1, p = p}
-                ).ToList(); //118:2
+                ).ToList(); //121:2
             int __loop6_iteration = 0;
             foreach (var __tmp1 in __loop6_results)
             {
                 ++__loop6_iteration;
                 var __loop6_var1 = __tmp1.__loop6_var1;
                 var p = __tmp1.p;
-                if (p.Name.ToString().EndsWith("Id")) //119:3
+                if (p.Name.ToString().EndsWith("Id")) //122:3
                 {
-                    result++; //120:4
+                    result++; //123:4
                 }
             }
-            return result; //123:5
+            return result; //126:5
         }
 
-        public string GetPackage(Declaration d) //128:1
+        public string GetPackage(Declaration d) //131:1
         {
-            return d.Namespace.FullName.ToLower(); //129:2
+            return d.Namespace.FullName.ToLower(); //132:2
         }
 
-        public string GetBindingType(Reference reference) //134:1
+        public string GetBindingType(Reference reference) //137:1
         {
-            Binding binding = reference.Binding; //135:2
-            if (binding == null) //136:2
+            Binding binding = reference.Binding; //138:2
+            if (binding == null) //139:2
             {
-                return ""; //137:3
+                return ""; //140:3
             }
-            if (binding.Transport is RestTransportBindingElement) //139:2
+            if (binding.Transport is RestTransportBindingElement) //142:2
             {
-                return "Rest"; //140:3
+                return "Rest"; //143:3
             }
-            if (binding.Transport is WebSocketTransportBindingElement) //142:2
+            if (binding.Transport is WebSocketTransportBindingElement) //145:2
             {
-                return "WebSocket"; //143:3
+                return "WebSocket"; //146:3
             }
             var __loop7_results = 
-                (from __loop7_var1 in __Enumerate((binding).GetEnumerator()) //145:8
-                from encoding in __Enumerate((__loop7_var1.Encodings).GetEnumerator()) //145:17
+                (from __loop7_var1 in __Enumerate((binding).GetEnumerator()) //148:8
+                from encoding in __Enumerate((__loop7_var1.Encodings).GetEnumerator()) //148:17
                 select new { __loop7_var1 = __loop7_var1, encoding = encoding}
-                ).ToList(); //145:2
+                ).ToList(); //148:2
             int __loop7_iteration = 0;
             foreach (var __tmp1 in __loop7_results)
             {
                 ++__loop7_iteration;
                 var __loop7_var1 = __tmp1.__loop7_var1;
                 var encoding = __tmp1.encoding;
-                if (encoding is SoapEncodingBindingElement) //146:3
+                if (encoding is SoapEncodingBindingElement) //149:3
                 {
-                    return "WebService"; //147:4
+                    return "WebService"; //150:4
                 }
             }
-            return ""; //150:2
+            return ""; //153:2
         }
 
         private class StringBuilder

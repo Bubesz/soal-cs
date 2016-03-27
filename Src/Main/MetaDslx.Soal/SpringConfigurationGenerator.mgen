@@ -8,9 +8,8 @@ template GeneratePersistence(Namespace ns, List<Struct> entities)
 <persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
     <persistence-unit name="[ns.Name]PU" transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-
-		<jta-data-source>java:jboss/datasources/[ns.Name]DS</jta-data-source>
-
+		^
+		<!-- <jta-data-source>java:jboss/datasources/[ns.Name]DS</jta-data-source> -->
 		^
 	[loop (entity:entities)]
 		<class>[SpringGeneratorUtil.GetPackage(entity)].[SpringGeneratorUtil.Properties.entityPackage].[entity.Name]</class>
@@ -25,6 +24,11 @@ template GeneratePersistence(Namespace ns, List<Struct> entities)
             <!--for debug-->
             <property name="eclipselink.ddl-generation" value="create-tables"/>
             <!--<property name="eclipselink.logging.level" value="FINE"/>-->
+
+			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem/[ns.Name.ToLower()]"/>
+            <property name="javax.persistence.jdbc.user" value="sa"/>
+            <property name="javax.persistence.jdbc.password" value=""/><!-- sa? -->
         </properties>
     </persistence-unit>
 </persistence>
@@ -38,6 +42,7 @@ template generateMasterPom(Namespace ns, List<string> modules)
 		<springframework.ws.version>2.2.4.RELEASE</springframework.ws.version>
         <spring-data-jpa.version>1.9.0.RELEASE</spring-data-jpa.version>
 		<wsdl4j.version>1.6.3</wsdl4j.version>
+		<thymeleaf.version>2.1.4.RELEASE</thymeleaf.version>
         <!--<spring-security.version>4.0.2.RELEASE</spring-security.version>-->
     </properties>
 ^
@@ -53,8 +58,8 @@ template generateMasterPom(Namespace ns, List<string> modules)
 ^
     <dependencies>
         <!-- eclipseLink -->
-		[SpringGeneratorUtil.GeneratePomDependency("org.eclipse.persistence", "javax.persistence", "2.1.0")]
-		[SpringGeneratorUtil.GeneratePomDependency("org.eclipse.persistence", "eclipselink", "2.6.2")]
+		[SpringGeneratorUtil.GeneratePomDependency("org.eclipse.persistence", "javax.persistence", "2.1.0", false)]
+		[SpringGeneratorUtil.GeneratePomDependency("org.eclipse.persistence", "eclipselink", "2.6.2", true)]
     </dependencies>
 	<build>
 		<plugins>
@@ -72,34 +77,46 @@ template generateMasterPom(Namespace ns, List<string> modules)
 </project>
 end template
 
-template generateComponentPom(Namespace ns, string moduleName, List<string> modules, bool rest, bool webService, bool webSocket)
+template generateComponentPom(Namespace ns, Component component, List<string> modules, bool rest, bool webService, bool webSocket)
 [SpringGeneratorUtil.GeneratePomStart()]
     <parent>
         <artifactId>[ns.Name]App</artifactId>
         <groupId>[ns.Name]</groupId>
         <version>1.0</version>
     </parent>
-
-    <artifactId>[ns.Name]-[moduleName]</artifactId>
-
+	^
+    <artifactId>[ns.Name]-[component.Name]</artifactId>
+	[if (component.Implementation != null && component.Implementation.Name.Equals("JSF"))]
+	<packaging>war</packaging>
+	[end if]
+	^
     <dependencies>
 [loop (module:modules)]
-		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-"+module, "1.0")]
+		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-"+module, "1.0", false)]
 [end loop]
-
-		[SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-context", "${springframework.version}")]
+^
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-context", "${springframework.version}", false)]
 [if (rest)]
 		<!-- for rest -->
-		[SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-webmvc", "${springframework.version}")]
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-webmvc", "${springframework.version}", false)]
 [end if]
 [if (webService)]
 		<!-- for SOAP -->
-		[SpringGeneratorUtil.GeneratePomDependency("org.springframework.ws", "spring-ws-core", "${springframework.ws.version}")]
-		[SpringGeneratorUtil.GeneratePomDependency("wsdl4j", "wsdl4j", "${wsdl4j.version}")]
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework.ws", "spring-ws-core", "${springframework.ws.version}", false)]
+		[SpringGeneratorUtil.GeneratePomDependency("wsdl4j", "wsdl4j", "${wsdl4j.version}", false)]
 [end if]
 [if (webSocket)]
 		<!-- for web socket -->
-		[SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-messaging", "${springframework.version}")]
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-messaging", "${springframework.version}", false)]
+[end if]
+[if (component.Implementation != null && component.Implementation.Name.Equals("JSF"))]
+		<!-- web -->
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-web", "${springframework.version}", false)]
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-webmvc", "${springframework.version}", false)]
+		^
+		<!-- thymeleaf -->
+		[SpringGeneratorUtil.GeneratePomDependency("org.thymeleaf", "thymeleaf", "${thymeleaf.version}", false)]
+		[SpringGeneratorUtil.GeneratePomDependency("org.thymeleaf", "thymeleaf-spring4", "${thymeleaf.version}", false)]
 [end if]
     </dependencies>
 </project>
@@ -112,16 +129,16 @@ template generateDataPom(Namespace ns, string moduleName)
         <groupId>[ns.Name]</groupId>
         <version>1.0</version>
     </parent>
-
+	^
     <artifactId>[ns.Name]-[moduleName]</artifactId>
-
+	^
     <dependencies>
 	[if (moduleName != "Model")]
-		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-Model", "1.0")]
+		[SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name+"-Model", "1.0", false)]
 	[end if]
 		<!-- spring data -->
-		[SpringGeneratorUtil.GeneratePomDependency("org.springframework","spring-orm", "${springframework.version}")]
-		[SpringGeneratorUtil.GeneratePomDependency("org.springframework.data", "spring-data-jpa", "${spring-data-jpa.version}")]
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework","spring-orm", "${springframework.version}", false)]
+		[SpringGeneratorUtil.GeneratePomDependency("org.springframework.data", "spring-data-jpa", "${spring-data-jpa.version}", false)]
           <!--  <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>

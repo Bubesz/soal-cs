@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringConfigurationGenerator_623579834;
-    namespace __Hidden_SpringConfigurationGenerator_623579834
+    using __Hidden_SpringConfigurationGenerator_738465305;
+    namespace __Hidden_SpringConfigurationGenerator_738465305
     {
         internal static class __Extensions
         {
@@ -88,7 +88,8 @@ namespace MetaDslx.Soal //1:1
             __out.AppendLine(false); //9:76
             __out.Append("        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>"); //10:1
             __out.AppendLine(false); //10:77
-            string __tmp6Line = "		<jta-data-source>java:jboss/datasources/"; //12:1
+            __out.AppendLine(true); //11:3
+            string __tmp6Line = "		<!-- <jta-data-source>java:jboss/datasources/"; //12:1
             if (__tmp6Line != null) __out.Append(__tmp6Line);
             StringBuilder __tmp7 = new StringBuilder();
             __tmp7.Append(ns.Name);
@@ -105,20 +106,20 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp7_last) __out.AppendLine(true);
                 }
             }
-            string __tmp8Line = "DS</jta-data-source>"; //12:52
+            string __tmp8Line = "DS</jta-data-source> -->"; //12:57
             if (__tmp8Line != null) __out.Append(__tmp8Line);
-            __out.AppendLine(false); //12:72
-            __out.AppendLine(true); //14:3
+            __out.AppendLine(false); //12:81
+            __out.AppendLine(true); //13:3
             var __loop1_results = 
-                (from entity in __Enumerate((entities).GetEnumerator()) //15:9
+                (from entity in __Enumerate((entities).GetEnumerator()) //14:9
                 select new { entity = entity}
-                ).ToList(); //15:3
+                ).ToList(); //14:3
             int __loop1_iteration = 0;
             foreach (var __tmp9 in __loop1_results)
             {
                 ++__loop1_iteration;
                 var entity = __tmp9.entity;
-                string __tmp11Line = "		<class>"; //16:1
+                string __tmp11Line = "		<class>"; //15:1
                 if (__tmp11Line != null) __out.Append(__tmp11Line);
                 StringBuilder __tmp12 = new StringBuilder();
                 __tmp12.Append(SpringGeneratorUtil.GetPackage(entity));
@@ -135,7 +136,7 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp12_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp13Line = "."; //16:50
+                string __tmp13Line = "."; //15:50
                 if (__tmp13Line != null) __out.Append(__tmp13Line);
                 StringBuilder __tmp14 = new StringBuilder();
                 __tmp14.Append(SpringGeneratorUtil.Properties.entityPackage);
@@ -152,7 +153,7 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp14_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp15Line = "."; //16:97
+                string __tmp15Line = "."; //15:97
                 if (__tmp15Line != null) __out.Append(__tmp15Line);
                 StringBuilder __tmp16 = new StringBuilder();
                 __tmp16.Append(entity.Name);
@@ -169,37 +170,63 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp16_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp17Line = "</class>"; //16:111
+                string __tmp17Line = "</class>"; //15:111
                 if (__tmp17Line != null) __out.Append(__tmp17Line);
-                __out.AppendLine(false); //16:119
+                __out.AppendLine(false); //15:119
             }
-            __out.AppendLine(true); //18:2
-            __out.Append("        <class>iit.cinema.status.ReservationStatus</class>"); //19:1
-            __out.AppendLine(false); //19:59
-            __out.Append("        <class>iit.cinema.status.SeatStatus</class>"); //20:1
-            __out.AppendLine(false); //20:52
-            __out.AppendLine(true); //21:3
-            __out.Append("        <shared-cache-mode>NONE</shared-cache-mode>"); //22:1
-            __out.AppendLine(false); //22:52
-            __out.AppendLine(true); //23:3
-            __out.Append("        <properties>"); //24:1
-            __out.AppendLine(false); //24:21
-            __out.Append("            <!--for debug-->"); //25:1
-            __out.AppendLine(false); //25:29
-            __out.Append("            <property name=\"eclipselink.ddl-generation\" value=\"create-tables\"/>"); //26:1
-            __out.AppendLine(false); //26:80
-            __out.Append("            <!--<property name=\"eclipselink.logging.level\" value=\"FINE\"/>-->"); //27:1
-            __out.AppendLine(false); //27:77
-            __out.Append("        </properties>"); //28:1
-            __out.AppendLine(false); //28:22
-            __out.Append("    </persistence-unit>"); //29:1
-            __out.AppendLine(false); //29:24
-            __out.Append("</persistence>"); //30:1
-            __out.AppendLine(false); //30:15
+            __out.AppendLine(true); //17:2
+            __out.Append("        <class>iit.cinema.status.ReservationStatus</class>"); //18:1
+            __out.AppendLine(false); //18:59
+            __out.Append("        <class>iit.cinema.status.SeatStatus</class>"); //19:1
+            __out.AppendLine(false); //19:52
+            __out.AppendLine(true); //20:3
+            __out.Append("        <shared-cache-mode>NONE</shared-cache-mode>"); //21:1
+            __out.AppendLine(false); //21:52
+            __out.AppendLine(true); //22:3
+            __out.Append("        <properties>"); //23:1
+            __out.AppendLine(false); //23:21
+            __out.Append("            <!--for debug-->"); //24:1
+            __out.AppendLine(false); //24:29
+            __out.Append("            <property name=\"eclipselink.ddl-generation\" value=\"create-tables\"/>"); //25:1
+            __out.AppendLine(false); //25:80
+            __out.Append("            <!--<property name=\"eclipselink.logging.level\" value=\"FINE\"/>-->"); //26:1
+            __out.AppendLine(false); //26:77
+            __out.Append("			<property name=\"javax.persistence.jdbc.driver\" value=\"org.h2.Driver\"/>"); //28:1
+            __out.AppendLine(false); //28:74
+            string __tmp19Line = "            <property name=\"javax.persistence.jdbc.url\" value=\"jdbc:h2:mem/"; //29:1
+            if (__tmp19Line != null) __out.Append(__tmp19Line);
+            StringBuilder __tmp20 = new StringBuilder();
+            __tmp20.Append(ns.Name.ToLower());
+            using(StreamReader __tmp20Reader = new StreamReader(this.__ToStream(__tmp20.ToString())))
+            {
+                bool __tmp20_first = true;
+                bool __tmp20_last = __tmp20Reader.EndOfStream;
+                while(__tmp20_first || !__tmp20_last)
+                {
+                    __tmp20_first = false;
+                    string __tmp20Line = __tmp20Reader.ReadLine();
+                    __tmp20_last = __tmp20Reader.EndOfStream;
+                    if (__tmp20Line != null) __out.Append(__tmp20Line);
+                    if (!__tmp20_last) __out.AppendLine(true);
+                }
+            }
+            string __tmp21Line = "\"/>"; //29:95
+            if (__tmp21Line != null) __out.Append(__tmp21Line);
+            __out.AppendLine(false); //29:98
+            __out.Append("            <property name=\"javax.persistence.jdbc.user\" value=\"sa\"/>"); //30:1
+            __out.AppendLine(false); //30:70
+            __out.Append("            <property name=\"javax.persistence.jdbc.password\" value=\"\"/><!-- sa? -->"); //31:1
+            __out.AppendLine(false); //31:84
+            __out.Append("        </properties>"); //32:1
+            __out.AppendLine(false); //32:22
+            __out.Append("    </persistence-unit>"); //33:1
+            __out.AppendLine(false); //33:24
+            __out.Append("</persistence>"); //34:1
+            __out.AppendLine(false); //34:15
             return __out.ToString();
         }
 
-        public string generateMasterPom(Namespace ns, List<string> modules) //33:1
+        public string generateMasterPom(Namespace ns, List<string> modules) //37:1
         {
             StringBuilder __out = new StringBuilder();
             StringBuilder __tmp2 = new StringBuilder();
@@ -215,26 +242,28 @@ namespace MetaDslx.Soal //1:1
                     __tmp2_last = __tmp2Reader.EndOfStream;
                     if (__tmp2Line != null) __out.Append(__tmp2Line);
                     if (!__tmp2_last) __out.AppendLine(true);
-                    __out.AppendLine(false); //34:41
+                    __out.AppendLine(false); //38:41
                 }
             }
-            __out.AppendLine(true); //35:1
-            __out.Append("    <properties>"); //36:1
-            __out.AppendLine(false); //36:17
-            __out.Append("        <springframework.version>4.1.6.RELEASE</springframework.version>"); //37:1
-            __out.AppendLine(false); //37:73
-            __out.Append("		<springframework.ws.version>2.2.4.RELEASE</springframework.ws.version>"); //38:1
-            __out.AppendLine(false); //38:73
-            __out.Append("        <spring-data-jpa.version>1.9.0.RELEASE</spring-data-jpa.version>"); //39:1
-            __out.AppendLine(false); //39:73
-            __out.Append("		<wsdl4j.version>1.6.3</wsdl4j.version>"); //40:1
-            __out.AppendLine(false); //40:41
-            __out.Append("        <!--<spring-security.version>4.0.2.RELEASE</spring-security.version>-->"); //41:1
-            __out.AppendLine(false); //41:80
-            __out.Append("    </properties>"); //42:1
-            __out.AppendLine(false); //42:18
-            __out.AppendLine(true); //43:1
-            string __tmp4Line = "    <groupId>"; //44:1
+            __out.AppendLine(true); //39:1
+            __out.Append("    <properties>"); //40:1
+            __out.AppendLine(false); //40:17
+            __out.Append("        <springframework.version>4.1.6.RELEASE</springframework.version>"); //41:1
+            __out.AppendLine(false); //41:73
+            __out.Append("		<springframework.ws.version>2.2.4.RELEASE</springframework.ws.version>"); //42:1
+            __out.AppendLine(false); //42:73
+            __out.Append("        <spring-data-jpa.version>1.9.0.RELEASE</spring-data-jpa.version>"); //43:1
+            __out.AppendLine(false); //43:73
+            __out.Append("		<wsdl4j.version>1.6.3</wsdl4j.version>"); //44:1
+            __out.AppendLine(false); //44:41
+            __out.Append("		<thymeleaf.version>2.1.4.RELEASE</thymeleaf.version>"); //45:1
+            __out.AppendLine(false); //45:55
+            __out.Append("        <!--<spring-security.version>4.0.2.RELEASE</spring-security.version>-->"); //46:1
+            __out.AppendLine(false); //46:80
+            __out.Append("    </properties>"); //47:1
+            __out.AppendLine(false); //47:18
+            __out.AppendLine(true); //48:1
+            string __tmp4Line = "    <groupId>"; //49:1
             if (__tmp4Line != null) __out.Append(__tmp4Line);
             StringBuilder __tmp5 = new StringBuilder();
             __tmp5.Append(ns.Name);
@@ -251,10 +280,10 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp5_last) __out.AppendLine(true);
                 }
             }
-            string __tmp6Line = "</groupId>"; //44:23
+            string __tmp6Line = "</groupId>"; //49:23
             if (__tmp6Line != null) __out.Append(__tmp6Line);
-            __out.AppendLine(false); //44:33
-            string __tmp8Line = "    <artifactId>"; //45:1
+            __out.AppendLine(false); //49:33
+            string __tmp8Line = "    <artifactId>"; //50:1
             if (__tmp8Line != null) __out.Append(__tmp8Line);
             StringBuilder __tmp9 = new StringBuilder();
             __tmp9.Append(ns.Name);
@@ -271,25 +300,25 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp9_last) __out.AppendLine(true);
                 }
             }
-            string __tmp10Line = "App</artifactId>"; //45:26
+            string __tmp10Line = "App</artifactId>"; //50:26
             if (__tmp10Line != null) __out.Append(__tmp10Line);
-            __out.AppendLine(false); //45:42
-            __out.Append("    <packaging>pom</packaging>"); //46:1
-            __out.AppendLine(false); //46:31
-            __out.Append("    <version>1.0</version>"); //47:1
-            __out.AppendLine(false); //47:27
-            __out.Append("    <modules>"); //48:1
-            __out.AppendLine(false); //48:14
+            __out.AppendLine(false); //50:42
+            __out.Append("    <packaging>pom</packaging>"); //51:1
+            __out.AppendLine(false); //51:31
+            __out.Append("    <version>1.0</version>"); //52:1
+            __out.AppendLine(false); //52:27
+            __out.Append("    <modules>"); //53:1
+            __out.AppendLine(false); //53:14
             var __loop2_results = 
-                (from module in __Enumerate((modules).GetEnumerator()) //49:8
+                (from module in __Enumerate((modules).GetEnumerator()) //54:8
                 select new { module = module}
-                ).ToList(); //49:2
+                ).ToList(); //54:2
             int __loop2_iteration = 0;
             foreach (var __tmp11 in __loop2_results)
             {
                 ++__loop2_iteration;
                 var module = __tmp11.module;
-                string __tmp13Line = "        <module>"; //50:1
+                string __tmp13Line = "        <module>"; //55:1
                 if (__tmp13Line != null) __out.Append(__tmp13Line);
                 StringBuilder __tmp14 = new StringBuilder();
                 __tmp14.Append(ns.Name);
@@ -306,7 +335,7 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp14_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp15Line = "-"; //50:26
+                string __tmp15Line = "-"; //55:26
                 if (__tmp15Line != null) __out.Append(__tmp15Line);
                 StringBuilder __tmp16 = new StringBuilder();
                 __tmp16.Append(module);
@@ -323,20 +352,20 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp16_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp17Line = "</module>"; //50:35
+                string __tmp17Line = "</module>"; //55:35
                 if (__tmp17Line != null) __out.Append(__tmp17Line);
-                __out.AppendLine(false); //50:44
+                __out.AppendLine(false); //55:44
             }
-            __out.Append("    </modules>"); //52:1
-            __out.AppendLine(false); //52:15
-            __out.AppendLine(true); //53:1
-            __out.Append("    <dependencies>"); //54:1
-            __out.AppendLine(false); //54:19
-            __out.Append("        <!-- eclipseLink -->"); //55:1
-            __out.AppendLine(false); //55:29
-            string __tmp18Prefix = "		"; //56:1
+            __out.Append("    </modules>"); //57:1
+            __out.AppendLine(false); //57:15
+            __out.AppendLine(true); //58:1
+            __out.Append("    <dependencies>"); //59:1
+            __out.AppendLine(false); //59:19
+            __out.Append("        <!-- eclipseLink -->"); //60:1
+            __out.AppendLine(false); //60:29
+            string __tmp18Prefix = "		"; //61:1
             StringBuilder __tmp19 = new StringBuilder();
-            __tmp19.Append(SpringGeneratorUtil.GeneratePomDependency("org.eclipse.persistence", "javax.persistence", "2.1.0"));
+            __tmp19.Append(SpringGeneratorUtil.GeneratePomDependency("org.eclipse.persistence", "javax.persistence", "2.1.0", false));
             using(StreamReader __tmp19Reader = new StreamReader(this.__ToStream(__tmp19.ToString())))
             {
                 bool __tmp19_first = true;
@@ -349,12 +378,12 @@ namespace MetaDslx.Soal //1:1
                     __out.Append(__tmp18Prefix);
                     if (__tmp19Line != null) __out.Append(__tmp19Line);
                     if (!__tmp19_last) __out.AppendLine(true);
-                    __out.AppendLine(false); //56:103
+                    __out.AppendLine(false); //61:110
                 }
             }
-            string __tmp20Prefix = "		"; //57:1
+            string __tmp20Prefix = "		"; //62:1
             StringBuilder __tmp21 = new StringBuilder();
-            __tmp21.Append(SpringGeneratorUtil.GeneratePomDependency("org.eclipse.persistence", "eclipselink", "2.6.2"));
+            __tmp21.Append(SpringGeneratorUtil.GeneratePomDependency("org.eclipse.persistence", "eclipselink", "2.6.2", true));
             using(StreamReader __tmp21Reader = new StreamReader(this.__ToStream(__tmp21.ToString())))
             {
                 bool __tmp21_first = true;
@@ -367,43 +396,43 @@ namespace MetaDslx.Soal //1:1
                     __out.Append(__tmp20Prefix);
                     if (__tmp21Line != null) __out.Append(__tmp21Line);
                     if (!__tmp21_last) __out.AppendLine(true);
-                    __out.AppendLine(false); //57:97
+                    __out.AppendLine(false); //62:103
                 }
             }
-            __out.Append("    </dependencies>"); //58:1
-            __out.AppendLine(false); //58:20
-            __out.Append("	<build>"); //59:1
-            __out.AppendLine(false); //59:9
-            __out.Append("		<plugins>"); //60:1
-            __out.AppendLine(false); //60:12
-            __out.Append("			<plugin>"); //61:1
-            __out.AppendLine(false); //61:12
-            __out.Append("				<groupId>org.apache.maven.plugins</groupId>"); //62:1
-            __out.AppendLine(false); //62:48
-            __out.Append("				<artifactId>maven-compiler-plugin</artifactId>"); //63:1
-            __out.AppendLine(false); //63:51
-            __out.Append("				<version>3.5.1</version>"); //64:1
-            __out.AppendLine(false); //64:29
-            __out.Append("				<configuration>"); //65:1
-            __out.AppendLine(false); //65:20
-            __out.Append("					<source>1.8</source>"); //66:1
-            __out.AppendLine(false); //66:26
-            __out.Append("					<target>1.8</target>"); //67:1
-            __out.AppendLine(false); //67:26
-            __out.Append("				</configuration>"); //68:1
-            __out.AppendLine(false); //68:21
-            __out.Append("			</plugin>"); //69:1
-            __out.AppendLine(false); //69:13
-            __out.Append("		</plugins>"); //70:1
-            __out.AppendLine(false); //70:13
-            __out.Append("	</build>"); //71:1
-            __out.AppendLine(false); //71:10
-            __out.Append("</project>"); //72:1
-            __out.AppendLine(false); //72:11
+            __out.Append("    </dependencies>"); //63:1
+            __out.AppendLine(false); //63:20
+            __out.Append("	<build>"); //64:1
+            __out.AppendLine(false); //64:9
+            __out.Append("		<plugins>"); //65:1
+            __out.AppendLine(false); //65:12
+            __out.Append("			<plugin>"); //66:1
+            __out.AppendLine(false); //66:12
+            __out.Append("				<groupId>org.apache.maven.plugins</groupId>"); //67:1
+            __out.AppendLine(false); //67:48
+            __out.Append("				<artifactId>maven-compiler-plugin</artifactId>"); //68:1
+            __out.AppendLine(false); //68:51
+            __out.Append("				<version>3.5.1</version>"); //69:1
+            __out.AppendLine(false); //69:29
+            __out.Append("				<configuration>"); //70:1
+            __out.AppendLine(false); //70:20
+            __out.Append("					<source>1.8</source>"); //71:1
+            __out.AppendLine(false); //71:26
+            __out.Append("					<target>1.8</target>"); //72:1
+            __out.AppendLine(false); //72:26
+            __out.Append("				</configuration>"); //73:1
+            __out.AppendLine(false); //73:21
+            __out.Append("			</plugin>"); //74:1
+            __out.AppendLine(false); //74:13
+            __out.Append("		</plugins>"); //75:1
+            __out.AppendLine(false); //75:13
+            __out.Append("	</build>"); //76:1
+            __out.AppendLine(false); //76:10
+            __out.Append("</project>"); //77:1
+            __out.AppendLine(false); //77:11
             return __out.ToString();
         }
 
-        public string generateComponentPom(Namespace ns, string moduleName, List<string> modules, bool rest, bool webService, bool webSocket) //75:1
+        public string generateComponentPom(Namespace ns, Component component, List<string> modules, bool rest, bool webService, bool webSocket) //80:1
         {
             StringBuilder __out = new StringBuilder();
             StringBuilder __tmp2 = new StringBuilder();
@@ -419,12 +448,12 @@ namespace MetaDslx.Soal //1:1
                     __tmp2_last = __tmp2Reader.EndOfStream;
                     if (__tmp2Line != null) __out.Append(__tmp2Line);
                     if (!__tmp2_last) __out.AppendLine(true);
-                    __out.AppendLine(false); //76:41
+                    __out.AppendLine(false); //81:41
                 }
             }
-            __out.Append("    <parent>"); //77:1
-            __out.AppendLine(false); //77:13
-            string __tmp4Line = "        <artifactId>"; //78:1
+            __out.Append("    <parent>"); //82:1
+            __out.AppendLine(false); //82:13
+            string __tmp4Line = "        <artifactId>"; //83:1
             if (__tmp4Line != null) __out.Append(__tmp4Line);
             StringBuilder __tmp5 = new StringBuilder();
             __tmp5.Append(ns.Name);
@@ -441,10 +470,10 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp5_last) __out.AppendLine(true);
                 }
             }
-            string __tmp6Line = "App</artifactId>"; //78:30
+            string __tmp6Line = "App</artifactId>"; //83:30
             if (__tmp6Line != null) __out.Append(__tmp6Line);
-            __out.AppendLine(false); //78:46
-            string __tmp8Line = "        <groupId>"; //79:1
+            __out.AppendLine(false); //83:46
+            string __tmp8Line = "        <groupId>"; //84:1
             if (__tmp8Line != null) __out.Append(__tmp8Line);
             StringBuilder __tmp9 = new StringBuilder();
             __tmp9.Append(ns.Name);
@@ -461,14 +490,15 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp9_last) __out.AppendLine(true);
                 }
             }
-            string __tmp10Line = "</groupId>"; //79:27
+            string __tmp10Line = "</groupId>"; //84:27
             if (__tmp10Line != null) __out.Append(__tmp10Line);
-            __out.AppendLine(false); //79:37
-            __out.Append("        <version>1.0</version>"); //80:1
-            __out.AppendLine(false); //80:31
-            __out.Append("    </parent>"); //81:1
-            __out.AppendLine(false); //81:14
-            string __tmp12Line = "    <artifactId>"; //83:1
+            __out.AppendLine(false); //84:37
+            __out.Append("        <version>1.0</version>"); //85:1
+            __out.AppendLine(false); //85:31
+            __out.Append("    </parent>"); //86:1
+            __out.AppendLine(false); //86:14
+            __out.AppendLine(true); //87:2
+            string __tmp12Line = "    <artifactId>"; //88:1
             if (__tmp12Line != null) __out.Append(__tmp12Line);
             StringBuilder __tmp13 = new StringBuilder();
             __tmp13.Append(ns.Name);
@@ -485,10 +515,10 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp13_last) __out.AppendLine(true);
                 }
             }
-            string __tmp14Line = "-"; //83:26
+            string __tmp14Line = "-"; //88:26
             if (__tmp14Line != null) __out.Append(__tmp14Line);
             StringBuilder __tmp15 = new StringBuilder();
-            __tmp15.Append(moduleName);
+            __tmp15.Append(component.Name);
             using(StreamReader __tmp15Reader = new StreamReader(this.__ToStream(__tmp15.ToString())))
             {
                 bool __tmp15_first = true;
@@ -502,23 +532,29 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp15_last) __out.AppendLine(true);
                 }
             }
-            string __tmp16Line = "</artifactId>"; //83:39
+            string __tmp16Line = "</artifactId>"; //88:43
             if (__tmp16Line != null) __out.Append(__tmp16Line);
-            __out.AppendLine(false); //83:52
-            __out.Append("    <dependencies>"); //85:1
-            __out.AppendLine(false); //85:19
+            __out.AppendLine(false); //88:56
+            if (component.Implementation != null && component.Implementation.Name.Equals("JSF")) //89:3
+            {
+                __out.Append("	<packaging>war</packaging>"); //90:1
+                __out.AppendLine(false); //90:28
+            }
+            __out.AppendLine(true); //92:2
+            __out.Append("    <dependencies>"); //93:1
+            __out.AppendLine(false); //93:19
             var __loop3_results = 
-                (from module in __Enumerate((modules).GetEnumerator()) //86:8
+                (from module in __Enumerate((modules).GetEnumerator()) //94:8
                 select new { module = module}
-                ).ToList(); //86:2
+                ).ToList(); //94:2
             int __loop3_iteration = 0;
             foreach (var __tmp17 in __loop3_results)
             {
                 ++__loop3_iteration;
                 var module = __tmp17.module;
-                string __tmp18Prefix = "		"; //87:1
+                string __tmp18Prefix = "		"; //95:1
                 StringBuilder __tmp19 = new StringBuilder();
-                __tmp19.Append(SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name + "-" + module, "1.0"));
+                __tmp19.Append(SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name + "-" + module, "1.0", false));
                 using(StreamReader __tmp19Reader = new StreamReader(this.__ToStream(__tmp19.ToString())))
                 {
                     bool __tmp19_first = true;
@@ -531,13 +567,14 @@ namespace MetaDslx.Soal //1:1
                         __out.Append(__tmp18Prefix);
                         if (__tmp19Line != null) __out.Append(__tmp19Line);
                         if (!__tmp19_last) __out.AppendLine(true);
-                        __out.AppendLine(false); //87:82
+                        __out.AppendLine(false); //95:89
                     }
                 }
             }
-            string __tmp20Prefix = "		"; //90:1
+            __out.AppendLine(true); //97:1
+            string __tmp20Prefix = "		"; //98:1
             StringBuilder __tmp21 = new StringBuilder();
-            __tmp21.Append(SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-context", "${springframework.version}"));
+            __tmp21.Append(SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-context", "${springframework.version}", false));
             using(StreamReader __tmp21Reader = new StreamReader(this.__ToStream(__tmp21.ToString())))
             {
                 bool __tmp21_first = true;
@@ -550,16 +587,16 @@ namespace MetaDslx.Soal //1:1
                     __out.Append(__tmp20Prefix);
                     if (__tmp21Line != null) __out.Append(__tmp21Line);
                     if (!__tmp21_last) __out.AppendLine(true);
-                    __out.AppendLine(false); //90:117
+                    __out.AppendLine(false); //98:124
                 }
             }
-            if (rest) //91:2
+            if (rest) //99:2
             {
-                __out.Append("		<!-- for rest -->"); //92:1
-                __out.AppendLine(false); //92:20
-                string __tmp22Prefix = "		"; //93:1
+                __out.Append("		<!-- for rest -->"); //100:1
+                __out.AppendLine(false); //100:20
+                string __tmp22Prefix = "		"; //101:1
                 StringBuilder __tmp23 = new StringBuilder();
-                __tmp23.Append(SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-webmvc", "${springframework.version}"));
+                __tmp23.Append(SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-webmvc", "${springframework.version}", false));
                 using(StreamReader __tmp23Reader = new StreamReader(this.__ToStream(__tmp23.ToString())))
                 {
                     bool __tmp23_first = true;
@@ -572,17 +609,17 @@ namespace MetaDslx.Soal //1:1
                         __out.Append(__tmp22Prefix);
                         if (__tmp23Line != null) __out.Append(__tmp23Line);
                         if (!__tmp23_last) __out.AppendLine(true);
-                        __out.AppendLine(false); //93:116
+                        __out.AppendLine(false); //101:123
                     }
                 }
             }
-            if (webService) //95:2
+            if (webService) //103:2
             {
-                __out.Append("		<!-- for SOAP -->"); //96:1
-                __out.AppendLine(false); //96:20
-                string __tmp24Prefix = "		"; //97:1
+                __out.Append("		<!-- for SOAP -->"); //104:1
+                __out.AppendLine(false); //104:20
+                string __tmp24Prefix = "		"; //105:1
                 StringBuilder __tmp25 = new StringBuilder();
-                __tmp25.Append(SpringGeneratorUtil.GeneratePomDependency("org.springframework.ws", "spring-ws-core", "${springframework.ws.version}"));
+                __tmp25.Append(SpringGeneratorUtil.GeneratePomDependency("org.springframework.ws", "spring-ws-core", "${springframework.ws.version}", false));
                 using(StreamReader __tmp25Reader = new StreamReader(this.__ToStream(__tmp25.ToString())))
                 {
                     bool __tmp25_first = true;
@@ -595,12 +632,12 @@ namespace MetaDslx.Soal //1:1
                         __out.Append(__tmp24Prefix);
                         if (__tmp25Line != null) __out.Append(__tmp25Line);
                         if (!__tmp25_last) __out.AppendLine(true);
-                        __out.AppendLine(false); //97:123
+                        __out.AppendLine(false); //105:130
                     }
                 }
-                string __tmp26Prefix = "		"; //98:1
+                string __tmp26Prefix = "		"; //106:1
                 StringBuilder __tmp27 = new StringBuilder();
-                __tmp27.Append(SpringGeneratorUtil.GeneratePomDependency("wsdl4j", "wsdl4j", "${wsdl4j.version}"));
+                __tmp27.Append(SpringGeneratorUtil.GeneratePomDependency("wsdl4j", "wsdl4j", "${wsdl4j.version}", false));
                 using(StreamReader __tmp27Reader = new StreamReader(this.__ToStream(__tmp27.ToString())))
                 {
                     bool __tmp27_first = true;
@@ -613,17 +650,17 @@ namespace MetaDslx.Soal //1:1
                         __out.Append(__tmp26Prefix);
                         if (__tmp27Line != null) __out.Append(__tmp27Line);
                         if (!__tmp27_last) __out.AppendLine(true);
-                        __out.AppendLine(false); //98:87
+                        __out.AppendLine(false); //106:94
                     }
                 }
             }
-            if (webSocket) //100:2
+            if (webSocket) //108:2
             {
-                __out.Append("		<!-- for web socket -->"); //101:1
-                __out.AppendLine(false); //101:26
-                string __tmp28Prefix = "		"; //102:1
+                __out.Append("		<!-- for web socket -->"); //109:1
+                __out.AppendLine(false); //109:26
+                string __tmp28Prefix = "		"; //110:1
                 StringBuilder __tmp29 = new StringBuilder();
-                __tmp29.Append(SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-messaging", "${springframework.version}"));
+                __tmp29.Append(SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-messaging", "${springframework.version}", false));
                 using(StreamReader __tmp29Reader = new StreamReader(this.__ToStream(__tmp29.ToString())))
                 {
                     bool __tmp29_first = true;
@@ -636,18 +673,98 @@ namespace MetaDslx.Soal //1:1
                         __out.Append(__tmp28Prefix);
                         if (__tmp29Line != null) __out.Append(__tmp29Line);
                         if (!__tmp29_last) __out.AppendLine(true);
-                        __out.AppendLine(false); //102:119
+                        __out.AppendLine(false); //110:126
                     }
                 }
             }
-            __out.Append("    </dependencies>"); //104:1
-            __out.AppendLine(false); //104:20
-            __out.Append("</project>"); //105:1
-            __out.AppendLine(false); //105:11
+            if (component.Implementation != null && component.Implementation.Name.Equals("JSF")) //112:2
+            {
+                __out.Append("		<!-- web -->"); //113:1
+                __out.AppendLine(false); //113:15
+                string __tmp30Prefix = "		"; //114:1
+                StringBuilder __tmp31 = new StringBuilder();
+                __tmp31.Append(SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-web", "${springframework.version}", false));
+                using(StreamReader __tmp31Reader = new StreamReader(this.__ToStream(__tmp31.ToString())))
+                {
+                    bool __tmp31_first = true;
+                    bool __tmp31_last = __tmp31Reader.EndOfStream;
+                    while(__tmp31_first || !__tmp31_last)
+                    {
+                        __tmp31_first = false;
+                        string __tmp31Line = __tmp31Reader.ReadLine();
+                        __tmp31_last = __tmp31Reader.EndOfStream;
+                        __out.Append(__tmp30Prefix);
+                        if (__tmp31Line != null) __out.Append(__tmp31Line);
+                        if (!__tmp31_last) __out.AppendLine(true);
+                        __out.AppendLine(false); //114:120
+                    }
+                }
+                string __tmp32Prefix = "		"; //115:1
+                StringBuilder __tmp33 = new StringBuilder();
+                __tmp33.Append(SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-webmvc", "${springframework.version}", false));
+                using(StreamReader __tmp33Reader = new StreamReader(this.__ToStream(__tmp33.ToString())))
+                {
+                    bool __tmp33_first = true;
+                    bool __tmp33_last = __tmp33Reader.EndOfStream;
+                    while(__tmp33_first || !__tmp33_last)
+                    {
+                        __tmp33_first = false;
+                        string __tmp33Line = __tmp33Reader.ReadLine();
+                        __tmp33_last = __tmp33Reader.EndOfStream;
+                        __out.Append(__tmp32Prefix);
+                        if (__tmp33Line != null) __out.Append(__tmp33Line);
+                        if (!__tmp33_last) __out.AppendLine(true);
+                        __out.AppendLine(false); //115:123
+                    }
+                }
+                __out.AppendLine(true); //116:3
+                __out.Append("		<!-- thymeleaf -->"); //117:1
+                __out.AppendLine(false); //117:21
+                string __tmp34Prefix = "		"; //118:1
+                StringBuilder __tmp35 = new StringBuilder();
+                __tmp35.Append(SpringGeneratorUtil.GeneratePomDependency("org.thymeleaf", "thymeleaf", "${thymeleaf.version}", false));
+                using(StreamReader __tmp35Reader = new StreamReader(this.__ToStream(__tmp35.ToString())))
+                {
+                    bool __tmp35_first = true;
+                    bool __tmp35_last = __tmp35Reader.EndOfStream;
+                    while(__tmp35_first || !__tmp35_last)
+                    {
+                        __tmp35_first = false;
+                        string __tmp35Line = __tmp35Reader.ReadLine();
+                        __tmp35_last = __tmp35Reader.EndOfStream;
+                        __out.Append(__tmp34Prefix);
+                        if (__tmp35Line != null) __out.Append(__tmp35Line);
+                        if (!__tmp35_last) __out.AppendLine(true);
+                        __out.AppendLine(false); //118:107
+                    }
+                }
+                string __tmp36Prefix = "		"; //119:1
+                StringBuilder __tmp37 = new StringBuilder();
+                __tmp37.Append(SpringGeneratorUtil.GeneratePomDependency("org.thymeleaf", "thymeleaf-spring4", "${thymeleaf.version}", false));
+                using(StreamReader __tmp37Reader = new StreamReader(this.__ToStream(__tmp37.ToString())))
+                {
+                    bool __tmp37_first = true;
+                    bool __tmp37_last = __tmp37Reader.EndOfStream;
+                    while(__tmp37_first || !__tmp37_last)
+                    {
+                        __tmp37_first = false;
+                        string __tmp37Line = __tmp37Reader.ReadLine();
+                        __tmp37_last = __tmp37Reader.EndOfStream;
+                        __out.Append(__tmp36Prefix);
+                        if (__tmp37Line != null) __out.Append(__tmp37Line);
+                        if (!__tmp37_last) __out.AppendLine(true);
+                        __out.AppendLine(false); //119:115
+                    }
+                }
+            }
+            __out.Append("    </dependencies>"); //121:1
+            __out.AppendLine(false); //121:20
+            __out.Append("</project>"); //122:1
+            __out.AppendLine(false); //122:11
             return __out.ToString();
         }
 
-        public string generateDataPom(Namespace ns, string moduleName) //108:1
+        public string generateDataPom(Namespace ns, string moduleName) //125:1
         {
             StringBuilder __out = new StringBuilder();
             StringBuilder __tmp2 = new StringBuilder();
@@ -663,12 +780,12 @@ namespace MetaDslx.Soal //1:1
                     __tmp2_last = __tmp2Reader.EndOfStream;
                     if (__tmp2Line != null) __out.Append(__tmp2Line);
                     if (!__tmp2_last) __out.AppendLine(true);
-                    __out.AppendLine(false); //109:41
+                    __out.AppendLine(false); //126:41
                 }
             }
-            __out.Append("    <parent>"); //110:1
-            __out.AppendLine(false); //110:13
-            string __tmp4Line = "        <artifactId>"; //111:1
+            __out.Append("    <parent>"); //127:1
+            __out.AppendLine(false); //127:13
+            string __tmp4Line = "        <artifactId>"; //128:1
             if (__tmp4Line != null) __out.Append(__tmp4Line);
             StringBuilder __tmp5 = new StringBuilder();
             __tmp5.Append(ns.Name);
@@ -685,10 +802,10 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp5_last) __out.AppendLine(true);
                 }
             }
-            string __tmp6Line = "App</artifactId>"; //111:30
+            string __tmp6Line = "App</artifactId>"; //128:30
             if (__tmp6Line != null) __out.Append(__tmp6Line);
-            __out.AppendLine(false); //111:46
-            string __tmp8Line = "        <groupId>"; //112:1
+            __out.AppendLine(false); //128:46
+            string __tmp8Line = "        <groupId>"; //129:1
             if (__tmp8Line != null) __out.Append(__tmp8Line);
             StringBuilder __tmp9 = new StringBuilder();
             __tmp9.Append(ns.Name);
@@ -705,14 +822,15 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp9_last) __out.AppendLine(true);
                 }
             }
-            string __tmp10Line = "</groupId>"; //112:27
+            string __tmp10Line = "</groupId>"; //129:27
             if (__tmp10Line != null) __out.Append(__tmp10Line);
-            __out.AppendLine(false); //112:37
-            __out.Append("        <version>1.0</version>"); //113:1
-            __out.AppendLine(false); //113:31
-            __out.Append("    </parent>"); //114:1
-            __out.AppendLine(false); //114:14
-            string __tmp12Line = "    <artifactId>"; //116:1
+            __out.AppendLine(false); //129:37
+            __out.Append("        <version>1.0</version>"); //130:1
+            __out.AppendLine(false); //130:31
+            __out.Append("    </parent>"); //131:1
+            __out.AppendLine(false); //131:14
+            __out.AppendLine(true); //132:2
+            string __tmp12Line = "    <artifactId>"; //133:1
             if (__tmp12Line != null) __out.Append(__tmp12Line);
             StringBuilder __tmp13 = new StringBuilder();
             __tmp13.Append(ns.Name);
@@ -729,7 +847,7 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp13_last) __out.AppendLine(true);
                 }
             }
-            string __tmp14Line = "-"; //116:26
+            string __tmp14Line = "-"; //133:26
             if (__tmp14Line != null) __out.Append(__tmp14Line);
             StringBuilder __tmp15 = new StringBuilder();
             __tmp15.Append(moduleName);
@@ -746,16 +864,17 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp15_last) __out.AppendLine(true);
                 }
             }
-            string __tmp16Line = "</artifactId>"; //116:39
+            string __tmp16Line = "</artifactId>"; //133:39
             if (__tmp16Line != null) __out.Append(__tmp16Line);
-            __out.AppendLine(false); //116:52
-            __out.Append("    <dependencies>"); //118:1
-            __out.AppendLine(false); //118:19
-            if (moduleName != "Model") //119:3
+            __out.AppendLine(false); //133:52
+            __out.AppendLine(true); //134:2
+            __out.Append("    <dependencies>"); //135:1
+            __out.AppendLine(false); //135:19
+            if (moduleName != "Model") //136:3
             {
-                string __tmp17Prefix = "		"; //120:1
+                string __tmp17Prefix = "		"; //137:1
                 StringBuilder __tmp18 = new StringBuilder();
-                __tmp18.Append(SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name + "-Model", "1.0"));
+                __tmp18.Append(SpringGeneratorUtil.GeneratePomDependency(ns.Name, ns.Name + "-Model", "1.0", false));
                 using(StreamReader __tmp18Reader = new StreamReader(this.__ToStream(__tmp18.ToString())))
                 {
                     bool __tmp18_first = true;
@@ -768,15 +887,15 @@ namespace MetaDslx.Soal //1:1
                         __out.Append(__tmp17Prefix);
                         if (__tmp18Line != null) __out.Append(__tmp18Line);
                         if (!__tmp18_last) __out.AppendLine(true);
-                        __out.AppendLine(false); //120:80
+                        __out.AppendLine(false); //137:87
                     }
                 }
             }
-            __out.Append("		<!-- spring data -->"); //122:1
-            __out.AppendLine(false); //122:23
-            string __tmp19Prefix = "		"; //123:1
+            __out.Append("		<!-- spring data -->"); //139:1
+            __out.AppendLine(false); //139:23
+            string __tmp19Prefix = "		"; //140:1
             StringBuilder __tmp20 = new StringBuilder();
-            __tmp20.Append(SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-orm", "${springframework.version}"));
+            __tmp20.Append(SpringGeneratorUtil.GeneratePomDependency("org.springframework", "spring-orm", "${springframework.version}", false));
             using(StreamReader __tmp20Reader = new StreamReader(this.__ToStream(__tmp20.ToString())))
             {
                 bool __tmp20_first = true;
@@ -789,12 +908,12 @@ namespace MetaDslx.Soal //1:1
                     __out.Append(__tmp19Prefix);
                     if (__tmp20Line != null) __out.Append(__tmp20Line);
                     if (!__tmp20_last) __out.AppendLine(true);
-                    __out.AppendLine(false); //123:112
+                    __out.AppendLine(false); //140:119
                 }
             }
-            string __tmp21Prefix = "		"; //124:1
+            string __tmp21Prefix = "		"; //141:1
             StringBuilder __tmp22 = new StringBuilder();
-            __tmp22.Append(SpringGeneratorUtil.GeneratePomDependency("org.springframework.data", "spring-data-jpa", "${spring-data-jpa.version}"));
+            __tmp22.Append(SpringGeneratorUtil.GeneratePomDependency("org.springframework.data", "spring-data-jpa", "${spring-data-jpa.version}", false));
             using(StreamReader __tmp22Reader = new StreamReader(this.__ToStream(__tmp22.ToString())))
             {
                 bool __tmp22_first = true;
@@ -807,55 +926,55 @@ namespace MetaDslx.Soal //1:1
                     __out.Append(__tmp21Prefix);
                     if (__tmp22Line != null) __out.Append(__tmp22Line);
                     if (!__tmp22_last) __out.AppendLine(true);
-                    __out.AppendLine(false); //124:123
+                    __out.AppendLine(false); //141:130
                 }
             }
-            __out.Append("          <!--  <exclusions>"); //125:1
-            __out.AppendLine(false); //125:29
-            __out.Append("                <exclusion>"); //126:1
-            __out.AppendLine(false); //126:28
-            __out.Append("                    <groupId>org.springframework</groupId>"); //127:1
-            __out.AppendLine(false); //127:59
-            __out.Append("                    <artifactId>spring-orm</artifactId>"); //128:1
-            __out.AppendLine(false); //128:56
-            __out.Append("                </exclusion>"); //129:1
-            __out.AppendLine(false); //129:29
-            __out.Append("            </exclusions> -->"); //130:1
-            __out.AppendLine(false); //130:30
-            __out.Append("	</dependencies>"); //131:1
-            __out.AppendLine(false); //131:17
-            __out.Append("</project>"); //132:1
-            __out.AppendLine(false); //132:11
+            __out.Append("          <!--  <exclusions>"); //142:1
+            __out.AppendLine(false); //142:29
+            __out.Append("                <exclusion>"); //143:1
+            __out.AppendLine(false); //143:28
+            __out.Append("                    <groupId>org.springframework</groupId>"); //144:1
+            __out.AppendLine(false); //144:59
+            __out.Append("                    <artifactId>spring-orm</artifactId>"); //145:1
+            __out.AppendLine(false); //145:56
+            __out.Append("                </exclusion>"); //146:1
+            __out.AppendLine(false); //146:29
+            __out.Append("            </exclusions> -->"); //147:1
+            __out.AppendLine(false); //147:30
+            __out.Append("	</dependencies>"); //148:1
+            __out.AppendLine(false); //148:17
+            __out.Append("</project>"); //149:1
+            __out.AppendLine(false); //149:11
             return __out.ToString();
         }
 
-        public string generateComponentSpringConfig(Namespace ns) //135:1
+        public string generateComponentSpringConfig(Namespace ns) //152:1
         {
             StringBuilder __out = new StringBuilder();
-            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //136:1
-            __out.AppendLine(false); //136:39
-            __out.Append("<beans xmlns=\"http://www.springframework.org/schema/beans\""); //137:1
-            __out.AppendLine(false); //137:59
-            __out.Append("       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //138:1
-            __out.AppendLine(false); //138:61
-            __out.Append("       xmlns:context=\"http://www.springframework.org/schema/context\""); //139:1
-            __out.AppendLine(false); //139:69
-            __out.Append("       xmlns:jpa=\"http://www.springframework.org/schema/data/jpa\""); //140:1
-            __out.AppendLine(false); //140:66
-            __out.Append("       xsi:schemaLocation=\"http://www.springframework.org/schema/beans"); //141:1
-            __out.AppendLine(false); //141:71
-            __out.Append("       http://www.springframework.org/schema/beans/spring-beans.xsd"); //142:1
-            __out.AppendLine(false); //142:68
-            __out.Append("       http://www.springframework.org/schema/context"); //143:1
-            __out.AppendLine(false); //143:53
-            __out.Append("       http://www.springframework.org/schema/context/spring-context.xsd"); //144:1
-            __out.AppendLine(false); //144:72
-            __out.Append("       http://www.springframework.org/schema/data/jpa"); //145:1
-            __out.AppendLine(false); //145:54
-            __out.Append("       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd\">"); //146:1
-            __out.AppendLine(false); //146:71
-            __out.AppendLine(true); //147:5
-            string __tmp2Line = "       <jpa:repositories base-package=\""; //148:1
+            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //153:1
+            __out.AppendLine(false); //153:39
+            __out.Append("<beans xmlns=\"http://www.springframework.org/schema/beans\""); //154:1
+            __out.AppendLine(false); //154:59
+            __out.Append("       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //155:1
+            __out.AppendLine(false); //155:61
+            __out.Append("       xmlns:context=\"http://www.springframework.org/schema/context\""); //156:1
+            __out.AppendLine(false); //156:69
+            __out.Append("       xmlns:jpa=\"http://www.springframework.org/schema/data/jpa\""); //157:1
+            __out.AppendLine(false); //157:66
+            __out.Append("       xsi:schemaLocation=\"http://www.springframework.org/schema/beans"); //158:1
+            __out.AppendLine(false); //158:71
+            __out.Append("       http://www.springframework.org/schema/beans/spring-beans.xsd"); //159:1
+            __out.AppendLine(false); //159:68
+            __out.Append("       http://www.springframework.org/schema/context"); //160:1
+            __out.AppendLine(false); //160:53
+            __out.Append("       http://www.springframework.org/schema/context/spring-context.xsd"); //161:1
+            __out.AppendLine(false); //161:72
+            __out.Append("       http://www.springframework.org/schema/data/jpa"); //162:1
+            __out.AppendLine(false); //162:54
+            __out.Append("       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd\">"); //163:1
+            __out.AppendLine(false); //163:71
+            __out.AppendLine(true); //164:5
+            string __tmp2Line = "       <jpa:repositories base-package=\""; //165:1
             if (__tmp2Line != null) __out.Append(__tmp2Line);
             StringBuilder __tmp3 = new StringBuilder();
             __tmp3.Append(ns.FullName.ToLower());
@@ -872,7 +991,7 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp3_last) __out.AppendLine(true);
                 }
             }
-            string __tmp4Line = "."; //148:63
+            string __tmp4Line = "."; //165:63
             if (__tmp4Line != null) __out.Append(__tmp4Line);
             StringBuilder __tmp5 = new StringBuilder();
             __tmp5.Append(SpringGeneratorUtil.Properties.repositoryPackage);
@@ -889,10 +1008,10 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp5_last) __out.AppendLine(true);
                 }
             }
-            string __tmp6Line = "\"/>"; //148:114
+            string __tmp6Line = "\"/>"; //165:114
             if (__tmp6Line != null) __out.Append(__tmp6Line);
-            __out.AppendLine(false); //148:117
-            string __tmp8Line = "       <context:component-scan base-package=\""; //149:1
+            __out.AppendLine(false); //165:117
+            string __tmp8Line = "       <context:component-scan base-package=\""; //166:1
             if (__tmp8Line != null) __out.Append(__tmp8Line);
             StringBuilder __tmp9 = new StringBuilder();
             __tmp9.Append(ns.FullName.ToLower());
@@ -909,7 +1028,7 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp9_last) __out.AppendLine(true);
                 }
             }
-            string __tmp10Line = "."; //149:69
+            string __tmp10Line = "."; //166:69
             if (__tmp10Line != null) __out.Append(__tmp10Line);
             StringBuilder __tmp11 = new StringBuilder();
             __tmp11.Append(SpringGeneratorUtil.Properties.serviceFacadePackage);
@@ -926,35 +1045,35 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp11_last) __out.AppendLine(true);
                 }
             }
-            string __tmp12Line = "\"/>"; //149:123
+            string __tmp12Line = "\"/>"; //166:123
             if (__tmp12Line != null) __out.Append(__tmp12Line);
-            __out.AppendLine(false); //149:126
-            __out.Append("</beans>"); //150:1
-            __out.AppendLine(false); //150:9
+            __out.AppendLine(false); //166:126
+            __out.Append("</beans>"); //167:1
+            __out.AppendLine(false); //167:9
             return __out.ToString();
         }
 
-        public string generateDataSpringConfig(Namespace ns) //153:1
+        public string generateDataSpringConfig(Namespace ns) //170:1
         {
             StringBuilder __out = new StringBuilder();
-            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //154:1
-            __out.AppendLine(false); //154:39
-            __out.Append("<beans xmlns=\"http://www.springframework.org/schema/beans\""); //155:1
-            __out.AppendLine(false); //155:59
-            __out.Append("       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //156:1
-            __out.AppendLine(false); //156:61
-            __out.Append("       xmlns:jpa=\"http://www.springframework.org/schema/data/jpa\""); //157:1
-            __out.AppendLine(false); //157:66
-            __out.Append("       xsi:schemaLocation=\"http://www.springframework.org/schema/beans"); //158:1
-            __out.AppendLine(false); //158:71
-            __out.Append("       http://www.springframework.org/schema/beans/spring-beans.xsd"); //159:1
-            __out.AppendLine(false); //159:68
-            __out.Append("       http://www.springframework.org/schema/data/jpa"); //160:1
-            __out.AppendLine(false); //160:54
-            __out.Append("       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd\">"); //161:1
-            __out.AppendLine(false); //161:71
-            __out.AppendLine(true); //162:5
-            string __tmp2Line = "       <jpa:repositories base-package=\""; //163:1
+            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //171:1
+            __out.AppendLine(false); //171:39
+            __out.Append("<beans xmlns=\"http://www.springframework.org/schema/beans\""); //172:1
+            __out.AppendLine(false); //172:59
+            __out.Append("       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //173:1
+            __out.AppendLine(false); //173:61
+            __out.Append("       xmlns:jpa=\"http://www.springframework.org/schema/data/jpa\""); //174:1
+            __out.AppendLine(false); //174:66
+            __out.Append("       xsi:schemaLocation=\"http://www.springframework.org/schema/beans"); //175:1
+            __out.AppendLine(false); //175:71
+            __out.Append("       http://www.springframework.org/schema/beans/spring-beans.xsd"); //176:1
+            __out.AppendLine(false); //176:68
+            __out.Append("       http://www.springframework.org/schema/data/jpa"); //177:1
+            __out.AppendLine(false); //177:54
+            __out.Append("       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd\">"); //178:1
+            __out.AppendLine(false); //178:71
+            __out.AppendLine(true); //179:5
+            string __tmp2Line = "       <jpa:repositories base-package=\""; //180:1
             if (__tmp2Line != null) __out.Append(__tmp2Line);
             StringBuilder __tmp3 = new StringBuilder();
             __tmp3.Append(ns.FullName.ToLower());
@@ -971,7 +1090,7 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp3_last) __out.AppendLine(true);
                 }
             }
-            string __tmp4Line = "."; //163:63
+            string __tmp4Line = "."; //180:63
             if (__tmp4Line != null) __out.Append(__tmp4Line);
             StringBuilder __tmp5 = new StringBuilder();
             __tmp5.Append(SpringGeneratorUtil.Properties.repositoryPackage);
@@ -988,15 +1107,15 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp5_last) __out.AppendLine(true);
                 }
             }
-            string __tmp6Line = "\"/>"; //163:114
+            string __tmp6Line = "\"/>"; //180:114
             if (__tmp6Line != null) __out.Append(__tmp6Line);
-            __out.AppendLine(false); //163:117
-            __out.AppendLine(true); //164:8
-            __out.Append("       <bean id=\"jpaVendorAdapter\" class=\"org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter\"/>"); //165:1
-            __out.AppendLine(false); //165:108
-            __out.Append("       <bean id=\"entityManagerFactory\" class=\"org.springframework.orm.jpa.LocalEntityManagerFactoryBean\">"); //166:1
-            __out.AppendLine(false); //166:106
-            string __tmp8Line = "              <property name=\"persistenceUnitName\" value=\""; //167:1
+            __out.AppendLine(false); //180:117
+            __out.AppendLine(true); //181:8
+            __out.Append("       <bean id=\"jpaVendorAdapter\" class=\"org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter\"/>"); //182:1
+            __out.AppendLine(false); //182:108
+            __out.Append("       <bean id=\"entityManagerFactory\" class=\"org.springframework.orm.jpa.LocalEntityManagerFactoryBean\">"); //183:1
+            __out.AppendLine(false); //183:106
+            string __tmp8Line = "              <property name=\"persistenceUnitName\" value=\""; //184:1
             if (__tmp8Line != null) __out.Append(__tmp8Line);
             StringBuilder __tmp9 = new StringBuilder();
             __tmp9.Append(ns.Name);
@@ -1013,21 +1132,21 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp9_last) __out.AppendLine(true);
                 }
             }
-            string __tmp10Line = "PU\"/>"; //167:68
+            string __tmp10Line = "PU\"/>"; //184:68
             if (__tmp10Line != null) __out.Append(__tmp10Line);
-            __out.AppendLine(false); //167:73
-            __out.Append("              <property name=\"jpaVendorAdapter\" ref=\"jpaVendorAdapter\"/>"); //168:1
-            __out.AppendLine(false); //168:73
-            __out.Append("       </bean>"); //169:1
-            __out.AppendLine(false); //169:15
-            __out.Append("       <bean id=\"transactionManager\" class=\"org.springframework.orm.jpa.JpaTransactionManager\">"); //170:1
-            __out.AppendLine(false); //170:96
-            __out.Append("              <property name=\"entityManagerFactory\" ref=\"entityManagerFactory\"/>"); //171:1
-            __out.AppendLine(false); //171:81
-            __out.Append("       </bean>"); //172:1
-            __out.AppendLine(false); //172:15
-            __out.Append("</beans>"); //173:1
-            __out.AppendLine(false); //173:9
+            __out.AppendLine(false); //184:73
+            __out.Append("              <property name=\"jpaVendorAdapter\" ref=\"jpaVendorAdapter\"/>"); //185:1
+            __out.AppendLine(false); //185:73
+            __out.Append("       </bean>"); //186:1
+            __out.AppendLine(false); //186:15
+            __out.Append("       <bean id=\"transactionManager\" class=\"org.springframework.orm.jpa.JpaTransactionManager\">"); //187:1
+            __out.AppendLine(false); //187:96
+            __out.Append("              <property name=\"entityManagerFactory\" ref=\"entityManagerFactory\"/>"); //188:1
+            __out.AppendLine(false); //188:81
+            __out.Append("       </bean>"); //189:1
+            __out.AppendLine(false); //189:15
+            __out.Append("</beans>"); //190:1
+            __out.AppendLine(false); //190:9
             return __out.ToString();
         }
 

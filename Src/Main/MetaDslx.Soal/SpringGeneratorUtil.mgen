@@ -63,11 +63,14 @@ end template
 
 
 
-template GeneratePomDependency(string group, string artifact, string version)
+template GeneratePomDependency(string group, string artifact, string version, bool provided)
 <dependency>
     <groupId>[group]</groupId>
     <artifactId>[artifact]</artifactId>
     <version>[version]</version>
+	[if (provided)]
+	<scope>provided</scope>
+	[end if]
 </dependency>
 end template
 
