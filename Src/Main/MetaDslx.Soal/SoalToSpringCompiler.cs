@@ -313,20 +313,35 @@ namespace MetaDslx.Soal
 
         private void GenerateWebTier(Namespace ns, string innerDir, SpringViewGenerator springViewGen, SpringGeneratorUtil generatorUtil, Component component)
         {
+            string contollerDir = createJavaDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.controllerPackage);
+            string viewDir = createWebDirectory(ns.Name, component.Name, "view");
+
+            // indexController
+            string contollerFile = Path.Combine(contollerDir, "IndexController.java");
+            using (StreamWriter writer = new StreamWriter(contollerFile))
+            {
+                writer.WriteLine(springViewGen.GenerateIndexController(ns));
+            }
+
+            // index view
+            string viewFile = Path.Combine(viewDir, "index.html");
+            using (StreamWriter writer = new StreamWriter(viewFile))
+            {
+                writer.WriteLine(springViewGen.GenerateIndexView(ns));
+            }
+
             List<ViewInfoHolder> views = new List<ViewInfoHolder>();
             foreach (Reference reference in component.References)
             {
                 // controllers
-                string contollerDir = createJavaDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.controllerPackage);
-                string contollerFile = Path.Combine(contollerDir, reference.Name + "Controller.java");
+                contollerFile = Path.Combine(contollerDir, reference.Name + "Controller.java");
                 using (StreamWriter writer = new StreamWriter(contollerFile))
                 {
                     writer.WriteLine(springViewGen.GenerateController(reference));
                 }
 
                 // views
-                string viewDir = createWebDirectory(ns.Name, component.Name, "view");
-                string viewFile = Path.Combine(viewDir, reference.Name + "View.html");
+                viewFile = Path.Combine(viewDir, reference.Name + "View.html");
                 using (StreamWriter writer = new StreamWriter(viewFile))
                 {
                     writer.WriteLine(springViewGen.GenerateView(reference));
@@ -367,8 +382,8 @@ namespace MetaDslx.Soal
             // master view
             if (views.Any())
             {
-                string viewDir = createWebDirectory(ns.Name, component.Name, "view");
-                string viewFile = Path.Combine(viewDir, "_master.html");
+                viewDir = createWebDirectory(ns.Name, component.Name, "view");
+                viewFile = Path.Combine(viewDir, "_master.html");
                 using (StreamWriter writer = new StreamWriter(viewFile))
                 {
                     writer.WriteLine(springViewGen.GenerateMasterView(component.Name, views));

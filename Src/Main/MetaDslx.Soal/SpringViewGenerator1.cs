@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringViewGenerator_1394676142;
-    namespace __Hidden_SpringViewGenerator_1394676142
+    using __Hidden_SpringViewGenerator_418060360;
+    namespace __Hidden_SpringViewGenerator_418060360
     {
         internal static class __Extensions
         {
@@ -59,13 +59,13 @@ namespace MetaDslx.Soal //1:1
 
         private SpringGeneratorUtil SpringGeneratorUtil = new SpringGeneratorUtil(); //4:1
 
-        public string GenerateController(Reference reference) //8:1
+        public string GenerateIndexController(Namespace ns) //8:1
         {
             StringBuilder __out = new StringBuilder();
             string __tmp2Line = "package "; //9:1
             if (__tmp2Line != null) __out.Append(__tmp2Line);
             StringBuilder __tmp3 = new StringBuilder();
-            __tmp3.Append(SpringGeneratorUtil.GetPackage(reference.Interface));
+            __tmp3.Append(ns.FullName.ToLower());
             using(StreamReader __tmp3Reader = new StreamReader(this.__ToStream(__tmp3.ToString())))
             {
                 bool __tmp3_first = true;
@@ -79,7 +79,7 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp3_last) __out.AppendLine(true);
                 }
             }
-            string __tmp4Line = "."; //9:62
+            string __tmp4Line = "."; //9:32
             if (__tmp4Line != null) __out.Append(__tmp4Line);
             StringBuilder __tmp5 = new StringBuilder();
             __tmp5.Append(SpringGeneratorUtil.Properties.controllerPackage);
@@ -96,24 +96,92 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp5_last) __out.AppendLine(true);
                 }
             }
-            string __tmp6Line = ";"; //9:113
+            string __tmp6Line = ";"; //9:83
             if (__tmp6Line != null) __out.Append(__tmp6Line);
-            __out.AppendLine(false); //9:114
+            __out.AppendLine(false); //9:84
             __out.AppendLine(true); //10:1
-            __out.Append("import org.springframework.beans.factory.annotation.Autowired;"); //11:1
-            __out.AppendLine(false); //11:63
-            __out.Append("import org.springframework.stereotype.Controller;"); //12:1
-            __out.AppendLine(false); //12:50
-            __out.Append("import org.springframework.ui.Model;"); //13:1
-            __out.AppendLine(false); //13:37
-            __out.Append("import org.springframework.web.bind.annotation.RequestMapping;"); //14:1
-            __out.AppendLine(false); //14:63
-            __out.Append("import org.springframework.web.bind.annotation.RequestMethod;"); //15:1
-            __out.AppendLine(false); //15:62
-            __out.Append("import org.springframework.web.bind.annotation.RequestParam;"); //16:1
-            __out.AppendLine(false); //16:61
-            __out.AppendLine(true); //17:1
-            string __tmp8Line = "import "; //18:1
+            __out.Append("import org.springframework.stereotype.Controller;"); //11:1
+            __out.AppendLine(false); //11:50
+            __out.Append("import org.springframework.web.bind.annotation.RequestMapping;"); //12:1
+            __out.AppendLine(false); //12:63
+            __out.Append("import org.springframework.web.bind.annotation.RequestMethod;"); //13:1
+            __out.AppendLine(false); //13:62
+            __out.AppendLine(true); //14:1
+            __out.Append("@Controller"); //15:1
+            __out.AppendLine(false); //15:12
+            __out.Append("@RequestMapping(method = RequestMethod.GET)"); //16:1
+            __out.AppendLine(false); //16:44
+            __out.Append("public class IndexController {"); //17:1
+            __out.AppendLine(false); //17:31
+            __out.AppendLine(true); //18:2
+            __out.Append("	@RequestMapping(\"/\")"); //19:1
+            __out.AppendLine(false); //19:22
+            __out.Append("	public String index() {"); //20:1
+            __out.AppendLine(false); //20:25
+            __out.Append("		return \"index\";"); //21:1
+            __out.AppendLine(false); //21:18
+            __out.Append("	}"); //22:1
+            __out.AppendLine(false); //22:3
+            __out.Append("}"); //23:1
+            __out.AppendLine(false); //23:2
+            return __out.ToString();
+        }
+
+        public string GenerateController(Reference reference) //28:1
+        {
+            StringBuilder __out = new StringBuilder();
+            string __tmp2Line = "package "; //29:1
+            if (__tmp2Line != null) __out.Append(__tmp2Line);
+            StringBuilder __tmp3 = new StringBuilder();
+            __tmp3.Append(SpringGeneratorUtil.GetPackage(reference.Interface));
+            using(StreamReader __tmp3Reader = new StreamReader(this.__ToStream(__tmp3.ToString())))
+            {
+                bool __tmp3_first = true;
+                bool __tmp3_last = __tmp3Reader.EndOfStream;
+                while(__tmp3_first || !__tmp3_last)
+                {
+                    __tmp3_first = false;
+                    string __tmp3Line = __tmp3Reader.ReadLine();
+                    __tmp3_last = __tmp3Reader.EndOfStream;
+                    if (__tmp3Line != null) __out.Append(__tmp3Line);
+                    if (!__tmp3_last) __out.AppendLine(true);
+                }
+            }
+            string __tmp4Line = "."; //29:62
+            if (__tmp4Line != null) __out.Append(__tmp4Line);
+            StringBuilder __tmp5 = new StringBuilder();
+            __tmp5.Append(SpringGeneratorUtil.Properties.controllerPackage);
+            using(StreamReader __tmp5Reader = new StreamReader(this.__ToStream(__tmp5.ToString())))
+            {
+                bool __tmp5_first = true;
+                bool __tmp5_last = __tmp5Reader.EndOfStream;
+                while(__tmp5_first || !__tmp5_last)
+                {
+                    __tmp5_first = false;
+                    string __tmp5Line = __tmp5Reader.ReadLine();
+                    __tmp5_last = __tmp5Reader.EndOfStream;
+                    if (__tmp5Line != null) __out.Append(__tmp5Line);
+                    if (!__tmp5_last) __out.AppendLine(true);
+                }
+            }
+            string __tmp6Line = ";"; //29:113
+            if (__tmp6Line != null) __out.Append(__tmp6Line);
+            __out.AppendLine(false); //29:114
+            __out.AppendLine(true); //30:1
+            __out.Append("import org.springframework.beans.factory.annotation.Autowired;"); //31:1
+            __out.AppendLine(false); //31:63
+            __out.Append("import org.springframework.stereotype.Controller;"); //32:1
+            __out.AppendLine(false); //32:50
+            __out.Append("import org.springframework.ui.Model;"); //33:1
+            __out.AppendLine(false); //33:37
+            __out.Append("import org.springframework.web.bind.annotation.RequestMapping;"); //34:1
+            __out.AppendLine(false); //34:63
+            __out.Append("import org.springframework.web.bind.annotation.RequestMethod;"); //35:1
+            __out.AppendLine(false); //35:62
+            __out.Append("import org.springframework.web.bind.annotation.RequestParam;"); //36:1
+            __out.AppendLine(false); //36:61
+            __out.AppendLine(true); //37:1
+            string __tmp8Line = "import "; //38:1
             if (__tmp8Line != null) __out.Append(__tmp8Line);
             StringBuilder __tmp9 = new StringBuilder();
             __tmp9.Append(SpringGeneratorUtil.GetPackage(reference.Interface));
@@ -130,7 +198,7 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp9_last) __out.AppendLine(true);
                 }
             }
-            string __tmp10Line = "."; //18:61
+            string __tmp10Line = "."; //38:61
             if (__tmp10Line != null) __out.Append(__tmp10Line);
             StringBuilder __tmp11 = new StringBuilder();
             __tmp11.Append(SpringGeneratorUtil.Properties.interfacePackage);
@@ -147,7 +215,7 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp11_last) __out.AppendLine(true);
                 }
             }
-            string __tmp12Line = "."; //18:111
+            string __tmp12Line = "."; //38:111
             if (__tmp12Line != null) __out.Append(__tmp12Line);
             StringBuilder __tmp13 = new StringBuilder();
             __tmp13.Append(reference.Interface.Name);
@@ -179,9 +247,9 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp14_last) __out.AppendLine(true);
                 }
             }
-            string __tmp15Line = ";"; //18:185
+            string __tmp15Line = ";"; //38:185
             if (__tmp15Line != null) __out.Append(__tmp15Line);
-            __out.AppendLine(false); //18:186
+            __out.AppendLine(false); //38:186
             StringBuilder __tmp17 = new StringBuilder();
             __tmp17.Append(SpringGeneratorUtil.GenerateImports(reference.Interface, false));
             using(StreamReader __tmp17Reader = new StreamReader(this.__ToStream(__tmp17.ToString())))
@@ -195,15 +263,13 @@ namespace MetaDslx.Soal //1:1
                     __tmp17_last = __tmp17Reader.EndOfStream;
                     if (__tmp17Line != null) __out.Append(__tmp17Line);
                     if (!__tmp17_last) __out.AppendLine(true);
-                    __out.AppendLine(false); //19:66
+                    __out.AppendLine(false); //39:66
                 }
             }
-            __out.AppendLine(true); //20:1
-            __out.Append("@Controller"); //21:1
-            __out.AppendLine(false); //21:12
-            __out.Append("@RequestMapping(method = RequestMethod.GET)"); //22:1
-            __out.AppendLine(false); //22:44
-            string __tmp19Line = "public class "; //23:1
+            __out.AppendLine(true); //40:1
+            __out.Append("@Controller"); //41:1
+            __out.AppendLine(false); //41:12
+            string __tmp19Line = "@RequestMapping(value = \""; //42:1
             if (__tmp19Line != null) __out.Append(__tmp19Line);
             StringBuilder __tmp20 = new StringBuilder();
             __tmp20.Append(reference.Name);
@@ -220,16 +286,13 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp20_last) __out.AppendLine(true);
                 }
             }
-            string __tmp21Line = "Controller {"; //23:30
+            string __tmp21Line = "\", method = RequestMethod.GET)"; //42:42
             if (__tmp21Line != null) __out.Append(__tmp21Line);
-            __out.AppendLine(false); //23:42
-            __out.AppendLine(true); //24:1
-            __out.Append("	@Autowired"); //25:1
-            __out.AppendLine(false); //25:12
-            string __tmp23Line = "	private "; //26:1
+            __out.AppendLine(false); //42:72
+            string __tmp23Line = "public class "; //43:1
             if (__tmp23Line != null) __out.Append(__tmp23Line);
             StringBuilder __tmp24 = new StringBuilder();
-            __tmp24.Append(reference.Interface.Name);
+            __tmp24.Append(reference.Name);
             using(StreamReader __tmp24Reader = new StreamReader(this.__ToStream(__tmp24.ToString())))
             {
                 bool __tmp24_first = true;
@@ -243,335 +306,380 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp24_last) __out.AppendLine(true);
                 }
             }
-            StringBuilder __tmp25 = new StringBuilder();
-            __tmp25.Append(SpringGeneratorUtil.GetBindingType(reference));
-            using(StreamReader __tmp25Reader = new StreamReader(this.__ToStream(__tmp25.ToString())))
+            string __tmp25Line = "Controller {"; //43:30
+            if (__tmp25Line != null) __out.Append(__tmp25Line);
+            __out.AppendLine(false); //43:42
+            __out.AppendLine(true); //44:1
+            __out.Append("	@Autowired"); //45:1
+            __out.AppendLine(false); //45:12
+            string __tmp27Line = "	private "; //46:1
+            if (__tmp27Line != null) __out.Append(__tmp27Line);
+            StringBuilder __tmp28 = new StringBuilder();
+            __tmp28.Append(reference.Interface.Name);
+            using(StreamReader __tmp28Reader = new StreamReader(this.__ToStream(__tmp28.ToString())))
             {
-                bool __tmp25_first = true;
-                bool __tmp25_last = __tmp25Reader.EndOfStream;
-                while(__tmp25_first || !__tmp25_last)
+                bool __tmp28_first = true;
+                bool __tmp28_last = __tmp28Reader.EndOfStream;
+                while(__tmp28_first || !__tmp28_last)
                 {
-                    __tmp25_first = false;
-                    string __tmp25Line = __tmp25Reader.ReadLine();
-                    __tmp25_last = __tmp25Reader.EndOfStream;
-                    if (__tmp25Line != null) __out.Append(__tmp25Line);
-                    if (!__tmp25_last) __out.AppendLine(true);
+                    __tmp28_first = false;
+                    string __tmp28Line = __tmp28Reader.ReadLine();
+                    __tmp28_last = __tmp28Reader.EndOfStream;
+                    if (__tmp28Line != null) __out.Append(__tmp28Line);
+                    if (!__tmp28_last) __out.AppendLine(true);
                 }
             }
-            string __tmp26Line = " "; //26:83
-            if (__tmp26Line != null) __out.Append(__tmp26Line);
-            StringBuilder __tmp27 = new StringBuilder();
-            __tmp27.Append(reference.Name.ToCamelCase());
-            using(StreamReader __tmp27Reader = new StreamReader(this.__ToStream(__tmp27.ToString())))
+            StringBuilder __tmp29 = new StringBuilder();
+            __tmp29.Append(SpringGeneratorUtil.GetBindingType(reference));
+            using(StreamReader __tmp29Reader = new StreamReader(this.__ToStream(__tmp29.ToString())))
             {
-                bool __tmp27_first = true;
-                bool __tmp27_last = __tmp27Reader.EndOfStream;
-                while(__tmp27_first || !__tmp27_last)
+                bool __tmp29_first = true;
+                bool __tmp29_last = __tmp29Reader.EndOfStream;
+                while(__tmp29_first || !__tmp29_last)
                 {
-                    __tmp27_first = false;
-                    string __tmp27Line = __tmp27Reader.ReadLine();
-                    __tmp27_last = __tmp27Reader.EndOfStream;
-                    if (__tmp27Line != null) __out.Append(__tmp27Line);
-                    if (!__tmp27_last) __out.AppendLine(true);
+                    __tmp29_first = false;
+                    string __tmp29Line = __tmp29Reader.ReadLine();
+                    __tmp29_last = __tmp29Reader.EndOfStream;
+                    if (__tmp29Line != null) __out.Append(__tmp29Line);
+                    if (!__tmp29_last) __out.AppendLine(true);
                 }
             }
-            string __tmp28Line = ";"; //26:114
-            if (__tmp28Line != null) __out.Append(__tmp28Line);
-            __out.AppendLine(false); //26:115
-            __out.AppendLine(true); //27:2
+            string __tmp30Line = " "; //46:83
+            if (__tmp30Line != null) __out.Append(__tmp30Line);
+            StringBuilder __tmp31 = new StringBuilder();
+            __tmp31.Append(reference.Name.ToCamelCase());
+            using(StreamReader __tmp31Reader = new StreamReader(this.__ToStream(__tmp31.ToString())))
+            {
+                bool __tmp31_first = true;
+                bool __tmp31_last = __tmp31Reader.EndOfStream;
+                while(__tmp31_first || !__tmp31_last)
+                {
+                    __tmp31_first = false;
+                    string __tmp31Line = __tmp31Reader.ReadLine();
+                    __tmp31_last = __tmp31Reader.EndOfStream;
+                    if (__tmp31Line != null) __out.Append(__tmp31Line);
+                    if (!__tmp31_last) __out.AppendLine(true);
+                }
+            }
+            string __tmp32Line = ";"; //46:114
+            if (__tmp32Line != null) __out.Append(__tmp32Line);
+            __out.AppendLine(false); //46:115
+            __out.AppendLine(true); //47:2
+            __out.Append("	@RequestMapping(\"/\")"); //48:1
+            __out.AppendLine(false); //48:22
+            __out.Append("	public String index() {"); //49:1
+            __out.AppendLine(false); //49:25
+            string __tmp34Line = "		return \""; //50:1
+            if (__tmp34Line != null) __out.Append(__tmp34Line);
+            StringBuilder __tmp35 = new StringBuilder();
+            __tmp35.Append(reference.Name);
+            using(StreamReader __tmp35Reader = new StreamReader(this.__ToStream(__tmp35.ToString())))
+            {
+                bool __tmp35_first = true;
+                bool __tmp35_last = __tmp35Reader.EndOfStream;
+                while(__tmp35_first || !__tmp35_last)
+                {
+                    __tmp35_first = false;
+                    string __tmp35Line = __tmp35Reader.ReadLine();
+                    __tmp35_last = __tmp35Reader.EndOfStream;
+                    if (__tmp35Line != null) __out.Append(__tmp35Line);
+                    if (!__tmp35_last) __out.AppendLine(true);
+                }
+            }
+            string __tmp36Line = "View\";"; //50:27
+            if (__tmp36Line != null) __out.Append(__tmp36Line);
+            __out.AppendLine(false); //50:33
+            __out.Append("	}"); //51:1
+            __out.AppendLine(false); //51:3
+            __out.AppendLine(true); //52:2
             var __loop1_results = 
-                (from __loop1_var1 in __Enumerate((reference.Interface).GetEnumerator()) //28:9
-                from op in __Enumerate((__loop1_var1.Operations).GetEnumerator()) //28:30
+                (from __loop1_var1 in __Enumerate((reference.Interface).GetEnumerator()) //53:9
+                from op in __Enumerate((__loop1_var1.Operations).GetEnumerator()) //53:30
                 select new { __loop1_var1 = __loop1_var1, op = op}
-                ).ToList(); //28:4
+                ).ToList(); //53:4
             int __loop1_iteration = 0;
-            foreach (var __tmp29 in __loop1_results)
+            foreach (var __tmp37 in __loop1_results)
             {
                 ++__loop1_iteration;
-                var __loop1_var1 = __tmp29.__loop1_var1;
-                var op = __tmp29.op;
-                string javaReturn = op.Result.Type.GetJavaName(); //30:5
-                string name = op.Name; //31:5
-                if (name.StartsWith("Get")) //32:5
+                var __loop1_var1 = __tmp37.__loop1_var1;
+                var op = __tmp37.op;
+                string javaReturn = op.Result.Type.GetJavaName(); //55:5
+                string name = op.Name; //56:5
+                if (name.StartsWith("Get")) //57:5
                 {
                     name = op.Name.Substring(3);
                 }
-                if (javaReturn.Contains("List")) //36:5
+                if (javaReturn.Contains("List")) //61:5
                 {
-                    string __tmp31Line = "	@RequestMapping(\"/"; //37:1
-                    if (__tmp31Line != null) __out.Append(__tmp31Line);
-                    StringBuilder __tmp32 = new StringBuilder();
-                    __tmp32.Append(name);
-                    using(StreamReader __tmp32Reader = new StreamReader(this.__ToStream(__tmp32.ToString())))
+                    string __tmp39Line = "	@RequestMapping(\"/"; //62:1
+                    if (__tmp39Line != null) __out.Append(__tmp39Line);
+                    StringBuilder __tmp40 = new StringBuilder();
+                    __tmp40.Append(name);
+                    using(StreamReader __tmp40Reader = new StreamReader(this.__ToStream(__tmp40.ToString())))
                     {
-                        bool __tmp32_first = true;
-                        bool __tmp32_last = __tmp32Reader.EndOfStream;
-                        while(__tmp32_first || !__tmp32_last)
+                        bool __tmp40_first = true;
+                        bool __tmp40_last = __tmp40Reader.EndOfStream;
+                        while(__tmp40_first || !__tmp40_last)
                         {
-                            __tmp32_first = false;
-                            string __tmp32Line = __tmp32Reader.ReadLine();
-                            __tmp32_last = __tmp32Reader.EndOfStream;
-                            if (__tmp32Line != null) __out.Append(__tmp32Line);
-                            if (!__tmp32_last) __out.AppendLine(true);
+                            __tmp40_first = false;
+                            string __tmp40Line = __tmp40Reader.ReadLine();
+                            __tmp40_last = __tmp40Reader.EndOfStream;
+                            if (__tmp40Line != null) __out.Append(__tmp40Line);
+                            if (!__tmp40_last) __out.AppendLine(true);
                         }
                     }
-                    string __tmp33Line = "\")"; //37:26
-                    if (__tmp33Line != null) __out.Append(__tmp33Line);
-                    __out.AppendLine(false); //37:28
+                    string __tmp41Line = "\")  // + POST"; //62:26
+                    if (__tmp41Line != null) __out.Append(__tmp41Line);
+                    __out.AppendLine(false); //62:39
                 }
-                else if (javaReturn != "void") //38:5
+                else //63:5
                 {
-                    string __tmp35Line = "	@RequestMapping(value=\"/\", params={\"action="; //39:1
-                    if (__tmp35Line != null) __out.Append(__tmp35Line);
-                    StringBuilder __tmp36 = new StringBuilder();
-                    __tmp36.Append(name);
-                    using(StreamReader __tmp36Reader = new StreamReader(this.__ToStream(__tmp36.ToString())))
+                    string __tmp43Line = "	@RequestMapping(value=\"/\", params={\"action="; //64:1
+                    if (__tmp43Line != null) __out.Append(__tmp43Line);
+                    StringBuilder __tmp44 = new StringBuilder();
+                    __tmp44.Append(name);
+                    using(StreamReader __tmp44Reader = new StreamReader(this.__ToStream(__tmp44.ToString())))
                     {
-                        bool __tmp36_first = true;
-                        bool __tmp36_last = __tmp36Reader.EndOfStream;
-                        while(__tmp36_first || !__tmp36_last)
+                        bool __tmp44_first = true;
+                        bool __tmp44_last = __tmp44Reader.EndOfStream;
+                        while(__tmp44_first || !__tmp44_last)
                         {
-                            __tmp36_first = false;
-                            string __tmp36Line = __tmp36Reader.ReadLine();
-                            __tmp36_last = __tmp36Reader.EndOfStream;
-                            if (__tmp36Line != null) __out.Append(__tmp36Line);
-                            if (!__tmp36_last) __out.AppendLine(true);
+                            __tmp44_first = false;
+                            string __tmp44Line = __tmp44Reader.ReadLine();
+                            __tmp44_last = __tmp44Reader.EndOfStream;
+                            if (__tmp44Line != null) __out.Append(__tmp44Line);
+                            if (!__tmp44_last) __out.AppendLine(true);
                         }
                     }
-                    string __tmp37Line = "\"})"; //39:51
-                    if (__tmp37Line != null) __out.Append(__tmp37Line);
-                    __out.AppendLine(false); //39:54
+                    string __tmp45Line = "\"})"; //64:51
+                    if (__tmp45Line != null) __out.Append(__tmp45Line);
+                    __out.AppendLine(false); //64:54
                 }
-                else //40:5
+                string __tmp47Line = "	public String "; //66:1
+                if (__tmp47Line != null) __out.Append(__tmp47Line);
+                StringBuilder __tmp48 = new StringBuilder();
+                __tmp48.Append(op.Name.ToCamelCase());
+                using(StreamReader __tmp48Reader = new StreamReader(this.__ToStream(__tmp48.ToString())))
                 {
-                    __out.Append("	//@RequestMapping(\"/\") // + POST"); //41:1
-                    __out.AppendLine(false); //41:34
-                }
-                string __tmp39Line = "	public String "; //43:1
-                if (__tmp39Line != null) __out.Append(__tmp39Line);
-                StringBuilder __tmp40 = new StringBuilder();
-                __tmp40.Append(op.Name.ToCamelCase());
-                using(StreamReader __tmp40Reader = new StreamReader(this.__ToStream(__tmp40.ToString())))
-                {
-                    bool __tmp40_first = true;
-                    bool __tmp40_last = __tmp40Reader.EndOfStream;
-                    while(__tmp40_first || !__tmp40_last)
+                    bool __tmp48_first = true;
+                    bool __tmp48_last = __tmp48Reader.EndOfStream;
+                    while(__tmp48_first || !__tmp48_last)
                     {
-                        __tmp40_first = false;
-                        string __tmp40Line = __tmp40Reader.ReadLine();
-                        __tmp40_last = __tmp40Reader.EndOfStream;
-                        if (__tmp40Line != null) __out.Append(__tmp40Line);
-                        if (!__tmp40_last) __out.AppendLine(true);
+                        __tmp48_first = false;
+                        string __tmp48Line = __tmp48Reader.ReadLine();
+                        __tmp48_last = __tmp48Reader.EndOfStream;
+                        if (__tmp48Line != null) __out.Append(__tmp48Line);
+                        if (!__tmp48_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp41Line = "(Model model"; //43:39
-                if (__tmp41Line != null) __out.Append(__tmp41Line);
+                string __tmp49Line = "(Model model"; //66:39
+                if (__tmp49Line != null) __out.Append(__tmp49Line);
                 var __loop2_results = 
-                    (from __loop2_var1 in __Enumerate((op).GetEnumerator()) //44:11
-                    from param in __Enumerate((__loop2_var1.Parameters).GetEnumerator()) //44:15
+                    (from __loop2_var1 in __Enumerate((op).GetEnumerator()) //67:11
+                    from param in __Enumerate((__loop2_var1.Parameters).GetEnumerator()) //67:15
                     select new { __loop2_var1 = __loop2_var1, param = param}
-                    ).ToList(); //44:5
+                    ).ToList(); //67:5
                 int __loop2_iteration = 0;
-                foreach (var __tmp42 in __loop2_results)
+                foreach (var __tmp50 in __loop2_results)
                 {
                     ++__loop2_iteration;
-                    var __loop2_var1 = __tmp42.__loop2_var1;
-                    var param = __tmp42.param;
-                    __out.Append(","); //45:1
-                    __out.AppendLine(false); //45:2
-                    string __tmp44Line = "		@RequestParam(value=\""; //46:1
-                    if (__tmp44Line != null) __out.Append(__tmp44Line);
-                    StringBuilder __tmp45 = new StringBuilder();
-                    __tmp45.Append(param.Name.ToString().ToCamelCase());
-                    using(StreamReader __tmp45Reader = new StreamReader(this.__ToStream(__tmp45.ToString())))
+                    var __loop2_var1 = __tmp50.__loop2_var1;
+                    var param = __tmp50.param;
+                    __out.Append(","); //68:1
+                    __out.AppendLine(false); //68:2
+                    string __tmp52Line = "		@RequestParam(value=\""; //69:1
+                    if (__tmp52Line != null) __out.Append(__tmp52Line);
+                    StringBuilder __tmp53 = new StringBuilder();
+                    __tmp53.Append(param.Name.ToString().ToCamelCase());
+                    using(StreamReader __tmp53Reader = new StreamReader(this.__ToStream(__tmp53.ToString())))
                     {
-                        bool __tmp45_first = true;
-                        bool __tmp45_last = __tmp45Reader.EndOfStream;
-                        while(__tmp45_first || !__tmp45_last)
+                        bool __tmp53_first = true;
+                        bool __tmp53_last = __tmp53Reader.EndOfStream;
+                        while(__tmp53_first || !__tmp53_last)
                         {
-                            __tmp45_first = false;
-                            string __tmp45Line = __tmp45Reader.ReadLine();
-                            __tmp45_last = __tmp45Reader.EndOfStream;
-                            if (__tmp45Line != null) __out.Append(__tmp45Line);
-                            if (!__tmp45_last) __out.AppendLine(true);
+                            __tmp53_first = false;
+                            string __tmp53Line = __tmp53Reader.ReadLine();
+                            __tmp53_last = __tmp53Reader.EndOfStream;
+                            if (__tmp53Line != null) __out.Append(__tmp53Line);
+                            if (!__tmp53_last) __out.AppendLine(true);
                         }
                     }
-                    string __tmp46Line = "\") "; //46:61
-                    if (__tmp46Line != null) __out.Append(__tmp46Line);
-                    StringBuilder __tmp47 = new StringBuilder();
-                    __tmp47.Append(param.Type.GetJavaName());
-                    using(StreamReader __tmp47Reader = new StreamReader(this.__ToStream(__tmp47.ToString())))
+                    string __tmp54Line = "\") "; //69:61
+                    if (__tmp54Line != null) __out.Append(__tmp54Line);
+                    StringBuilder __tmp55 = new StringBuilder();
+                    __tmp55.Append(param.Type.GetJavaName());
+                    using(StreamReader __tmp55Reader = new StreamReader(this.__ToStream(__tmp55.ToString())))
                     {
-                        bool __tmp47_first = true;
-                        bool __tmp47_last = __tmp47Reader.EndOfStream;
-                        while(__tmp47_first || !__tmp47_last)
+                        bool __tmp55_first = true;
+                        bool __tmp55_last = __tmp55Reader.EndOfStream;
+                        while(__tmp55_first || !__tmp55_last)
                         {
-                            __tmp47_first = false;
-                            string __tmp47Line = __tmp47Reader.ReadLine();
-                            __tmp47_last = __tmp47Reader.EndOfStream;
-                            if (__tmp47Line != null) __out.Append(__tmp47Line);
-                            if (!__tmp47_last) __out.AppendLine(true);
+                            __tmp55_first = false;
+                            string __tmp55Line = __tmp55Reader.ReadLine();
+                            __tmp55_last = __tmp55Reader.EndOfStream;
+                            if (__tmp55Line != null) __out.Append(__tmp55Line);
+                            if (!__tmp55_last) __out.AppendLine(true);
                         }
                     }
-                    string __tmp48Line = " "; //46:90
-                    if (__tmp48Line != null) __out.Append(__tmp48Line);
-                    StringBuilder __tmp49 = new StringBuilder();
-                    __tmp49.Append(param.Name.ToString().ToCamelCase());
-                    using(StreamReader __tmp49Reader = new StreamReader(this.__ToStream(__tmp49.ToString())))
+                    string __tmp56Line = " "; //69:90
+                    if (__tmp56Line != null) __out.Append(__tmp56Line);
+                    StringBuilder __tmp57 = new StringBuilder();
+                    __tmp57.Append(param.Name.ToString().ToCamelCase());
+                    using(StreamReader __tmp57Reader = new StreamReader(this.__ToStream(__tmp57.ToString())))
                     {
-                        bool __tmp49_first = true;
-                        bool __tmp49_last = __tmp49Reader.EndOfStream;
-                        while(__tmp49_first || !__tmp49_last)
+                        bool __tmp57_first = true;
+                        bool __tmp57_last = __tmp57Reader.EndOfStream;
+                        while(__tmp57_first || !__tmp57_last)
                         {
-                            __tmp49_first = false;
-                            string __tmp49Line = __tmp49Reader.ReadLine();
-                            __tmp49_last = __tmp49Reader.EndOfStream;
-                            if (__tmp49Line != null) __out.Append(__tmp49Line);
-                            if (!__tmp49_last) __out.AppendLine(true);
+                            __tmp57_first = false;
+                            string __tmp57Line = __tmp57Reader.ReadLine();
+                            __tmp57_last = __tmp57Reader.EndOfStream;
+                            if (__tmp57Line != null) __out.Append(__tmp57Line);
+                            if (!__tmp57_last) __out.AppendLine(true);
                         }
                     }
                 }
-                __out.Append(") {"); //48:1
-                __out.AppendLine(false); //48:4
-                if (op.Exceptions.Any()) //49:3
+                __out.Append(") {"); //71:1
+                __out.AppendLine(false); //71:4
+                if (op.Exceptions.Any()) //72:3
                 {
-                    __out.Append("		try {"); //50:1
-                    __out.AppendLine(false); //50:8
-                    string __tmp50Prefix = "			"; //51:1
-                    StringBuilder __tmp51 = new StringBuilder();
-                    __tmp51.Append(ControllerMethodImpl(reference, op));
-                    using(StreamReader __tmp51Reader = new StreamReader(this.__ToStream(__tmp51.ToString())))
+                    __out.Append("		try {"); //73:1
+                    __out.AppendLine(false); //73:8
+                    string __tmp58Prefix = "			"; //74:1
+                    StringBuilder __tmp59 = new StringBuilder();
+                    __tmp59.Append(ControllerMethodImpl(reference, op));
+                    using(StreamReader __tmp59Reader = new StreamReader(this.__ToStream(__tmp59.ToString())))
                     {
-                        bool __tmp51_first = true;
-                        bool __tmp51_last = __tmp51Reader.EndOfStream;
-                        while(__tmp51_first || !__tmp51_last)
+                        bool __tmp59_first = true;
+                        bool __tmp59_last = __tmp59Reader.EndOfStream;
+                        while(__tmp59_first || !__tmp59_last)
                         {
-                            __tmp51_first = false;
-                            string __tmp51Line = __tmp51Reader.ReadLine();
-                            __tmp51_last = __tmp51Reader.EndOfStream;
-                            __out.Append(__tmp50Prefix);
-                            if (__tmp51Line != null) __out.Append(__tmp51Line);
-                            if (!__tmp51_last) __out.AppendLine(true);
-                            __out.AppendLine(false); //51:41
+                            __tmp59_first = false;
+                            string __tmp59Line = __tmp59Reader.ReadLine();
+                            __tmp59_last = __tmp59Reader.EndOfStream;
+                            __out.Append(__tmp58Prefix);
+                            if (__tmp59Line != null) __out.Append(__tmp59Line);
+                            if (!__tmp59_last) __out.AppendLine(true);
+                            __out.AppendLine(false); //74:41
                         }
                     }
                     var __loop3_results = 
-                        (from __loop3_var1 in __Enumerate((op).GetEnumerator()) //52:9
-                        from ex in __Enumerate((__loop3_var1.Exceptions).GetEnumerator()) //52:13
+                        (from __loop3_var1 in __Enumerate((op).GetEnumerator()) //75:9
+                        from ex in __Enumerate((__loop3_var1.Exceptions).GetEnumerator()) //75:13
                         select new { __loop3_var1 = __loop3_var1, ex = ex}
-                        ).ToList(); //52:4
+                        ).ToList(); //75:4
                     int __loop3_iteration = 0;
-                    foreach (var __tmp52 in __loop3_results)
+                    foreach (var __tmp60 in __loop3_results)
                     {
                         ++__loop3_iteration;
-                        var __loop3_var1 = __tmp52.__loop3_var1;
-                        var ex = __tmp52.ex;
-                        string __tmp54Line = "		} catch ("; //53:1
-                        if (__tmp54Line != null) __out.Append(__tmp54Line);
-                        StringBuilder __tmp55 = new StringBuilder();
-                        __tmp55.Append(ex.GetJavaName());
-                        using(StreamReader __tmp55Reader = new StreamReader(this.__ToStream(__tmp55.ToString())))
+                        var __loop3_var1 = __tmp60.__loop3_var1;
+                        var ex = __tmp60.ex;
+                        string __tmp62Line = "		} catch ("; //76:1
+                        if (__tmp62Line != null) __out.Append(__tmp62Line);
+                        StringBuilder __tmp63 = new StringBuilder();
+                        __tmp63.Append(ex.GetJavaName());
+                        using(StreamReader __tmp63Reader = new StreamReader(this.__ToStream(__tmp63.ToString())))
                         {
-                            bool __tmp55_first = true;
-                            bool __tmp55_last = __tmp55Reader.EndOfStream;
-                            while(__tmp55_first || !__tmp55_last)
+                            bool __tmp63_first = true;
+                            bool __tmp63_last = __tmp63Reader.EndOfStream;
+                            while(__tmp63_first || !__tmp63_last)
                             {
-                                __tmp55_first = false;
-                                string __tmp55Line = __tmp55Reader.ReadLine();
-                                __tmp55_last = __tmp55Reader.EndOfStream;
-                                if (__tmp55Line != null) __out.Append(__tmp55Line);
-                                if (!__tmp55_last) __out.AppendLine(true);
+                                __tmp63_first = false;
+                                string __tmp63Line = __tmp63Reader.ReadLine();
+                                __tmp63_last = __tmp63Reader.EndOfStream;
+                                if (__tmp63Line != null) __out.Append(__tmp63Line);
+                                if (!__tmp63_last) __out.AppendLine(true);
                             }
                         }
-                        string __tmp56Line = " e) {"; //53:30
-                        if (__tmp56Line != null) __out.Append(__tmp56Line);
-                        __out.AppendLine(false); //53:35
-                        __out.Append("			throw new RuntimeException(e);"); //54:1
-                        __out.AppendLine(false); //54:34
+                        string __tmp64Line = " e) {"; //76:30
+                        if (__tmp64Line != null) __out.Append(__tmp64Line);
+                        __out.AppendLine(false); //76:35
+                        __out.Append("			throw new RuntimeException(e);"); //77:1
+                        __out.AppendLine(false); //77:34
                     }
-                    __out.Append("		}"); //56:1
-                    __out.AppendLine(false); //56:4
+                    __out.Append("		}"); //79:1
+                    __out.AppendLine(false); //79:4
                 }
-                else //57:3
+                else //80:3
                 {
-                    string __tmp57Prefix = "		"; //58:1
-                    StringBuilder __tmp58 = new StringBuilder();
-                    __tmp58.Append(ControllerMethodImpl(reference, op));
-                    using(StreamReader __tmp58Reader = new StreamReader(this.__ToStream(__tmp58.ToString())))
+                    string __tmp65Prefix = "		"; //81:1
+                    StringBuilder __tmp66 = new StringBuilder();
+                    __tmp66.Append(ControllerMethodImpl(reference, op));
+                    using(StreamReader __tmp66Reader = new StreamReader(this.__ToStream(__tmp66.ToString())))
                     {
-                        bool __tmp58_first = true;
-                        bool __tmp58_last = __tmp58Reader.EndOfStream;
-                        while(__tmp58_first || !__tmp58_last)
+                        bool __tmp66_first = true;
+                        bool __tmp66_last = __tmp66Reader.EndOfStream;
+                        while(__tmp66_first || !__tmp66_last)
                         {
-                            __tmp58_first = false;
-                            string __tmp58Line = __tmp58Reader.ReadLine();
-                            __tmp58_last = __tmp58Reader.EndOfStream;
-                            __out.Append(__tmp57Prefix);
-                            if (__tmp58Line != null) __out.Append(__tmp58Line);
-                            if (!__tmp58_last) __out.AppendLine(true);
-                            __out.AppendLine(false); //58:40
+                            __tmp66_first = false;
+                            string __tmp66Line = __tmp66Reader.ReadLine();
+                            __tmp66_last = __tmp66Reader.EndOfStream;
+                            __out.Append(__tmp65Prefix);
+                            if (__tmp66Line != null) __out.Append(__tmp66Line);
+                            if (!__tmp66_last) __out.AppendLine(true);
+                            __out.AppendLine(false); //81:40
                         }
                     }
                 }
-                if (javaReturn.Contains("List")) //60:4
+                if (javaReturn.Contains("List")) //83:4
                 {
-                    string __tmp60Line = "		return \""; //61:1
-                    if (__tmp60Line != null) __out.Append(__tmp60Line);
-                    StringBuilder __tmp61 = new StringBuilder();
-                    __tmp61.Append(name);
-                    using(StreamReader __tmp61Reader = new StreamReader(this.__ToStream(__tmp61.ToString())))
+                    string __tmp68Line = "		return \""; //84:1
+                    if (__tmp68Line != null) __out.Append(__tmp68Line);
+                    StringBuilder __tmp69 = new StringBuilder();
+                    __tmp69.Append(name);
+                    using(StreamReader __tmp69Reader = new StreamReader(this.__ToStream(__tmp69.ToString())))
                     {
-                        bool __tmp61_first = true;
-                        bool __tmp61_last = __tmp61Reader.EndOfStream;
-                        while(__tmp61_first || !__tmp61_last)
+                        bool __tmp69_first = true;
+                        bool __tmp69_last = __tmp69Reader.EndOfStream;
+                        while(__tmp69_first || !__tmp69_last)
                         {
-                            __tmp61_first = false;
-                            string __tmp61Line = __tmp61Reader.ReadLine();
-                            __tmp61_last = __tmp61Reader.EndOfStream;
-                            if (__tmp61Line != null) __out.Append(__tmp61Line);
-                            if (!__tmp61_last) __out.AppendLine(true);
+                            __tmp69_first = false;
+                            string __tmp69Line = __tmp69Reader.ReadLine();
+                            __tmp69_last = __tmp69Reader.EndOfStream;
+                            if (__tmp69Line != null) __out.Append(__tmp69Line);
+                            if (!__tmp69_last) __out.AppendLine(true);
                         }
                     }
-                    string __tmp62Line = "\";"; //61:17
-                    if (__tmp62Line != null) __out.Append(__tmp62Line);
-                    __out.AppendLine(false); //61:19
+                    string __tmp70Line = "\";"; //84:17
+                    if (__tmp70Line != null) __out.Append(__tmp70Line);
+                    __out.AppendLine(false); //84:19
                 }
-                else //62:5
+                else //85:5
                 {
-                    string __tmp64Line = "		return \""; //63:1
-                    if (__tmp64Line != null) __out.Append(__tmp64Line);
-                    StringBuilder __tmp65 = new StringBuilder();
-                    __tmp65.Append(reference.Name);
-                    using(StreamReader __tmp65Reader = new StreamReader(this.__ToStream(__tmp65.ToString())))
+                    string __tmp72Line = "		return \""; //86:1
+                    if (__tmp72Line != null) __out.Append(__tmp72Line);
+                    StringBuilder __tmp73 = new StringBuilder();
+                    __tmp73.Append(reference.Name);
+                    using(StreamReader __tmp73Reader = new StreamReader(this.__ToStream(__tmp73.ToString())))
                     {
-                        bool __tmp65_first = true;
-                        bool __tmp65_last = __tmp65Reader.EndOfStream;
-                        while(__tmp65_first || !__tmp65_last)
+                        bool __tmp73_first = true;
+                        bool __tmp73_last = __tmp73Reader.EndOfStream;
+                        while(__tmp73_first || !__tmp73_last)
                         {
-                            __tmp65_first = false;
-                            string __tmp65Line = __tmp65Reader.ReadLine();
-                            __tmp65_last = __tmp65Reader.EndOfStream;
-                            if (__tmp65Line != null) __out.Append(__tmp65Line);
-                            if (!__tmp65_last) __out.AppendLine(true);
+                            __tmp73_first = false;
+                            string __tmp73Line = __tmp73Reader.ReadLine();
+                            __tmp73_last = __tmp73Reader.EndOfStream;
+                            if (__tmp73Line != null) __out.Append(__tmp73Line);
+                            if (!__tmp73_last) __out.AppendLine(true);
                         }
                     }
-                    string __tmp66Line = "View\";"; //63:27
-                    if (__tmp66Line != null) __out.Append(__tmp66Line);
-                    __out.AppendLine(false); //63:33
+                    string __tmp74Line = "View\";"; //86:27
+                    if (__tmp74Line != null) __out.Append(__tmp74Line);
+                    __out.AppendLine(false); //86:33
                 }
-                __out.Append("	}"); //65:1
-                __out.AppendLine(false); //65:3
-                __out.AppendLine(true); //66:2
+                __out.Append("	}"); //88:1
+                __out.AppendLine(false); //88:3
+                __out.AppendLine(true); //89:2
             }
-            __out.Append("}"); //68:1
-            __out.AppendLine(false); //68:2
+            __out.Append("}"); //91:1
+            __out.AppendLine(false); //91:2
             return __out.ToString();
         }
 
-        public string ControllerMethodImpl(Reference reference, Operation op) //73:1
+        public string ControllerMethodImpl(Reference reference, Operation op) //96:1
         {
             StringBuilder __out = new StringBuilder();
-            if (op.Result.Type.GetJavaName() == "void") //74:3
+            if (op.Result.Type.GetJavaName() == "void") //97:3
             {
                 StringBuilder __tmp2 = new StringBuilder();
                 __tmp2.Append(reference.Name.ToCamelCase());
@@ -588,7 +696,7 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp2_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp3Line = "."; //75:31
+                string __tmp3Line = "."; //98:31
                 if (__tmp3Line != null) __out.Append(__tmp3Line);
                 StringBuilder __tmp4 = new StringBuilder();
                 __tmp4.Append(op.Name.ToCamelCase());
@@ -605,7 +713,7 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp4_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp5Line = "("; //75:55
+                string __tmp5Line = "("; //98:55
                 if (__tmp5Line != null) __out.Append(__tmp5Line);
                 StringBuilder __tmp6 = new StringBuilder();
                 __tmp6.Append(SpringGeneratorUtil.GetParameterNameList(op));
@@ -622,11 +730,11 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp6_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp7Line = ");"; //75:102
+                string __tmp7Line = ");"; //98:102
                 if (__tmp7Line != null) __out.Append(__tmp7Line);
-                __out.AppendLine(false); //75:104
+                __out.AppendLine(false); //98:104
             }
-            else //76:3
+            else //99:3
             {
                 StringBuilder __tmp9 = new StringBuilder();
                 __tmp9.Append(op.Result.Type.GetJavaName());
@@ -643,7 +751,7 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp9_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp10Line = " result = "; //77:31
+                string __tmp10Line = " result = "; //100:31
                 if (__tmp10Line != null) __out.Append(__tmp10Line);
                 StringBuilder __tmp11 = new StringBuilder();
                 __tmp11.Append(reference.Name.ToCamelCase());
@@ -660,7 +768,7 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp11_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp12Line = "."; //77:71
+                string __tmp12Line = "."; //100:71
                 if (__tmp12Line != null) __out.Append(__tmp12Line);
                 StringBuilder __tmp13 = new StringBuilder();
                 __tmp13.Append(op.Name.ToCamelCase());
@@ -677,7 +785,7 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp13_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp14Line = "("; //77:95
+                string __tmp14Line = "("; //100:95
                 if (__tmp14Line != null) __out.Append(__tmp14Line);
                 StringBuilder __tmp15 = new StringBuilder();
                 __tmp15.Append(SpringGeneratorUtil.GetParameterNameList(op));
@@ -694,13 +802,13 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp15_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp16Line = ");"; //77:142
+                string __tmp16Line = ");"; //100:142
                 if (__tmp16Line != null) __out.Append(__tmp16Line);
-                __out.AppendLine(false); //77:144
-                ArrayType array = (op.Result.Type as ArrayType); //78:2
-                if (array != null) //79:4
+                __out.AppendLine(false); //100:144
+                ArrayType array = (op.Result.Type as ArrayType); //101:2
+                if (array != null) //102:4
                 {
-                    string __tmp18Line = "model.addAttribute(\""; //80:1
+                    string __tmp18Line = "model.addAttribute(\""; //103:1
                     if (__tmp18Line != null) __out.Append(__tmp18Line);
                     StringBuilder __tmp19 = new StringBuilder();
                     __tmp19.Append(array.InnerType.GetJavaName());
@@ -717,13 +825,13 @@ namespace MetaDslx.Soal //1:1
                             if (!__tmp19_last) __out.AppendLine(true);
                         }
                     }
-                    string __tmp20Line = "List\", result);"; //80:52
+                    string __tmp20Line = "List\", result);"; //103:52
                     if (__tmp20Line != null) __out.Append(__tmp20Line);
-                    __out.AppendLine(false); //80:67
+                    __out.AppendLine(false); //103:67
                 }
-                else //81:4
+                else //104:4
                 {
-                    string __tmp22Line = "model.addAttribute(\""; //82:1
+                    string __tmp22Line = "model.addAttribute(\""; //105:1
                     if (__tmp22Line != null) __out.Append(__tmp22Line);
                     StringBuilder __tmp23 = new StringBuilder();
                     __tmp23.Append(op.Result.Type.GetJavaName());
@@ -740,50 +848,151 @@ namespace MetaDslx.Soal //1:1
                             if (!__tmp23_last) __out.AppendLine(true);
                         }
                     }
-                    string __tmp24Line = "\", result);"; //82:51
+                    string __tmp24Line = "\", result);"; //105:51
                     if (__tmp24Line != null) __out.Append(__tmp24Line);
-                    __out.AppendLine(false); //82:62
+                    __out.AppendLine(false); //105:62
                 }
             }
             return __out.ToString();
         }
 
-        public string GenerateView(Reference reference) //89:1
+        public string GenerateIndexView(Namespace ns) //112:1
         {
             StringBuilder __out = new StringBuilder();
-            __out.Append("<!DOCTYPE html>"); //90:1
-            __out.AppendLine(false); //90:16
-            __out.Append("<html xmlns:th=\"http://www.thymeleaf.org\">"); //91:1
-            __out.AppendLine(false); //91:43
-            __out.Append("<head th:substituteby=\"_master :: head\">"); //92:1
-            __out.AppendLine(false); //92:41
-            __out.Append("    <title>Simple</title>"); //93:1
-            __out.AppendLine(false); //93:26
-            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/foundation.min.css\"/>"); //94:1
-            __out.AppendLine(false); //94:72
-            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/style.css\"/>"); //95:1
-            __out.AppendLine(false); //95:63
-            __out.Append("</head>"); //96:1
-            __out.AppendLine(false); //96:8
-            __out.Append("<body>"); //97:1
-            __out.AppendLine(false); //97:7
-            __out.AppendLine(true); //98:1
-            __out.Append("<header class=\"template row\" th:substituteby=\"_master :: header\">"); //99:1
-            __out.AppendLine(false); //99:66
-            __out.Append("    <div class=\"small-10 columns\">"); //100:1
-            __out.AppendLine(false); //100:35
-            __out.Append("        <h1>//Title//</h1>"); //101:1
-            __out.AppendLine(false); //101:27
-            __out.Append("    </div>"); //102:1
-            __out.AppendLine(false); //102:11
-            __out.Append("</header>"); //103:1
-            __out.AppendLine(false); //103:10
-            __out.AppendLine(true); //104:1
-            __out.Append("<div class=\"row\">"); //105:1
-            __out.AppendLine(false); //105:18
-            __out.Append("    <div class=\"small-10 columns\">"); //106:1
-            __out.AppendLine(false); //106:35
-            string __tmp2Line = "		<h2>"; //107:1
+            __out.Append("<!DOCTYPE html>"); //113:1
+            __out.AppendLine(false); //113:16
+            __out.Append("<html xmlns:th=\"http://www.thymeleaf.org\">"); //114:1
+            __out.AppendLine(false); //114:43
+            __out.Append("<head th:substituteby=\"_master :: head\">"); //115:1
+            __out.AppendLine(false); //115:41
+            __out.Append("    <title>Simple</title>"); //116:1
+            __out.AppendLine(false); //116:26
+            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/foundation.min.css\"/>"); //117:1
+            __out.AppendLine(false); //117:72
+            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/style.css\"/>"); //118:1
+            __out.AppendLine(false); //118:63
+            __out.Append("</head>"); //119:1
+            __out.AppendLine(false); //119:8
+            __out.Append("<body>"); //120:1
+            __out.AppendLine(false); //120:7
+            __out.AppendLine(true); //121:1
+            __out.Append("<header class=\"template row\" th:substituteby=\"_master :: header\">"); //122:1
+            __out.AppendLine(false); //122:66
+            __out.Append("    <div class=\"small-10 columns\">"); //123:1
+            __out.AppendLine(false); //123:35
+            __out.Append("        <h1>//Title//</h1>"); //124:1
+            __out.AppendLine(false); //124:27
+            __out.Append("    </div>"); //125:1
+            __out.AppendLine(false); //125:11
+            __out.Append("</header>"); //126:1
+            __out.AppendLine(false); //126:10
+            __out.AppendLine(true); //127:1
+            __out.Append("<div class=\"row\">"); //128:1
+            __out.AppendLine(false); //128:18
+            __out.Append("    <div class=\"small-10 columns\">"); //129:1
+            __out.AppendLine(false); //129:35
+            string __tmp2Line = "		<h2>Hello World in "; //130:1
+            if (__tmp2Line != null) __out.Append(__tmp2Line);
+            StringBuilder __tmp3 = new StringBuilder();
+            __tmp3.Append(ns.Name);
+            using(StreamReader __tmp3Reader = new StreamReader(this.__ToStream(__tmp3.ToString())))
+            {
+                bool __tmp3_first = true;
+                bool __tmp3_last = __tmp3Reader.EndOfStream;
+                while(__tmp3_first || !__tmp3_last)
+                {
+                    __tmp3_first = false;
+                    string __tmp3Line = __tmp3Reader.ReadLine();
+                    __tmp3_last = __tmp3Reader.EndOfStream;
+                    if (__tmp3Line != null) __out.Append(__tmp3Line);
+                    if (!__tmp3_last) __out.AppendLine(true);
+                }
+            }
+            string __tmp4Line = "</h2>"; //130:31
+            if (__tmp4Line != null) __out.Append(__tmp4Line);
+            __out.AppendLine(false); //130:36
+            __out.AppendLine(true); //131:3
+            __out.Append("		<div class=\"small-2 columns template\" th:substituteby=\"_master :: sidebar\">"); //132:1
+            __out.AppendLine(false); //132:78
+            __out.Append("			//side-nav menu//"); //133:1
+            __out.AppendLine(false); //133:21
+            __out.Append("		</div>"); //134:1
+            __out.AppendLine(false); //134:9
+            __out.Append("	</div>"); //135:1
+            __out.AppendLine(false); //135:8
+            __out.Append("</div>"); //136:1
+            __out.AppendLine(false); //136:7
+            __out.AppendLine(true); //137:1
+            __out.Append("<footer class=\"template row\" th:substituteby=\"_master :: footer\">"); //138:1
+            __out.AppendLine(false); //138:66
+            __out.Append("    <div class=\"large-12 columns\">"); //139:1
+            __out.AppendLine(false); //139:35
+            __out.Append("        <hr/>"); //140:1
+            __out.AppendLine(false); //140:14
+            __out.Append("        <div class=\"row\">"); //141:1
+            __out.AppendLine(false); //141:26
+            __out.Append("            <div class=\"small-4 columns\">"); //142:1
+            __out.AppendLine(false); //142:42
+            __out.Append("                //copyright//"); //143:1
+            __out.AppendLine(false); //143:30
+            __out.Append("            </div>"); //144:1
+            __out.AppendLine(false); //144:19
+            __out.Append("            <div class=\"small-8 columns\">"); //145:1
+            __out.AppendLine(false); //145:42
+            __out.Append("                <span class=\"right\">//powered by//</span>"); //146:1
+            __out.AppendLine(false); //146:58
+            __out.Append("            </div>"); //147:1
+            __out.AppendLine(false); //147:19
+            __out.Append("        </div>"); //148:1
+            __out.AppendLine(false); //148:15
+            __out.Append("    </div>"); //149:1
+            __out.AppendLine(false); //149:11
+            __out.Append("</footer>"); //150:1
+            __out.AppendLine(false); //150:10
+            __out.AppendLine(true); //151:1
+            __out.Append("</body>"); //152:1
+            __out.AppendLine(false); //152:8
+            __out.Append("</html>"); //153:1
+            __out.AppendLine(false); //153:8
+            return __out.ToString();
+        }
+
+        public string GenerateView(Reference reference) //158:1
+        {
+            StringBuilder __out = new StringBuilder();
+            __out.Append("<!DOCTYPE html>"); //159:1
+            __out.AppendLine(false); //159:16
+            __out.Append("<html xmlns:th=\"http://www.thymeleaf.org\">"); //160:1
+            __out.AppendLine(false); //160:43
+            __out.Append("<head th:substituteby=\"_master :: head\">"); //161:1
+            __out.AppendLine(false); //161:41
+            __out.Append("    <title>Simple</title>"); //162:1
+            __out.AppendLine(false); //162:26
+            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/foundation.min.css\"/>"); //163:1
+            __out.AppendLine(false); //163:72
+            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/style.css\"/>"); //164:1
+            __out.AppendLine(false); //164:63
+            __out.Append("</head>"); //165:1
+            __out.AppendLine(false); //165:8
+            __out.Append("<body>"); //166:1
+            __out.AppendLine(false); //166:7
+            __out.AppendLine(true); //167:1
+            __out.Append("<header class=\"template row\" th:substituteby=\"_master :: header\">"); //168:1
+            __out.AppendLine(false); //168:66
+            __out.Append("    <div class=\"small-10 columns\">"); //169:1
+            __out.AppendLine(false); //169:35
+            __out.Append("        <h1>//Title//</h1>"); //170:1
+            __out.AppendLine(false); //170:27
+            __out.Append("    </div>"); //171:1
+            __out.AppendLine(false); //171:11
+            __out.Append("</header>"); //172:1
+            __out.AppendLine(false); //172:10
+            __out.AppendLine(true); //173:1
+            __out.Append("<div class=\"row\">"); //174:1
+            __out.AppendLine(false); //174:18
+            __out.Append("    <div class=\"small-10 columns\">"); //175:1
+            __out.AppendLine(false); //175:35
+            string __tmp2Line = "		<h2>"; //176:1
             if (__tmp2Line != null) __out.Append(__tmp2Line);
             StringBuilder __tmp3 = new StringBuilder();
             __tmp3.Append(reference.Interface.Name);
@@ -800,31 +1009,31 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp3_last) __out.AppendLine(true);
                 }
             }
-            string __tmp4Line = "</h2>"; //107:33
+            string __tmp4Line = "</h2>"; //176:33
             if (__tmp4Line != null) __out.Append(__tmp4Line);
-            __out.AppendLine(false); //107:38
-            __out.AppendLine(true); //108:1
-            int ids = 0; //109:2
+            __out.AppendLine(false); //176:38
+            __out.AppendLine(true); //177:1
+            int ids = 0; //178:2
             var __loop4_results = 
-                (from __loop4_var1 in __Enumerate((reference.Interface).GetEnumerator()) //110:7
-                from action in __Enumerate((__loop4_var1.Operations).GetEnumerator()) //110:28
+                (from __loop4_var1 in __Enumerate((reference.Interface).GetEnumerator()) //179:7
+                from action in __Enumerate((__loop4_var1.Operations).GetEnumerator()) //179:28
                 select new { __loop4_var1 = __loop4_var1, action = action}
-                ).ToList(); //110:2
+                ).ToList(); //179:2
             int __loop4_iteration = 0;
             foreach (var __tmp5 in __loop4_results)
             {
                 ++__loop4_iteration;
                 var __loop4_var1 = __tmp5.__loop4_var1;
                 var action = __tmp5.action;
-                string actionName = action.Name; //111:3
-                if (actionName.StartsWith("Get")) //112:3
+                string actionName = action.Name; //180:3
+                if (actionName.StartsWith("Get")) //181:3
                 {
                     actionName = actionName.Substring(3);
                 }
-                string javaReturn = action.Result.Type.GetJavaName(); //116:3
-                if (javaReturn.Contains("List") && !action.Parameters.Any()) //118:3
+                string javaReturn = action.Result.Type.GetJavaName(); //185:3
+                if (javaReturn.Contains("List") && !action.Parameters.Any()) //187:3
                 {
-                    string __tmp7Line = "		<a href=\""; //119:1
+                    string __tmp7Line = "		<a href=\""; //188:1
                     if (__tmp7Line != null) __out.Append(__tmp7Line);
                     StringBuilder __tmp8 = new StringBuilder();
                     __tmp8.Append(actionName);
@@ -841,7 +1050,7 @@ namespace MetaDslx.Soal //1:1
                             if (!__tmp8_last) __out.AppendLine(true);
                         }
                     }
-                    string __tmp9Line = ".html\">"; //119:24
+                    string __tmp9Line = ".html\">"; //188:24
                     if (__tmp9Line != null) __out.Append(__tmp9Line);
                     StringBuilder __tmp10 = new StringBuilder();
                     __tmp10.Append(actionName);
@@ -858,15 +1067,15 @@ namespace MetaDslx.Soal //1:1
                             if (!__tmp10_last) __out.AppendLine(true);
                         }
                     }
-                    string __tmp11Line = "</a>"; //119:43
+                    string __tmp11Line = "</a>"; //188:43
                     if (__tmp11Line != null) __out.Append(__tmp11Line);
-                    __out.AppendLine(false); //119:47
+                    __out.AppendLine(false); //188:47
                 }
-                else //120:3
+                else //189:3
                 {
-                    if (javaReturn.Contains("List")) //121:4
+                    if (javaReturn.Contains("List")) //190:4
                     {
-                        string __tmp13Line = "		<form action=\""; //122:1
+                        string __tmp13Line = "		<form action=\""; //191:1
                         if (__tmp13Line != null) __out.Append(__tmp13Line);
                         StringBuilder __tmp14 = new StringBuilder();
                         __tmp14.Append(actionName);
@@ -883,20 +1092,20 @@ namespace MetaDslx.Soal //1:1
                                 if (!__tmp14_last) __out.AppendLine(true);
                             }
                         }
-                        string __tmp15Line = ".html\">"; //122:29
+                        string __tmp15Line = ".html\">"; //191:29
                         if (__tmp15Line != null) __out.Append(__tmp15Line);
-                        __out.AppendLine(false); //122:36
+                        __out.AppendLine(false); //191:36
                     }
-                    else //123:4
+                    else //192:4
                     {
-                        __out.Append("		<form>"); //124:1
-                        __out.AppendLine(false); //124:9
+                        __out.Append("		<form>"); //193:1
+                        __out.AppendLine(false); //193:9
                     }
-                    if (action.Parameters.Any()) //127:4
+                    if (action.Parameters.Any()) //196:4
                     {
-                        __out.Append("			<fieldset>"); //128:1
-                        __out.AppendLine(false); //128:14
-                        string __tmp17Line = "				<legend>"; //129:1
+                        __out.Append("			<fieldset>"); //197:1
+                        __out.AppendLine(false); //197:14
+                        string __tmp17Line = "				<legend>"; //198:1
                         if (__tmp17Line != null) __out.Append(__tmp17Line);
                         StringBuilder __tmp18 = new StringBuilder();
                         __tmp18.Append(actionName);
@@ -913,13 +1122,13 @@ namespace MetaDslx.Soal //1:1
                                 if (!__tmp18_last) __out.AppendLine(true);
                             }
                         }
-                        string __tmp19Line = "</legend>"; //129:25
+                        string __tmp19Line = "</legend>"; //198:25
                         if (__tmp19Line != null) __out.Append(__tmp19Line);
-                        __out.AppendLine(false); //129:34
+                        __out.AppendLine(false); //198:34
                     }
-                    if (javaReturn != "void" && !javaReturn.Contains("List")) //132:4
+                    if (javaReturn != "void" && !javaReturn.Contains("List")) //201:4
                     {
-                        string __tmp21Line = "				<input type=\"hidden\" name=\"action\" value=\""; //133:1
+                        string __tmp21Line = "				<input type=\"hidden\" name=\"action\" value=\""; //202:1
                         if (__tmp21Line != null) __out.Append(__tmp21Line);
                         StringBuilder __tmp22 = new StringBuilder();
                         __tmp22.Append(actionName);
@@ -936,23 +1145,23 @@ namespace MetaDslx.Soal //1:1
                                 if (!__tmp22_last) __out.AppendLine(true);
                             }
                         }
-                        string __tmp23Line = "\" />"; //133:59
+                        string __tmp23Line = "\" />"; //202:59
                         if (__tmp23Line != null) __out.Append(__tmp23Line);
-                        __out.AppendLine(false); //133:63
+                        __out.AppendLine(false); //202:63
                     }
                     var __loop5_results = 
-                        (from __loop5_var1 in __Enumerate((action).GetEnumerator()) //136:9
-                        from input in __Enumerate((__loop5_var1.Parameters).GetEnumerator()) //136:17
+                        (from __loop5_var1 in __Enumerate((action).GetEnumerator()) //205:9
+                        from input in __Enumerate((__loop5_var1.Parameters).GetEnumerator()) //205:17
                         select new { __loop5_var1 = __loop5_var1, input = input}
-                        ).ToList(); //136:4
+                        ).ToList(); //205:4
                     int __loop5_iteration = 0;
                     foreach (var __tmp24 in __loop5_results)
                     {
                         ++__loop5_iteration;
                         var __loop5_var1 = __tmp24.__loop5_var1;
                         var input = __tmp24.input;
-                        string id = (ids++).ToString(); //137:5
-                        string __tmp26Line = "				<label for=\""; //138:1
+                        string id = (ids++).ToString(); //206:5
+                        string __tmp26Line = "				<label for=\""; //207:1
                         if (__tmp26Line != null) __out.Append(__tmp26Line);
                         StringBuilder __tmp27 = new StringBuilder();
                         __tmp27.Append(id);
@@ -969,7 +1178,7 @@ namespace MetaDslx.Soal //1:1
                                 if (!__tmp27_last) __out.AppendLine(true);
                             }
                         }
-                        string __tmp28Line = "\">"; //138:21
+                        string __tmp28Line = "\">"; //207:21
                         if (__tmp28Line != null) __out.Append(__tmp28Line);
                         StringBuilder __tmp29 = new StringBuilder();
                         __tmp29.Append(input.Name);
@@ -986,10 +1195,10 @@ namespace MetaDslx.Soal //1:1
                                 if (!__tmp29_last) __out.AppendLine(true);
                             }
                         }
-                        string __tmp30Line = ": </label>"; //138:35
+                        string __tmp30Line = ": </label>"; //207:35
                         if (__tmp30Line != null) __out.Append(__tmp30Line);
-                        __out.AppendLine(false); //138:45
-                        string __tmp32Line = "				<input id=\""; //139:1
+                        __out.AppendLine(false); //207:45
+                        string __tmp32Line = "				<input id=\""; //208:1
                         if (__tmp32Line != null) __out.Append(__tmp32Line);
                         StringBuilder __tmp33 = new StringBuilder();
                         __tmp33.Append(id);
@@ -1006,7 +1215,7 @@ namespace MetaDslx.Soal //1:1
                                 if (!__tmp33_last) __out.AppendLine(true);
                             }
                         }
-                        string __tmp34Line = "\" type=\"text\" name=\""; //139:20
+                        string __tmp34Line = "\" type=\"text\" name=\""; //208:20
                         if (__tmp34Line != null) __out.Append(__tmp34Line);
                         StringBuilder __tmp35 = new StringBuilder();
                         __tmp35.Append(input.Name);
@@ -1023,11 +1232,11 @@ namespace MetaDslx.Soal //1:1
                                 if (!__tmp35_last) __out.AppendLine(true);
                             }
                         }
-                        string __tmp36Line = "\" />"; //139:52
+                        string __tmp36Line = "\" />"; //208:52
                         if (__tmp36Line != null) __out.Append(__tmp36Line);
-                        __out.AppendLine(false); //139:56
+                        __out.AppendLine(false); //208:56
                     }
-                    string __tmp38Line = "				<input type=\"submit\" value=\""; //141:1
+                    string __tmp38Line = "				<input type=\"submit\" value=\""; //210:1
                     if (__tmp38Line != null) __out.Append(__tmp38Line);
                     StringBuilder __tmp39 = new StringBuilder();
                     __tmp39.Append(action.Name);
@@ -1044,13 +1253,13 @@ namespace MetaDslx.Soal //1:1
                             if (!__tmp39_last) __out.AppendLine(true);
                         }
                     }
-                    string __tmp40Line = "\" />"; //141:46
+                    string __tmp40Line = "\" />"; //210:46
                     if (__tmp40Line != null) __out.Append(__tmp40Line);
-                    __out.AppendLine(false); //141:50
-                    if (javaReturn != "void" && !javaReturn.Contains("List")) //143:4
+                    __out.AppendLine(false); //210:50
+                    if (javaReturn != "void" && !javaReturn.Contains("List")) //212:4
                     {
-                        string id = (ids++).ToString(); //144:5
-                        string __tmp42Line = "				<input id=\""; //145:1
+                        string id = (ids++).ToString(); //213:5
+                        string __tmp42Line = "				<input id=\""; //214:1
                         if (__tmp42Line != null) __out.Append(__tmp42Line);
                         StringBuilder __tmp43 = new StringBuilder();
                         __tmp43.Append(id);
@@ -1067,7 +1276,7 @@ namespace MetaDslx.Soal //1:1
                                 if (!__tmp43_last) __out.AppendLine(true);
                             }
                         }
-                        string __tmp44Line = "\" type=\"text\" name=\""; //145:20
+                        string __tmp44Line = "\" type=\"text\" name=\""; //214:20
                         if (__tmp44Line != null) __out.Append(__tmp44Line);
                         StringBuilder __tmp45 = new StringBuilder();
                         __tmp45.Append(actionName);
@@ -1084,100 +1293,102 @@ namespace MetaDslx.Soal //1:1
                                 if (!__tmp45_last) __out.AppendLine(true);
                             }
                         }
-                        string __tmp46Line = "Result\" disabled />"; //145:52
+                        string __tmp46Line = "Result\" readonly=\"readonly\" />"; //214:52
                         if (__tmp46Line != null) __out.Append(__tmp46Line);
-                        __out.AppendLine(false); //145:71
+                        __out.AppendLine(false); //214:82
                     }
-                    if (action.Parameters.Any()) //147:4
+                    if (action.Parameters.Any()) //216:4
                     {
-                        __out.Append("			</fieldset>"); //148:1
-                        __out.AppendLine(false); //148:15
+                        __out.Append("			</fieldset>"); //217:1
+                        __out.AppendLine(false); //217:15
                     }
-                    __out.Append("		</form>"); //150:1
-                    __out.AppendLine(false); //150:10
+                    __out.Append("		</form>"); //219:1
+                    __out.AppendLine(false); //219:10
                 }
-                __out.Append("		<br/>"); //152:1
-                __out.AppendLine(false); //152:8
+                __out.Append("		<br/>"); //221:1
+                __out.AppendLine(false); //221:8
             }
-            __out.Append("    <div class=\"small-2 columns template\" th:substituteby=\"_master :: sidebar\">"); //154:1
-            __out.AppendLine(false); //154:80
-            __out.Append("        //side-nav menu//"); //155:1
-            __out.AppendLine(false); //155:26
-            __out.Append("    </div>"); //156:1
-            __out.AppendLine(false); //156:11
-            __out.Append("</div>"); //157:1
-            __out.AppendLine(false); //157:7
-            __out.AppendLine(true); //158:1
-            __out.Append("<footer class=\"template row\" th:substituteby=\"_master :: footer\">"); //159:1
-            __out.AppendLine(false); //159:66
-            __out.Append("    <div class=\"large-12 columns\">"); //160:1
-            __out.AppendLine(false); //160:35
-            __out.Append("        <hr/>"); //161:1
-            __out.AppendLine(false); //161:14
-            __out.Append("        <div class=\"row\">"); //162:1
-            __out.AppendLine(false); //162:26
-            __out.Append("            <div class=\"small-4 columns\">"); //163:1
-            __out.AppendLine(false); //163:42
-            __out.Append("                //copyright//"); //164:1
-            __out.AppendLine(false); //164:30
-            __out.Append("            </div>"); //165:1
-            __out.AppendLine(false); //165:19
-            __out.Append("            <div class=\"small-8 columns\">"); //166:1
-            __out.AppendLine(false); //166:42
-            __out.Append("                <span class=\"right\">//powered by//</span>"); //167:1
-            __out.AppendLine(false); //167:58
-            __out.Append("            </div>"); //168:1
-            __out.AppendLine(false); //168:19
-            __out.Append("        </div>"); //169:1
-            __out.AppendLine(false); //169:15
-            __out.Append("    </div>"); //170:1
-            __out.AppendLine(false); //170:11
-            __out.Append("</footer>"); //171:1
-            __out.AppendLine(false); //171:10
-            __out.AppendLine(true); //172:1
-            __out.Append("</body>"); //173:1
-            __out.AppendLine(false); //173:8
-            __out.Append("</html>"); //174:1
-            __out.AppendLine(false); //174:8
+            __out.Append("		<div class=\"small-2 columns template\" th:substituteby=\"_master :: sidebar\">"); //223:1
+            __out.AppendLine(false); //223:78
+            __out.Append("			//side-nav menu//"); //224:1
+            __out.AppendLine(false); //224:21
+            __out.Append("		</div>"); //225:1
+            __out.AppendLine(false); //225:9
+            __out.Append("	</div>"); //226:1
+            __out.AppendLine(false); //226:8
+            __out.Append("</div>"); //227:1
+            __out.AppendLine(false); //227:7
+            __out.AppendLine(true); //228:1
+            __out.Append("<footer class=\"template row\" th:substituteby=\"_master :: footer\">"); //229:1
+            __out.AppendLine(false); //229:66
+            __out.Append("    <div class=\"large-12 columns\">"); //230:1
+            __out.AppendLine(false); //230:35
+            __out.Append("        <hr/>"); //231:1
+            __out.AppendLine(false); //231:14
+            __out.Append("        <div class=\"row\">"); //232:1
+            __out.AppendLine(false); //232:26
+            __out.Append("            <div class=\"small-4 columns\">"); //233:1
+            __out.AppendLine(false); //233:42
+            __out.Append("                //copyright//"); //234:1
+            __out.AppendLine(false); //234:30
+            __out.Append("            </div>"); //235:1
+            __out.AppendLine(false); //235:19
+            __out.Append("            <div class=\"small-8 columns\">"); //236:1
+            __out.AppendLine(false); //236:42
+            __out.Append("                <span class=\"right\">//powered by//</span>"); //237:1
+            __out.AppendLine(false); //237:58
+            __out.Append("            </div>"); //238:1
+            __out.AppendLine(false); //238:19
+            __out.Append("        </div>"); //239:1
+            __out.AppendLine(false); //239:15
+            __out.Append("    </div>"); //240:1
+            __out.AppendLine(false); //240:11
+            __out.Append("</footer>"); //241:1
+            __out.AppendLine(false); //241:10
+            __out.AppendLine(true); //242:1
+            __out.Append("</body>"); //243:1
+            __out.AppendLine(false); //243:8
+            __out.Append("</html>"); //244:1
+            __out.AppendLine(false); //244:8
             return __out.ToString();
         }
 
-        public string GenerateListView(Struct entity) //179:1
+        public string GenerateListView(Struct entity) //249:1
         {
             StringBuilder __out = new StringBuilder();
-            __out.Append("<!DOCTYPE html>"); //180:1
-            __out.AppendLine(false); //180:16
-            __out.Append("<html xmlns:th=\"http://www.thymeleaf.org\">"); //181:1
-            __out.AppendLine(false); //181:43
-            __out.Append("<head th:substituteby=\"_master :: head\">"); //182:1
-            __out.AppendLine(false); //182:41
-            __out.Append("    <title>Simple</title>"); //183:1
-            __out.AppendLine(false); //183:26
-            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/foundation.min.css\"/>"); //184:1
-            __out.AppendLine(false); //184:72
-            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/style.css\"/>"); //185:1
-            __out.AppendLine(false); //185:63
-            __out.Append("</head>"); //186:1
-            __out.AppendLine(false); //186:8
-            __out.Append("<body>"); //187:1
-            __out.AppendLine(false); //187:7
-            __out.AppendLine(true); //188:1
-            __out.Append("<header class=\"template row\" th:substituteby=\"_master :: header\">"); //189:1
-            __out.AppendLine(false); //189:66
-            __out.Append("    <div class=\"small-10 columns\">"); //190:1
-            __out.AppendLine(false); //190:35
-            __out.Append("        <h1>//Title//</h1>"); //191:1
-            __out.AppendLine(false); //191:27
-            __out.Append("    </div>"); //192:1
-            __out.AppendLine(false); //192:11
-            __out.Append("</header>"); //193:1
-            __out.AppendLine(false); //193:10
-            __out.AppendLine(true); //194:1
-            __out.Append("<div class=\"row\">"); //195:1
-            __out.AppendLine(false); //195:18
-            __out.Append("    <div class=\"small-10 columns\">"); //196:1
-            __out.AppendLine(false); //196:35
-            string __tmp2Line = "        <h2>"; //197:1
+            __out.Append("<!DOCTYPE html>"); //250:1
+            __out.AppendLine(false); //250:16
+            __out.Append("<html xmlns:th=\"http://www.thymeleaf.org\">"); //251:1
+            __out.AppendLine(false); //251:43
+            __out.Append("<head th:substituteby=\"_master :: head\">"); //252:1
+            __out.AppendLine(false); //252:41
+            __out.Append("    <title>Simple</title>"); //253:1
+            __out.AppendLine(false); //253:26
+            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/foundation.min.css\"/>"); //254:1
+            __out.AppendLine(false); //254:72
+            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/style.css\"/>"); //255:1
+            __out.AppendLine(false); //255:63
+            __out.Append("</head>"); //256:1
+            __out.AppendLine(false); //256:8
+            __out.Append("<body>"); //257:1
+            __out.AppendLine(false); //257:7
+            __out.AppendLine(true); //258:1
+            __out.Append("<header class=\"template row\" th:substituteby=\"_master :: header\">"); //259:1
+            __out.AppendLine(false); //259:66
+            __out.Append("    <div class=\"small-10 columns\">"); //260:1
+            __out.AppendLine(false); //260:35
+            __out.Append("        <h1>//Title//</h1>"); //261:1
+            __out.AppendLine(false); //261:27
+            __out.Append("    </div>"); //262:1
+            __out.AppendLine(false); //262:11
+            __out.Append("</header>"); //263:1
+            __out.AppendLine(false); //263:10
+            __out.AppendLine(true); //264:1
+            __out.Append("<div class=\"row\">"); //265:1
+            __out.AppendLine(false); //265:18
+            __out.Append("    <div class=\"small-10 columns\">"); //266:1
+            __out.AppendLine(false); //266:35
+            string __tmp2Line = "        <h2>"; //267:1
             if (__tmp2Line != null) __out.Append(__tmp2Line);
             StringBuilder __tmp3 = new StringBuilder();
             __tmp3.Append(entity.Name);
@@ -1194,26 +1405,26 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp3_last) __out.AppendLine(true);
                 }
             }
-            string __tmp4Line = " list</h2>"; //197:26
+            string __tmp4Line = " list</h2>"; //267:26
             if (__tmp4Line != null) __out.Append(__tmp4Line);
-            __out.AppendLine(false); //197:36
-            __out.AppendLine(true); //198:1
-            __out.Append("        <table>"); //199:1
-            __out.AppendLine(false); //199:16
-            __out.Append("            <tr>"); //200:1
-            __out.AppendLine(false); //200:17
+            __out.AppendLine(false); //267:36
+            __out.AppendLine(true); //268:1
+            __out.Append("        <table>"); //269:1
+            __out.AppendLine(false); //269:16
+            __out.Append("            <tr>"); //270:1
+            __out.AppendLine(false); //270:17
             var __loop6_results = 
-                (from __loop6_var1 in __Enumerate((entity).GetEnumerator()) //201:9
-                from property in __Enumerate((__loop6_var1.Properties).GetEnumerator()) //201:17
+                (from __loop6_var1 in __Enumerate((entity).GetEnumerator()) //271:9
+                from property in __Enumerate((__loop6_var1.Properties).GetEnumerator()) //271:17
                 select new { __loop6_var1 = __loop6_var1, property = property}
-                ).ToList(); //201:4
+                ).ToList(); //271:4
             int __loop6_iteration = 0;
             foreach (var __tmp5 in __loop6_results)
             {
                 ++__loop6_iteration;
                 var __loop6_var1 = __tmp5.__loop6_var1;
                 var property = __tmp5.property;
-                string __tmp7Line = "                <th>"; //202:1
+                string __tmp7Line = "                <th>"; //272:1
                 if (__tmp7Line != null) __out.Append(__tmp7Line);
                 StringBuilder __tmp8 = new StringBuilder();
                 __tmp8.Append(property.Name);
@@ -1230,13 +1441,13 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp8_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp9Line = "</th>"; //202:36
+                string __tmp9Line = "</th>"; //272:36
                 if (__tmp9Line != null) __out.Append(__tmp9Line);
-                __out.AppendLine(false); //202:41
+                __out.AppendLine(false); //272:41
             }
-            __out.Append("            </tr>"); //204:1
-            __out.AppendLine(false); //204:18
-            string __tmp11Line = "            <tr th:each=\""; //205:1
+            __out.Append("            </tr>"); //274:1
+            __out.AppendLine(false); //274:18
+            string __tmp11Line = "            <tr th:each=\""; //275:1
             if (__tmp11Line != null) __out.Append(__tmp11Line);
             StringBuilder __tmp12 = new StringBuilder();
             __tmp12.Append(entity.Name.ToCamelCase());
@@ -1253,7 +1464,7 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp12_last) __out.AppendLine(true);
                 }
             }
-            string __tmp13Line = " : ${"; //205:53
+            string __tmp13Line = " : ${"; //275:53
             if (__tmp13Line != null) __out.Append(__tmp13Line);
             StringBuilder __tmp14 = new StringBuilder();
             __tmp14.Append(entity.Name.ToCamelCase());
@@ -1270,21 +1481,21 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp14_last) __out.AppendLine(true);
                 }
             }
-            string __tmp15Line = "List}\">"; //205:85
+            string __tmp15Line = "List}\">"; //275:85
             if (__tmp15Line != null) __out.Append(__tmp15Line);
-            __out.AppendLine(false); //205:92
+            __out.AppendLine(false); //275:92
             var __loop7_results = 
-                (from __loop7_var1 in __Enumerate((entity).GetEnumerator()) //206:9
-                from property in __Enumerate((__loop7_var1.Properties).GetEnumerator()) //206:17
+                (from __loop7_var1 in __Enumerate((entity).GetEnumerator()) //276:9
+                from property in __Enumerate((__loop7_var1.Properties).GetEnumerator()) //276:17
                 select new { __loop7_var1 = __loop7_var1, property = property}
-                ).ToList(); //206:4
+                ).ToList(); //276:4
             int __loop7_iteration = 0;
             foreach (var __tmp16 in __loop7_results)
             {
                 ++__loop7_iteration;
                 var __loop7_var1 = __tmp16.__loop7_var1;
                 var property = __tmp16.property;
-                string __tmp18Line = "				<td th:text=\"${"; //207:1
+                string __tmp18Line = "				<td th:text=\"${"; //277:1
                 if (__tmp18Line != null) __out.Append(__tmp18Line);
                 StringBuilder __tmp19 = new StringBuilder();
                 __tmp19.Append(entity.Name.ToCamelCase());
@@ -1301,7 +1512,7 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp19_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp20Line = "."; //207:47
+                string __tmp20Line = "."; //277:47
                 if (__tmp20Line != null) __out.Append(__tmp20Line);
                 StringBuilder __tmp21 = new StringBuilder();
                 __tmp21.Append(property.Name.ToCamelCase());
@@ -1318,70 +1529,70 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp21_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp22Line = "}\">Data</td>"; //207:77
+                string __tmp22Line = "}\">Data</td>"; //277:77
                 if (__tmp22Line != null) __out.Append(__tmp22Line);
-                __out.AppendLine(false); //207:89
+                __out.AppendLine(false); //277:89
             }
-            __out.Append("            </tr>"); //209:1
-            __out.AppendLine(false); //209:18
-            __out.Append("        </table>"); //210:1
-            __out.AppendLine(false); //210:17
-            __out.Append("    </div>"); //211:1
-            __out.AppendLine(false); //211:11
-            __out.Append("    <div class=\"small-2 columns template\" th:substituteby=\"_master :: sidebar\">"); //212:1
-            __out.AppendLine(false); //212:80
-            __out.Append("        //side-nav menu//"); //213:1
-            __out.AppendLine(false); //213:26
-            __out.Append("    </div>"); //214:1
-            __out.AppendLine(false); //214:11
-            __out.Append("</div>"); //215:1
-            __out.AppendLine(false); //215:7
-            __out.AppendLine(true); //216:1
-            __out.Append("<footer class=\"template row\" th:substituteby=\"_master :: footer\">"); //217:1
-            __out.AppendLine(false); //217:66
-            __out.Append("    <div class=\"large-12 columns\">"); //218:1
-            __out.AppendLine(false); //218:35
-            __out.Append("        <hr/>"); //219:1
-            __out.AppendLine(false); //219:14
-            __out.Append("        <div class=\"row\">"); //220:1
-            __out.AppendLine(false); //220:26
-            __out.Append("            <div class=\"small-4 columns\">"); //221:1
-            __out.AppendLine(false); //221:42
-            __out.Append("                //copyright//"); //222:1
-            __out.AppendLine(false); //222:30
-            __out.Append("            </div>"); //223:1
-            __out.AppendLine(false); //223:19
-            __out.Append("            <div class=\"small-8 columns\">"); //224:1
-            __out.AppendLine(false); //224:42
-            __out.Append("                <span class=\"right\">//powered by//</span>"); //225:1
-            __out.AppendLine(false); //225:58
-            __out.Append("            </div>"); //226:1
-            __out.AppendLine(false); //226:19
-            __out.Append("        </div>"); //227:1
-            __out.AppendLine(false); //227:15
-            __out.Append("    </div>"); //228:1
-            __out.AppendLine(false); //228:11
-            __out.Append("</footer>"); //229:1
-            __out.AppendLine(false); //229:10
-            __out.AppendLine(true); //230:1
-            __out.Append("</body>"); //231:1
-            __out.AppendLine(false); //231:8
-            __out.Append("</html>"); //232:1
-            __out.AppendLine(false); //232:8
+            __out.Append("            </tr>"); //279:1
+            __out.AppendLine(false); //279:18
+            __out.Append("        </table>"); //280:1
+            __out.AppendLine(false); //280:17
+            __out.Append("    </div>"); //281:1
+            __out.AppendLine(false); //281:11
+            __out.Append("    <div class=\"small-2 columns template\" th:substituteby=\"_master :: sidebar\">"); //282:1
+            __out.AppendLine(false); //282:80
+            __out.Append("        //side-nav menu//"); //283:1
+            __out.AppendLine(false); //283:26
+            __out.Append("    </div>"); //284:1
+            __out.AppendLine(false); //284:11
+            __out.Append("</div>"); //285:1
+            __out.AppendLine(false); //285:7
+            __out.AppendLine(true); //286:1
+            __out.Append("<footer class=\"template row\" th:substituteby=\"_master :: footer\">"); //287:1
+            __out.AppendLine(false); //287:66
+            __out.Append("    <div class=\"large-12 columns\">"); //288:1
+            __out.AppendLine(false); //288:35
+            __out.Append("        <hr/>"); //289:1
+            __out.AppendLine(false); //289:14
+            __out.Append("        <div class=\"row\">"); //290:1
+            __out.AppendLine(false); //290:26
+            __out.Append("            <div class=\"small-4 columns\">"); //291:1
+            __out.AppendLine(false); //291:42
+            __out.Append("                //copyright//"); //292:1
+            __out.AppendLine(false); //292:30
+            __out.Append("            </div>"); //293:1
+            __out.AppendLine(false); //293:19
+            __out.Append("            <div class=\"small-8 columns\">"); //294:1
+            __out.AppendLine(false); //294:42
+            __out.Append("                <span class=\"right\">//powered by//</span>"); //295:1
+            __out.AppendLine(false); //295:58
+            __out.Append("            </div>"); //296:1
+            __out.AppendLine(false); //296:19
+            __out.Append("        </div>"); //297:1
+            __out.AppendLine(false); //297:15
+            __out.Append("    </div>"); //298:1
+            __out.AppendLine(false); //298:11
+            __out.Append("</footer>"); //299:1
+            __out.AppendLine(false); //299:10
+            __out.AppendLine(true); //300:1
+            __out.Append("</body>"); //301:1
+            __out.AppendLine(false); //301:8
+            __out.Append("</html>"); //302:1
+            __out.AppendLine(false); //302:8
             return __out.ToString();
         }
 
-        public string GenerateMasterView(string applicationName, List<ViewInfoHolder> views) //237:1
+        public string GenerateMasterView(string applicationName, List<ViewInfoHolder> views) //307:1
         {
             StringBuilder __out = new StringBuilder();
-            __out.Append("<!DOCTYPE html>"); //238:1
-            __out.AppendLine(false); //238:16
-            __out.Append("<html xmlns:th=\"http://www.thymeleaf.org\">"); //239:1
-            __out.AppendLine(false); //239:43
-            __out.AppendLine(true); //240:1
-            __out.Append("<head th:fragment=\"head\">"); //241:1
-            __out.AppendLine(false); //241:26
-            string __tmp2Line = "    <title>"; //242:1
+            __out.Append("<!DOCTYPE html>"); //308:1
+            __out.AppendLine(false); //308:16
+            __out.Append("<html xmlns:th=\"http://www.thymeleaf.org\">"); //309:1
+            __out.AppendLine(false); //309:43
+            __out.AppendLine(true); //310:1
+            __out.Append("<head th:fragment=\"head\">"); //311:1
+            __out.AppendLine(false); //311:26
+            string __tmp2Line = "    <title>"; //312:1
             if (__tmp2Line != null) __out.Append(__tmp2Line);
             StringBuilder __tmp3 = new StringBuilder();
             __tmp3.Append(applicationName);
@@ -1398,50 +1609,50 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp3_last) __out.AppendLine(true);
                 }
             }
-            string __tmp4Line = "</title>"; //242:29
+            string __tmp4Line = "</title>"; //312:29
             if (__tmp4Line != null) __out.Append(__tmp4Line);
-            __out.AppendLine(false); //242:37
-            __out.Append("    <meta name=\"viewport\" content=\"width=device-width\"/>"); //243:1
-            __out.AppendLine(false); //243:57
-            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/normalize.css\""); //244:1
-            __out.AppendLine(false); //244:65
-            __out.Append("          th:href=\"@{/resources/css/normalize.css}\"/>"); //245:1
-            __out.AppendLine(false); //245:54
-            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/foundation.min.css\""); //246:1
-            __out.AppendLine(false); //246:70
-            __out.Append("          th:href=\"@{/resources/css/foundation.min.css}\"/>"); //247:1
-            __out.AppendLine(false); //247:59
-            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/style.css\""); //248:1
-            __out.AppendLine(false); //248:61
-            __out.Append("          th:href=\"@{/resources/css/style.css}\"/>"); //249:1
-            __out.AppendLine(false); //249:50
-            __out.Append("    <script type=\"text/javascript\" src=\"../resources/js/vendor/custom.modernizr.js\""); //250:1
-            __out.AppendLine(false); //250:84
-            __out.Append("            th:src=\"@{/resources/js/vendor/custom.modernizr.js}\"></script>"); //251:1
-            __out.AppendLine(false); //251:75
-            __out.Append("    <script type=\"text/javascript\" src=\"../resources/js/vendor/jquery.js\""); //252:1
-            __out.AppendLine(false); //252:74
-            __out.Append("            th:src=\"@{/resources/js/vendor/jquery.js}\"></script>"); //253:1
-            __out.AppendLine(false); //253:65
-            __out.Append("    <script type=\"text/javascript\" src=\"../resources/js/foundation.min.js\""); //254:1
-            __out.AppendLine(false); //254:75
-            __out.Append("            th:src=\"@{/resources/js/foundation.min.js}\"></script>"); //255:1
-            __out.AppendLine(false); //255:66
-            __out.Append("    <script type=\"text/javascript\" src=\"../resources/js/app.js\""); //256:1
-            __out.AppendLine(false); //256:64
-            __out.Append("            th:src=\"@{/resources/js/app.js}\"></script>"); //257:1
-            __out.AppendLine(false); //257:55
-            __out.Append("</head>"); //258:1
-            __out.AppendLine(false); //258:8
-            __out.AppendLine(true); //259:1
-            __out.Append("<body>"); //260:1
-            __out.AppendLine(false); //260:7
-            __out.AppendLine(true); //261:1
-            __out.Append("<header class=\"row\" th:fragment=\"header\">"); //262:1
-            __out.AppendLine(false); //262:42
-            __out.Append("    <div class=\"small-10 columns\">"); //263:1
-            __out.AppendLine(false); //263:35
-            string __tmp6Line = "        <h1>"; //264:1
+            __out.AppendLine(false); //312:37
+            __out.Append("    <meta name=\"viewport\" content=\"width=device-width\"/>"); //313:1
+            __out.AppendLine(false); //313:57
+            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/normalize.css\""); //314:1
+            __out.AppendLine(false); //314:65
+            __out.Append("          th:href=\"@{/resources/css/normalize.css}\"/>"); //315:1
+            __out.AppendLine(false); //315:54
+            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/foundation.min.css\""); //316:1
+            __out.AppendLine(false); //316:70
+            __out.Append("          th:href=\"@{/resources/css/foundation.min.css}\"/>"); //317:1
+            __out.AppendLine(false); //317:59
+            __out.Append("    <link rel=\"stylesheet\" href=\"../resources/css/style.css\""); //318:1
+            __out.AppendLine(false); //318:61
+            __out.Append("          th:href=\"@{/resources/css/style.css}\"/>"); //319:1
+            __out.AppendLine(false); //319:50
+            __out.Append("    <script type=\"text/javascript\" src=\"../resources/js/vendor/custom.modernizr.js\""); //320:1
+            __out.AppendLine(false); //320:84
+            __out.Append("            th:src=\"@{/resources/js/vendor/custom.modernizr.js}\"></script>"); //321:1
+            __out.AppendLine(false); //321:75
+            __out.Append("    <script type=\"text/javascript\" src=\"../resources/js/vendor/jquery.js\""); //322:1
+            __out.AppendLine(false); //322:74
+            __out.Append("            th:src=\"@{/resources/js/vendor/jquery.js}\"></script>"); //323:1
+            __out.AppendLine(false); //323:65
+            __out.Append("    <script type=\"text/javascript\" src=\"../resources/js/foundation.min.js\""); //324:1
+            __out.AppendLine(false); //324:75
+            __out.Append("            th:src=\"@{/resources/js/foundation.min.js}\"></script>"); //325:1
+            __out.AppendLine(false); //325:66
+            __out.Append("    <script type=\"text/javascript\" src=\"../resources/js/app.js\""); //326:1
+            __out.AppendLine(false); //326:64
+            __out.Append("            th:src=\"@{/resources/js/app.js}\"></script>"); //327:1
+            __out.AppendLine(false); //327:55
+            __out.Append("</head>"); //328:1
+            __out.AppendLine(false); //328:8
+            __out.AppendLine(true); //329:1
+            __out.Append("<body>"); //330:1
+            __out.AppendLine(false); //330:7
+            __out.AppendLine(true); //331:1
+            __out.Append("<header class=\"row\" th:fragment=\"header\">"); //332:1
+            __out.AppendLine(false); //332:42
+            __out.Append("    <div class=\"small-10 columns\">"); //333:1
+            __out.AppendLine(false); //333:35
+            string __tmp6Line = "        <h1>"; //334:1
             if (__tmp6Line != null) __out.Append(__tmp6Line);
             StringBuilder __tmp7 = new StringBuilder();
             __tmp7.Append(applicationName);
@@ -1458,41 +1669,41 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp7_last) __out.AppendLine(true);
                 }
             }
-            string __tmp8Line = "</h1>"; //264:30
+            string __tmp8Line = "</h1>"; //334:30
             if (__tmp8Line != null) __out.Append(__tmp8Line);
-            __out.AppendLine(false); //264:35
-            __out.Append("    </div>"); //265:1
-            __out.AppendLine(false); //265:11
-            __out.Append("</header>"); //266:1
-            __out.AppendLine(false); //266:10
-            __out.AppendLine(true); //267:1
-            __out.Append("<div class=\"row\">"); //268:1
-            __out.AppendLine(false); //268:18
-            __out.Append("    <div class=\"small-10 columns template\">"); //269:1
-            __out.AppendLine(false); //269:44
-            __out.Append("        <h2>//content title//</h2>"); //270:1
-            __out.AppendLine(false); //270:35
-            __out.Append("        <p>//content//</p>"); //272:1
-            __out.AppendLine(false); //272:27
-            __out.Append("    </div>"); //273:1
-            __out.AppendLine(false); //273:11
-            __out.AppendLine(true); //274:1
-            __out.Append("    <div class=\"small-2 columns\" th:fragment=\"sidebar\">"); //275:1
-            __out.AppendLine(false); //275:56
-            __out.Append("        <div style=\"width: 140px; margin: 0 auto\">"); //276:1
-            __out.AppendLine(false); //276:51
-            __out.Append("            <ul class=\"side-nav\">"); //277:1
-            __out.AppendLine(false); //277:34
+            __out.AppendLine(false); //334:35
+            __out.Append("    </div>"); //335:1
+            __out.AppendLine(false); //335:11
+            __out.Append("</header>"); //336:1
+            __out.AppendLine(false); //336:10
+            __out.AppendLine(true); //337:1
+            __out.Append("<div class=\"row\">"); //338:1
+            __out.AppendLine(false); //338:18
+            __out.Append("    <div class=\"small-10 columns template\">"); //339:1
+            __out.AppendLine(false); //339:44
+            __out.Append("        <h2>//content title//</h2>"); //340:1
+            __out.AppendLine(false); //340:35
+            __out.Append("        <p>//content//</p>"); //342:1
+            __out.AppendLine(false); //342:27
+            __out.Append("    </div>"); //343:1
+            __out.AppendLine(false); //343:11
+            __out.AppendLine(true); //344:1
+            __out.Append("    <div class=\"small-2 columns\" th:fragment=\"sidebar\">"); //345:1
+            __out.AppendLine(false); //345:56
+            __out.Append("        <div style=\"width: 140px; margin: 0 auto\">"); //346:1
+            __out.AppendLine(false); //346:51
+            __out.Append("            <ul class=\"side-nav\">"); //347:1
+            __out.AppendLine(false); //347:34
             var __loop8_results = 
-                (from view in __Enumerate((views).GetEnumerator()) //278:10
+                (from view in __Enumerate((views).GetEnumerator()) //348:10
                 select new { view = view}
-                ).ToList(); //278:5
+                ).ToList(); //348:5
             int __loop8_iteration = 0;
             foreach (var __tmp9 in __loop8_results)
             {
                 ++__loop8_iteration;
                 var view = __tmp9.view;
-                string __tmp11Line = "                <li><a href=\""; //279:1
+                string __tmp11Line = "                <li><a href=\""; //349:1
                 if (__tmp11Line != null) __out.Append(__tmp11Line);
                 StringBuilder __tmp12 = new StringBuilder();
                 __tmp12.Append(view.FileName);
@@ -1509,7 +1720,7 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp12_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp13Line = "\" th:href=\"@{/"; //279:45
+                string __tmp13Line = "\" th:href=\"@{/"; //349:45
                 if (__tmp13Line != null) __out.Append(__tmp13Line);
                 StringBuilder __tmp14 = new StringBuilder();
                 __tmp14.Append(view.Mapping);
@@ -1526,7 +1737,7 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp14_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp15Line = "}\" th:text=\"#{page."; //279:73
+                string __tmp15Line = "/}\">"; //349:73
                 if (__tmp15Line != null) __out.Append(__tmp15Line);
                 StringBuilder __tmp16 = new StringBuilder();
                 __tmp16.Append(view.Name);
@@ -1543,179 +1754,162 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp16_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp17Line = "}\">"; //279:103
+                string __tmp17Line = "</a></li>"; //349:88
                 if (__tmp17Line != null) __out.Append(__tmp17Line);
-                StringBuilder __tmp18 = new StringBuilder();
-                __tmp18.Append(view.Name);
-                using(StreamReader __tmp18Reader = new StreamReader(this.__ToStream(__tmp18.ToString())))
-                {
-                    bool __tmp18_first = true;
-                    bool __tmp18_last = __tmp18Reader.EndOfStream;
-                    while(__tmp18_first || !__tmp18_last)
-                    {
-                        __tmp18_first = false;
-                        string __tmp18Line = __tmp18Reader.ReadLine();
-                        __tmp18_last = __tmp18Reader.EndOfStream;
-                        if (__tmp18Line != null) __out.Append(__tmp18Line);
-                        if (!__tmp18_last) __out.AppendLine(true);
-                    }
-                }
-                string __tmp19Line = "</a></li>"; //279:117
-                if (__tmp19Line != null) __out.Append(__tmp19Line);
-                __out.AppendLine(false); //279:126
+                __out.AppendLine(false); //349:97
             }
-            __out.Append("            </ul>"); //281:1
-            __out.AppendLine(false); //281:18
-            __out.Append("        </div>"); //282:1
-            __out.AppendLine(false); //282:15
-            __out.Append("    </div>"); //283:1
-            __out.AppendLine(false); //283:11
-            __out.Append("</div>"); //284:1
-            __out.AppendLine(false); //284:7
-            __out.AppendLine(true); //285:1
-            __out.Append("<footer class=\"row\" th:fragment=\"footer\">"); //286:1
-            __out.AppendLine(false); //286:42
-            __out.Append("    <div class=\"large-12 columns\">"); //287:1
-            __out.AppendLine(false); //287:35
-            __out.Append("        <hr/>"); //288:1
-            __out.AppendLine(false); //288:14
-            __out.Append("        <div class=\"row\">"); //289:1
-            __out.AppendLine(false); //289:26
-            __out.Append("            <div class=\"small-4 columns\">"); //290:1
-            __out.AppendLine(false); //290:42
-            __out.Append("                <p>&copy; Copyright BME IIT</p>"); //291:1
-            __out.AppendLine(false); //291:48
-            __out.Append("            </div>"); //292:1
-            __out.AppendLine(false); //292:19
-            __out.Append("            <div class=\"small-8 columns\">"); //293:1
-            __out.AppendLine(false); //293:42
-            __out.Append("                <ul class=\"inline-list right\">"); //294:1
-            __out.AppendLine(false); //294:47
-            __out.Append("                    <li>Powered by</li>"); //295:1
-            __out.AppendLine(false); //295:40
-            __out.Append("                    <li><a href=\"http://www.spring.io/\">Spring</a></li>"); //296:1
-            __out.AppendLine(false); //296:72
-            __out.Append("                    <li><a href=\"http://www.thymeleaf.org/\">Thymeleaf</a></li>"); //297:1
-            __out.AppendLine(false); //297:79
-            __out.Append("                    <li><a href=\"http://foundation.zurb.com/\">Foundation</a></li>"); //298:1
-            __out.AppendLine(false); //298:82
-            __out.Append("                </ul>"); //299:1
-            __out.AppendLine(false); //299:22
-            __out.Append("            </div>"); //300:1
-            __out.AppendLine(false); //300:19
-            __out.Append("        </div>"); //301:1
-            __out.AppendLine(false); //301:15
-            __out.Append("    </div>"); //302:1
-            __out.AppendLine(false); //302:11
-            __out.Append("</footer>"); //303:1
-            __out.AppendLine(false); //303:10
-            __out.AppendLine(true); //304:1
-            __out.Append("</body>"); //305:1
-            __out.AppendLine(false); //305:8
-            __out.Append("</html>"); //306:1
-            __out.AppendLine(false); //306:8
+            __out.Append("            </ul>"); //351:1
+            __out.AppendLine(false); //351:18
+            __out.Append("        </div>"); //352:1
+            __out.AppendLine(false); //352:15
+            __out.Append("    </div>"); //353:1
+            __out.AppendLine(false); //353:11
+            __out.Append("</div>"); //354:1
+            __out.AppendLine(false); //354:7
+            __out.AppendLine(true); //355:1
+            __out.Append("<footer class=\"row\" th:fragment=\"footer\">"); //356:1
+            __out.AppendLine(false); //356:42
+            __out.Append("    <div class=\"large-12 columns\">"); //357:1
+            __out.AppendLine(false); //357:35
+            __out.Append("        <hr/>"); //358:1
+            __out.AppendLine(false); //358:14
+            __out.Append("        <div class=\"row\">"); //359:1
+            __out.AppendLine(false); //359:26
+            __out.Append("            <div class=\"small-4 columns\">"); //360:1
+            __out.AppendLine(false); //360:42
+            __out.Append("                <p>&copy; Copyright BME IIT</p>"); //361:1
+            __out.AppendLine(false); //361:48
+            __out.Append("            </div>"); //362:1
+            __out.AppendLine(false); //362:19
+            __out.Append("            <div class=\"small-8 columns\">"); //363:1
+            __out.AppendLine(false); //363:42
+            __out.Append("                <ul class=\"inline-list right\">"); //364:1
+            __out.AppendLine(false); //364:47
+            __out.Append("                    <li>Powered by</li>"); //365:1
+            __out.AppendLine(false); //365:40
+            __out.Append("                    <li><a href=\"http://www.spring.io/\">Spring</a></li>"); //366:1
+            __out.AppendLine(false); //366:72
+            __out.Append("                    <li><a href=\"http://www.thymeleaf.org/\">Thymeleaf</a></li>"); //367:1
+            __out.AppendLine(false); //367:79
+            __out.Append("                    <li><a href=\"http://foundation.zurb.com/\">Foundation</a></li>"); //368:1
+            __out.AppendLine(false); //368:82
+            __out.Append("                </ul>"); //369:1
+            __out.AppendLine(false); //369:22
+            __out.Append("            </div>"); //370:1
+            __out.AppendLine(false); //370:19
+            __out.Append("        </div>"); //371:1
+            __out.AppendLine(false); //371:15
+            __out.Append("    </div>"); //372:1
+            __out.AppendLine(false); //372:11
+            __out.Append("</footer>"); //373:1
+            __out.AppendLine(false); //373:10
+            __out.AppendLine(true); //374:1
+            __out.Append("</body>"); //375:1
+            __out.AppendLine(false); //375:8
+            __out.Append("</html>"); //376:1
+            __out.AppendLine(false); //376:8
             return __out.ToString();
         }
 
-        public string GenerateWebXml() //311:1
+        public string GenerateWebXml() //381:1
         {
             StringBuilder __out = new StringBuilder();
-            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //312:1
-            __out.AppendLine(false); //312:39
-            __out.Append("<web-app xmlns=\"http://java.sun.com/xml/ns/javaee\""); //313:1
-            __out.AppendLine(false); //313:51
-            __out.Append("         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //314:1
-            __out.AppendLine(false); //314:63
-            __out.Append("         xsi:schemaLocation=\"http://java.sun.com/xml/ns/javaee"); //315:1
-            __out.AppendLine(false); //315:63
-            __out.Append("		 http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd\" version=\"3.0\">"); //316:1
-            __out.AppendLine(false); //316:69
-            __out.AppendLine(true); //317:1
-            __out.Append("    <servlet>"); //318:1
-            __out.AppendLine(false); //318:14
-            __out.Append("        <servlet-name>spring</servlet-name>"); //319:1
-            __out.AppendLine(false); //319:44
-            __out.Append("        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>"); //320:1
-            __out.AppendLine(false); //320:89
-            __out.Append("        <load-on-startup>1</load-on-startup>"); //321:1
-            __out.AppendLine(false); //321:45
-            __out.Append("    </servlet>"); //322:1
-            __out.AppendLine(false); //322:15
-            __out.AppendLine(true); //323:1
-            __out.Append("    <servlet-mapping>"); //324:1
-            __out.AppendLine(false); //324:22
-            __out.Append("        <servlet-name>spring</servlet-name>"); //325:1
-            __out.AppendLine(false); //325:44
-            __out.Append("        <url-pattern>/*</url-pattern>"); //326:1
-            __out.AppendLine(false); //326:38
-            __out.Append("    </servlet-mapping>"); //327:1
-            __out.AppendLine(false); //327:23
-            __out.AppendLine(true); //328:1
-            __out.Append("    <listener>"); //329:1
-            __out.AppendLine(false); //329:15
-            __out.Append("        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>"); //330:1
-            __out.AppendLine(false); //330:95
-            __out.Append("    </listener>"); //331:1
-            __out.AppendLine(false); //331:16
-            __out.AppendLine(true); //332:1
-            __out.Append("    <filter>"); //333:1
-            __out.AppendLine(false); //333:13
-            __out.Append("        <filter-name>characterEncodingFilter</filter-name>"); //334:1
-            __out.AppendLine(false); //334:59
-            __out.Append("        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>"); //335:1
-            __out.AppendLine(false); //335:92
-            __out.Append("        <init-param>"); //336:1
-            __out.AppendLine(false); //336:21
-            __out.Append("            <param-name>encoding</param-name>"); //337:1
-            __out.AppendLine(false); //337:46
-            __out.Append("            <param-value>UTF-8</param-value>"); //338:1
-            __out.AppendLine(false); //338:45
-            __out.Append("        </init-param>"); //339:1
-            __out.AppendLine(false); //339:22
-            __out.Append("    </filter>"); //340:1
-            __out.AppendLine(false); //340:14
-            __out.AppendLine(true); //341:1
-            __out.Append("    <filter-mapping>"); //342:1
-            __out.AppendLine(false); //342:21
-            __out.Append("        <filter-name>characterEncodingFilter</filter-name>"); //343:1
-            __out.AppendLine(false); //343:59
-            __out.Append("        <servlet-name>spring</servlet-name>"); //344:1
-            __out.AppendLine(false); //344:44
-            __out.Append("    </filter-mapping>"); //345:1
-            __out.AppendLine(false); //345:22
-            __out.AppendLine(true); //346:1
-            __out.Append("</web-app>"); //347:1
-            __out.AppendLine(false); //347:11
+            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //382:1
+            __out.AppendLine(false); //382:39
+            __out.Append("<web-app xmlns=\"http://java.sun.com/xml/ns/javaee\""); //383:1
+            __out.AppendLine(false); //383:51
+            __out.Append("         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //384:1
+            __out.AppendLine(false); //384:63
+            __out.Append("         xsi:schemaLocation=\"http://java.sun.com/xml/ns/javaee"); //385:1
+            __out.AppendLine(false); //385:63
+            __out.Append("		 http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd\" version=\"3.0\">"); //386:1
+            __out.AppendLine(false); //386:69
+            __out.AppendLine(true); //387:1
+            __out.Append("    <servlet>"); //388:1
+            __out.AppendLine(false); //388:14
+            __out.Append("        <servlet-name>spring</servlet-name>"); //389:1
+            __out.AppendLine(false); //389:44
+            __out.Append("        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>"); //390:1
+            __out.AppendLine(false); //390:89
+            __out.Append("        <load-on-startup>1</load-on-startup>"); //391:1
+            __out.AppendLine(false); //391:45
+            __out.Append("    </servlet>"); //392:1
+            __out.AppendLine(false); //392:15
+            __out.AppendLine(true); //393:1
+            __out.Append("    <servlet-mapping>"); //394:1
+            __out.AppendLine(false); //394:22
+            __out.Append("        <servlet-name>spring</servlet-name>"); //395:1
+            __out.AppendLine(false); //395:44
+            __out.Append("        <url-pattern>/*</url-pattern>"); //396:1
+            __out.AppendLine(false); //396:38
+            __out.Append("    </servlet-mapping>"); //397:1
+            __out.AppendLine(false); //397:23
+            __out.AppendLine(true); //398:1
+            __out.Append("    <listener>"); //399:1
+            __out.AppendLine(false); //399:15
+            __out.Append("        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>"); //400:1
+            __out.AppendLine(false); //400:95
+            __out.Append("    </listener>"); //401:1
+            __out.AppendLine(false); //401:16
+            __out.AppendLine(true); //402:1
+            __out.Append("    <filter>"); //403:1
+            __out.AppendLine(false); //403:13
+            __out.Append("        <filter-name>characterEncodingFilter</filter-name>"); //404:1
+            __out.AppendLine(false); //404:59
+            __out.Append("        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>"); //405:1
+            __out.AppendLine(false); //405:92
+            __out.Append("        <init-param>"); //406:1
+            __out.AppendLine(false); //406:21
+            __out.Append("            <param-name>encoding</param-name>"); //407:1
+            __out.AppendLine(false); //407:46
+            __out.Append("            <param-value>UTF-8</param-value>"); //408:1
+            __out.AppendLine(false); //408:45
+            __out.Append("        </init-param>"); //409:1
+            __out.AppendLine(false); //409:22
+            __out.Append("    </filter>"); //410:1
+            __out.AppendLine(false); //410:14
+            __out.AppendLine(true); //411:1
+            __out.Append("    <filter-mapping>"); //412:1
+            __out.AppendLine(false); //412:21
+            __out.Append("        <filter-name>characterEncodingFilter</filter-name>"); //413:1
+            __out.AppendLine(false); //413:59
+            __out.Append("        <servlet-name>spring</servlet-name>"); //414:1
+            __out.AppendLine(false); //414:44
+            __out.Append("    </filter-mapping>"); //415:1
+            __out.AppendLine(false); //415:22
+            __out.AppendLine(true); //416:1
+            __out.Append("</web-app>"); //417:1
+            __out.AppendLine(false); //417:11
             return __out.ToString();
         }
 
-        public string GenerateServlet(Namespace ns) //351:1
+        public string GenerateServlet(Namespace ns) //421:1
         {
             StringBuilder __out = new StringBuilder();
-            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //352:1
-            __out.AppendLine(false); //352:39
-            __out.Append("<beans xmlns=\"http://www.springframework.org/schema/beans\""); //353:1
-            __out.AppendLine(false); //353:59
-            __out.Append("       xmlns:mvc=\"http://www.springframework.org/schema/mvc\""); //354:1
-            __out.AppendLine(false); //354:61
-            __out.Append("       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //355:1
-            __out.AppendLine(false); //355:61
-            __out.Append("       xmlns:context=\"http://www.springframework.org/schema/context\""); //356:1
-            __out.AppendLine(false); //356:69
-            __out.Append("       xsi:schemaLocation=\"http://www.springframework.org/schema/beans"); //357:1
-            __out.AppendLine(false); //357:71
-            __out.Append("                           http://www.springframework.org/schema/beans/spring-beans.xsd"); //358:1
-            __out.AppendLine(false); //358:88
-            __out.Append("                           http://www.springframework.org/schema/context"); //359:1
-            __out.AppendLine(false); //359:73
-            __out.Append("                           http://www.springframework.org/schema/context/spring-context.xsd"); //360:1
-            __out.AppendLine(false); //360:92
-            __out.Append("                           http://www.springframework.org/schema/mvc"); //361:1
-            __out.AppendLine(false); //361:69
-            __out.Append("                           http://www.springframework.org/schema/mvc/spring-mvc.xsd\">"); //362:1
-            __out.AppendLine(false); //362:86
-            __out.AppendLine(true); //363:1
-            string __tmp2Line = "    <context:component-scan base-package=\""; //364:1
+            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //422:1
+            __out.AppendLine(false); //422:39
+            __out.Append("<beans xmlns=\"http://www.springframework.org/schema/beans\""); //423:1
+            __out.AppendLine(false); //423:59
+            __out.Append("       xmlns:mvc=\"http://www.springframework.org/schema/mvc\""); //424:1
+            __out.AppendLine(false); //424:61
+            __out.Append("       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //425:1
+            __out.AppendLine(false); //425:61
+            __out.Append("       xmlns:context=\"http://www.springframework.org/schema/context\""); //426:1
+            __out.AppendLine(false); //426:69
+            __out.Append("       xsi:schemaLocation=\"http://www.springframework.org/schema/beans"); //427:1
+            __out.AppendLine(false); //427:71
+            __out.Append("                           http://www.springframework.org/schema/beans/spring-beans.xsd"); //428:1
+            __out.AppendLine(false); //428:88
+            __out.Append("                           http://www.springframework.org/schema/context"); //429:1
+            __out.AppendLine(false); //429:73
+            __out.Append("                           http://www.springframework.org/schema/context/spring-context.xsd"); //430:1
+            __out.AppendLine(false); //430:92
+            __out.Append("                           http://www.springframework.org/schema/mvc"); //431:1
+            __out.AppendLine(false); //431:69
+            __out.Append("                           http://www.springframework.org/schema/mvc/spring-mvc.xsd\">"); //432:1
+            __out.AppendLine(false); //432:86
+            __out.AppendLine(true); //433:1
+            string __tmp2Line = "    <context:component-scan base-package=\""; //434:1
             if (__tmp2Line != null) __out.Append(__tmp2Line);
             StringBuilder __tmp3 = new StringBuilder();
             __tmp3.Append(ns.FullName.ToLower());
@@ -1732,7 +1926,7 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp3_last) __out.AppendLine(true);
                 }
             }
-            string __tmp4Line = "."; //364:66
+            string __tmp4Line = "."; //434:66
             if (__tmp4Line != null) __out.Append(__tmp4Line);
             StringBuilder __tmp5 = new StringBuilder();
             __tmp5.Append(SpringGeneratorUtil.Properties.controllerPackage);
@@ -1749,121 +1943,121 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp5_last) __out.AppendLine(true);
                 }
             }
-            string __tmp6Line = "\"/>"; //364:117
+            string __tmp6Line = "\"/>"; //434:117
             if (__tmp6Line != null) __out.Append(__tmp6Line);
-            __out.AppendLine(false); //364:120
-            __out.AppendLine(true); //365:1
-            __out.Append("    <mvc:annotation-driven/>"); //366:1
-            __out.AppendLine(false); //366:29
-            __out.AppendLine(true); //367:1
-            __out.Append("    <!--<mvc:resources mapping=\"/favicon.ico\" location=\"/WEB-INF/resources/img/\"/>-->"); //368:1
-            __out.AppendLine(false); //368:86
-            __out.Append("    <mvc:resources mapping=\"/resources/**\" location=\"/WEB-INF/resources/\"/>"); //369:1
-            __out.AppendLine(false); //369:76
-            __out.AppendLine(true); //370:1
-            __out.Append("    <mvc:interceptors>"); //371:1
-            __out.AppendLine(false); //371:23
-            __out.Append("        <bean class=\"org.springframework.web.servlet.i18n.LocaleChangeInterceptor\">"); //372:1
-            __out.AppendLine(false); //372:84
-            __out.Append("            <property name=\"paramName\" value=\"lang\"/>"); //373:1
-            __out.AppendLine(false); //373:54
-            __out.Append("        </bean>"); //374:1
-            __out.AppendLine(false); //374:16
-            __out.Append("    </mvc:interceptors>"); //375:1
-            __out.AppendLine(false); //375:24
-            __out.AppendLine(true); //376:1
-            __out.Append("    <bean id=\"templateResolver\" class=\"org.thymeleaf.templateresolver.ServletContextTemplateResolver\">"); //377:1
-            __out.AppendLine(false); //377:103
-            __out.Append("        <property name=\"prefix\" value=\"/WEB-INF/view/\"/>"); //378:1
-            __out.AppendLine(false); //378:57
-            __out.Append("        <property name=\"suffix\" value=\".html\"/>"); //379:1
-            __out.AppendLine(false); //379:48
-            __out.Append("        <property name=\"characterEncoding\" value=\"UTF-8\"/>"); //380:1
-            __out.AppendLine(false); //380:59
-            __out.Append("        <property name=\"templateMode\" value=\"HTML5\"/>"); //381:1
-            __out.AppendLine(false); //381:54
-            __out.Append("        <property name=\"cacheable\" value=\"false\"/>"); //382:1
-            __out.AppendLine(false); //382:51
-            __out.Append("    </bean>"); //383:1
-            __out.AppendLine(false); //383:12
-            __out.AppendLine(true); //384:1
-            __out.Append("    <bean id=\"templateEngine\" class=\"org.thymeleaf.spring4.SpringTemplateEngine\">"); //385:1
-            __out.AppendLine(false); //385:82
-            __out.Append("        <property name=\"templateResolver\" ref=\"templateResolver\"/>"); //386:1
-            __out.AppendLine(false); //386:67
-            __out.Append("    </bean>"); //387:1
-            __out.AppendLine(false); //387:12
-            __out.AppendLine(true); //388:1
-            __out.Append("    <bean class=\"org.thymeleaf.spring4.view.ThymeleafViewResolver\">"); //389:1
-            __out.AppendLine(false); //389:68
-            __out.Append("        <property name=\"templateEngine\" ref=\"templateEngine\"/>"); //390:1
-            __out.AppendLine(false); //390:63
-            __out.Append("        <property name=\"contentType\" value=\"text/html; charset=UTF-8\"/>"); //391:1
-            __out.AppendLine(false); //391:72
-            __out.Append("        <property name=\"characterEncoding\" value=\"UTF-8\"/>"); //392:1
-            __out.AppendLine(false); //392:59
-            __out.Append("    </bean>"); //393:1
-            __out.AppendLine(false); //393:12
-            __out.AppendLine(true); //394:1
-            __out.Append("    <bean id=\"localeResolver\" class=\"org.springframework.web.servlet.i18n.SessionLocaleResolver\"/>"); //395:1
-            __out.AppendLine(false); //395:99
-            __out.AppendLine(true); //396:1
-            __out.Append("</beans>"); //397:1
-            __out.AppendLine(false); //397:9
+            __out.AppendLine(false); //434:120
+            __out.AppendLine(true); //435:1
+            __out.Append("    <mvc:annotation-driven/>"); //436:1
+            __out.AppendLine(false); //436:29
+            __out.AppendLine(true); //437:1
+            __out.Append("    <!--<mvc:resources mapping=\"/favicon.ico\" location=\"/WEB-INF/resources/img/\"/>-->"); //438:1
+            __out.AppendLine(false); //438:86
+            __out.Append("    <mvc:resources mapping=\"/resources/**\" location=\"/WEB-INF/resources/\"/>"); //439:1
+            __out.AppendLine(false); //439:76
+            __out.AppendLine(true); //440:1
+            __out.Append("    <mvc:interceptors>"); //441:1
+            __out.AppendLine(false); //441:23
+            __out.Append("        <bean class=\"org.springframework.web.servlet.i18n.LocaleChangeInterceptor\">"); //442:1
+            __out.AppendLine(false); //442:84
+            __out.Append("            <property name=\"paramName\" value=\"lang\"/>"); //443:1
+            __out.AppendLine(false); //443:54
+            __out.Append("        </bean>"); //444:1
+            __out.AppendLine(false); //444:16
+            __out.Append("    </mvc:interceptors>"); //445:1
+            __out.AppendLine(false); //445:24
+            __out.AppendLine(true); //446:1
+            __out.Append("    <bean id=\"templateResolver\" class=\"org.thymeleaf.templateresolver.ServletContextTemplateResolver\">"); //447:1
+            __out.AppendLine(false); //447:103
+            __out.Append("        <property name=\"prefix\" value=\"/WEB-INF/view/\"/>"); //448:1
+            __out.AppendLine(false); //448:57
+            __out.Append("        <property name=\"suffix\" value=\".html\"/>"); //449:1
+            __out.AppendLine(false); //449:48
+            __out.Append("        <property name=\"characterEncoding\" value=\"UTF-8\"/>"); //450:1
+            __out.AppendLine(false); //450:59
+            __out.Append("        <property name=\"templateMode\" value=\"HTML5\"/>"); //451:1
+            __out.AppendLine(false); //451:54
+            __out.Append("        <property name=\"cacheable\" value=\"false\"/>"); //452:1
+            __out.AppendLine(false); //452:51
+            __out.Append("    </bean>"); //453:1
+            __out.AppendLine(false); //453:12
+            __out.AppendLine(true); //454:1
+            __out.Append("    <bean id=\"templateEngine\" class=\"org.thymeleaf.spring4.SpringTemplateEngine\">"); //455:1
+            __out.AppendLine(false); //455:82
+            __out.Append("        <property name=\"templateResolver\" ref=\"templateResolver\"/>"); //456:1
+            __out.AppendLine(false); //456:67
+            __out.Append("    </bean>"); //457:1
+            __out.AppendLine(false); //457:12
+            __out.AppendLine(true); //458:1
+            __out.Append("    <bean class=\"org.thymeleaf.spring4.view.ThymeleafViewResolver\">"); //459:1
+            __out.AppendLine(false); //459:68
+            __out.Append("        <property name=\"templateEngine\" ref=\"templateEngine\"/>"); //460:1
+            __out.AppendLine(false); //460:63
+            __out.Append("        <property name=\"contentType\" value=\"text/html; charset=UTF-8\"/>"); //461:1
+            __out.AppendLine(false); //461:72
+            __out.Append("        <property name=\"characterEncoding\" value=\"UTF-8\"/>"); //462:1
+            __out.AppendLine(false); //462:59
+            __out.Append("    </bean>"); //463:1
+            __out.AppendLine(false); //463:12
+            __out.AppendLine(true); //464:1
+            __out.Append("    <bean id=\"localeResolver\" class=\"org.springframework.web.servlet.i18n.SessionLocaleResolver\"/>"); //465:1
+            __out.AppendLine(false); //465:99
+            __out.AppendLine(true); //466:1
+            __out.Append("</beans>"); //467:1
+            __out.AppendLine(false); //467:9
             return __out.ToString();
         }
 
-        public string GenerateJboss() //402:1
+        public string GenerateJboss() //472:1
         {
             StringBuilder __out = new StringBuilder();
-            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //403:1
-            __out.AppendLine(false); //403:39
-            __out.Append("<jboss-deployment-structure>"); //404:1
-            __out.AppendLine(false); //404:29
-            __out.Append("    <deployment>"); //405:1
-            __out.AppendLine(false); //405:17
-            __out.Append("        <dependencies>"); //406:1
-            __out.AppendLine(false); //406:23
-            __out.Append("            <module name=\"com.h2database.h2\" />"); //407:1
-            __out.AppendLine(false); //407:48
-            __out.Append("			<module name=\"org.eclipse.persistence\" />"); //408:1
-            __out.AppendLine(false); //408:45
-            __out.Append("        </dependencies>"); //409:1
-            __out.AppendLine(false); //409:24
-            __out.Append("    </deployment>"); //410:1
-            __out.AppendLine(false); //410:18
-            __out.Append("</jboss-deployment-structure>"); //411:1
-            __out.AppendLine(false); //411:30
+            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //473:1
+            __out.AppendLine(false); //473:39
+            __out.Append("<jboss-deployment-structure>"); //474:1
+            __out.AppendLine(false); //474:29
+            __out.Append("    <deployment>"); //475:1
+            __out.AppendLine(false); //475:17
+            __out.Append("        <dependencies>"); //476:1
+            __out.AppendLine(false); //476:23
+            __out.Append("            <module name=\"com.h2database.h2\" />"); //477:1
+            __out.AppendLine(false); //477:48
+            __out.Append("			<module name=\"org.eclipse.persistence\" />"); //478:1
+            __out.AppendLine(false); //478:45
+            __out.Append("        </dependencies>"); //479:1
+            __out.AppendLine(false); //479:24
+            __out.Append("    </deployment>"); //480:1
+            __out.AppendLine(false); //480:18
+            __out.Append("</jboss-deployment-structure>"); //481:1
+            __out.AppendLine(false); //481:30
             return __out.ToString();
         }
 
-        public string GenerateAppCtx(Namespace ns) //415:1
+        public string GenerateAppCtx(Namespace ns) //485:1
         {
             StringBuilder __out = new StringBuilder();
-            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //416:1
-            __out.AppendLine(false); //416:39
-            __out.Append("<beans xmlns=\"http://www.springframework.org/schema/beans\""); //417:1
-            __out.AppendLine(false); //417:59
-            __out.Append("       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //418:1
-            __out.AppendLine(false); //418:61
-            __out.Append("       xmlns:context=\"http://www.springframework.org/schema/context\""); //419:1
-            __out.AppendLine(false); //419:69
-            __out.Append("       xmlns:jpa=\"http://www.springframework.org/schema/data/jpa\""); //420:1
-            __out.AppendLine(false); //420:66
-            __out.Append("       xsi:schemaLocation=\"http://www.springframework.org/schema/beans"); //421:1
-            __out.AppendLine(false); //421:71
-            __out.Append("       http://www.springframework.org/schema/beans/spring-beans.xsd"); //422:1
-            __out.AppendLine(false); //422:68
-            __out.Append("       http://www.springframework.org/schema/context"); //423:1
-            __out.AppendLine(false); //423:53
-            __out.Append("       http://www.springframework.org/schema/context/spring-context.xsd"); //424:1
-            __out.AppendLine(false); //424:72
-            __out.Append("       http://www.springframework.org/schema/data/jpa"); //425:1
-            __out.AppendLine(false); //425:54
-            __out.Append("       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd\">"); //426:1
-            __out.AppendLine(false); //426:71
-            __out.AppendLine(true); //427:5
-            string __tmp2Line = "       <jpa:repositories base-package=\""; //428:1
+            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //486:1
+            __out.AppendLine(false); //486:39
+            __out.Append("<beans xmlns=\"http://www.springframework.org/schema/beans\""); //487:1
+            __out.AppendLine(false); //487:59
+            __out.Append("       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //488:1
+            __out.AppendLine(false); //488:61
+            __out.Append("       xmlns:context=\"http://www.springframework.org/schema/context\""); //489:1
+            __out.AppendLine(false); //489:69
+            __out.Append("       xmlns:jpa=\"http://www.springframework.org/schema/data/jpa\""); //490:1
+            __out.AppendLine(false); //490:66
+            __out.Append("       xsi:schemaLocation=\"http://www.springframework.org/schema/beans"); //491:1
+            __out.AppendLine(false); //491:71
+            __out.Append("       http://www.springframework.org/schema/beans/spring-beans.xsd"); //492:1
+            __out.AppendLine(false); //492:68
+            __out.Append("       http://www.springframework.org/schema/context"); //493:1
+            __out.AppendLine(false); //493:53
+            __out.Append("       http://www.springframework.org/schema/context/spring-context.xsd"); //494:1
+            __out.AppendLine(false); //494:72
+            __out.Append("       http://www.springframework.org/schema/data/jpa"); //495:1
+            __out.AppendLine(false); //495:54
+            __out.Append("       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd\">"); //496:1
+            __out.AppendLine(false); //496:71
+            __out.AppendLine(true); //497:5
+            string __tmp2Line = "       <jpa:repositories base-package=\""; //498:1
             if (__tmp2Line != null) __out.Append(__tmp2Line);
             StringBuilder __tmp3 = new StringBuilder();
             __tmp3.Append(ns.FullName.ToLower());
@@ -1880,7 +2074,7 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp3_last) __out.AppendLine(true);
                 }
             }
-            string __tmp4Line = "."; //428:63
+            string __tmp4Line = "."; //498:63
             if (__tmp4Line != null) __out.Append(__tmp4Line);
             StringBuilder __tmp5 = new StringBuilder();
             __tmp5.Append(SpringGeneratorUtil.Properties.repositoryPackage);
@@ -1897,10 +2091,10 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp5_last) __out.AppendLine(true);
                 }
             }
-            string __tmp6Line = "\"/>"; //428:114
+            string __tmp6Line = "\"/>"; //498:114
             if (__tmp6Line != null) __out.Append(__tmp6Line);
-            __out.AppendLine(false); //428:117
-            string __tmp8Line = "       <context:component-scan base-package=\""; //429:1
+            __out.AppendLine(false); //498:117
+            string __tmp8Line = "       <context:component-scan base-package=\""; //499:1
             if (__tmp8Line != null) __out.Append(__tmp8Line);
             StringBuilder __tmp9 = new StringBuilder();
             __tmp9.Append(ns.FullName.ToLower());
@@ -1917,16 +2111,16 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp9_last) __out.AppendLine(true);
                 }
             }
-            string __tmp10Line = "\"/>"; //429:69
+            string __tmp10Line = "\"/>"; //499:69
             if (__tmp10Line != null) __out.Append(__tmp10Line);
-            __out.AppendLine(false); //429:72
-            __out.AppendLine(true); //430:8
-            __out.AppendLine(true); //431:5
-            __out.Append("       <bean id=\"jpaVendorAdapter\" class=\"org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter\"/>"); //432:1
-            __out.AppendLine(false); //432:108
-            __out.Append("       <bean id=\"entityManagerFactory\" class=\"org.springframework.orm.jpa.LocalEntityManagerFactoryBean\">"); //433:1
-            __out.AppendLine(false); //433:106
-            string __tmp12Line = "              <property name=\"persistenceUnitName\" value=\""; //434:1
+            __out.AppendLine(false); //499:72
+            __out.AppendLine(true); //500:8
+            __out.AppendLine(true); //501:5
+            __out.Append("       <bean id=\"jpaVendorAdapter\" class=\"org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter\"/>"); //502:1
+            __out.AppendLine(false); //502:108
+            __out.Append("       <bean id=\"entityManagerFactory\" class=\"org.springframework.orm.jpa.LocalEntityManagerFactoryBean\">"); //503:1
+            __out.AppendLine(false); //503:106
+            string __tmp12Line = "              <property name=\"persistenceUnitName\" value=\""; //504:1
             if (__tmp12Line != null) __out.Append(__tmp12Line);
             StringBuilder __tmp13 = new StringBuilder();
             __tmp13.Append(ns.Name);
@@ -1943,21 +2137,21 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp13_last) __out.AppendLine(true);
                 }
             }
-            string __tmp14Line = "PU\"/>"; //434:68
+            string __tmp14Line = "PU\"/>"; //504:68
             if (__tmp14Line != null) __out.Append(__tmp14Line);
-            __out.AppendLine(false); //434:73
-            __out.Append("              <property name=\"jpaVendorAdapter\" ref=\"jpaVendorAdapter\"/>"); //435:1
-            __out.AppendLine(false); //435:73
-            __out.Append("       </bean>"); //436:1
-            __out.AppendLine(false); //436:15
-            __out.Append("       <bean id=\"transactionManager\" class=\"org.springframework.orm.jpa.JpaTransactionManager\">"); //437:1
-            __out.AppendLine(false); //437:96
-            __out.Append("              <property name=\"entityManagerFactory\" ref=\"entityManagerFactory\"/>"); //438:1
-            __out.AppendLine(false); //438:81
-            __out.Append("       </bean>"); //439:1
-            __out.AppendLine(false); //439:15
-            __out.Append("</beans>"); //440:1
-            __out.AppendLine(false); //440:9
+            __out.AppendLine(false); //504:73
+            __out.Append("              <property name=\"jpaVendorAdapter\" ref=\"jpaVendorAdapter\"/>"); //505:1
+            __out.AppendLine(false); //505:73
+            __out.Append("       </bean>"); //506:1
+            __out.AppendLine(false); //506:15
+            __out.Append("       <bean id=\"transactionManager\" class=\"org.springframework.orm.jpa.JpaTransactionManager\">"); //507:1
+            __out.AppendLine(false); //507:96
+            __out.Append("              <property name=\"entityManagerFactory\" ref=\"entityManagerFactory\"/>"); //508:1
+            __out.AppendLine(false); //508:81
+            __out.Append("       </bean>"); //509:1
+            __out.AppendLine(false); //509:15
+            __out.Append("</beans>"); //510:1
+            __out.AppendLine(false); //510:9
             return __out.ToString();
         }
 
