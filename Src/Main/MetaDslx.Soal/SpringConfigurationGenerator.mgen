@@ -9,14 +9,11 @@ template GeneratePersistence(Namespace ns, List<Struct> entities)
     <persistence-unit name="[ns.Name]PU" transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		^
-		<!-- <jta-data-source>java:jboss/datasources/[ns.Name]DS</jta-data-source> -->
+		<non-jta-data-source>java:jboss/datasources/[ns.Name]DS</non-jta-data-source>
 		^
 	[loop (entity:entities)]
 		<class>[SpringGeneratorUtil.GetPackage(entity)].[SpringGeneratorUtil.Properties.entityPackage].[entity.Name]</class>
 	[end loop]
-	^
-        <class>iit.cinema.status.ReservationStatus</class>
-        <class>iit.cinema.status.SeatStatus</class>
 		^
         <shared-cache-mode>NONE</shared-cache-mode>
 		^
@@ -24,11 +21,6 @@ template GeneratePersistence(Namespace ns, List<Struct> entities)
             <!--for debug-->
             <property name="eclipselink.ddl-generation" value="create-tables"/>
             <!--<property name="eclipselink.logging.level" value="FINE"/>-->
-
-			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem/[ns.Name.ToLower()]"/>
-            <property name="javax.persistence.jdbc.user" value="sa"/>
-            <property name="javax.persistence.jdbc.password" value=""/><!-- sa? -->
         </properties>
     </persistence-unit>
 </persistence>
