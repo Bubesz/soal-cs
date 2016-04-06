@@ -240,30 +240,25 @@ namespace MetaDslx.Soal
                             dependencies.Add(component.Name + "-API");
                         }
 
-                        // generate pom.xml and spring-config.xml
-                        if (component.Name != dataModule)
-                        {
-                            // if uses DB TODO
-                            dependencies.Add(dataModule + "-API");
-                        }
-                        else
+                        if (component.Name == dataModule)
                         {
                             GenerateDataModule(ns, component, innerDir, springClassGen, springConfigGen, generatorUtil, springInterfaceGen, entities, modules);
                         }
 
+                        // generate pom.xml and spring-config.xml
                         createJavaDirectory(ns.Name, component.Name, "", "");
                         string fileName = Path.Combine(ns.Name + "-" + component.Name, "pom.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
                             // bindingsOfModule.HasRestBinding, bindingsOfModule.HasWebServiceBinding, bindingsOfModule.HasWebSocketBinding
-                            string s = springConfigGen.generateComponentPom(ns, component, dependencies, false, false, false);
+                            string s = springConfigGen.GenerateComponentPom(ns, component, dependencies, false, false, false);
                             writer.WriteLine(s);
                         }
 
                         fileName = Path.Combine(ns.Name + "-" + component.Name, this.mvnJavaDir, "spring-config.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
-                            writer.WriteLine(springConfigGen.generateComponentSpringConfig(ns));
+                            writer.WriteLine(springConfigGen.GenerateComponentSpringConfig(ns));
                         }
                     }
 
@@ -274,7 +269,7 @@ namespace MetaDslx.Soal
                         string fileName = Path.Combine(myDirectory, "pom.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
-                            writer.WriteLine(springConfigGen.generateMasterPom(ns, modules));
+                            writer.WriteLine(springConfigGen.GenerateMasterPom(ns, modules));
                         }
                     }
                 }
@@ -298,10 +293,29 @@ namespace MetaDslx.Soal
                             {
                                 if (wire.Target.Equals(serv))
                                 {
-                                    if (!dependencies.Contains(comp.Name))
+                                    List<Binding> bindings = new List<Binding>();
+                                    if (serv.Binding != null)
+                                        bindings.Add(serv.Binding);
+                                    if (reference.Binding != null)
+                                        bindings.Add(reference.Binding);
+                                    BindingTypeHolder binding = CheckForBindings(bindings);
+
+                                    if (binding.hasAnyBinding())
                                     {
-                                        dependencies.Add(comp.Name);
+                                        if (!dependencies.Contains(comp.Name + "-API") && !dependencies.Contains(comp.Name))
+                                        {
+                                            dependencies.Add(comp.Name + "-API");
+                                        }
                                     }
+                                    else
+                                    {
+                                        if (!dependencies.Contains(comp.Name))
+                                        {
+                                            dependencies.Add(comp.Name);
+                                            dependencies.Remove(comp.Name + "-API");
+                                        }
+                                    }
+
                                 }
                             }
                         }
@@ -412,7 +426,7 @@ namespace MetaDslx.Soal
                 writer.WriteLine(springViewGen.GenerateAppCtx(ns));
             }
 
-            // appCtx
+            // servlet
             string servletFile = Path.Combine(webinfDir, "spring-servlet.xml");
             using (StreamWriter writer = new StreamWriter(servletFile))
             {
@@ -429,13 +443,13 @@ namespace MetaDslx.Soal
             string filename = Path.Combine(ns.Name + "-" + component.Name, "pom.xml");
             using (StreamWriter writer = new StreamWriter(filename))
             {
-                writer.WriteLine(springConfigGen.generateDataPom(ns, component.Name));
+                writer.WriteLine(springConfigGen.GenerateDataPom(ns, component.Name));
             }
 
             filename = Path.Combine(ns.Name + "-" + component.Name, this.mvnJavaDir, "spring-config.xml");
             using (StreamWriter writer = new StreamWriter(filename))
             {
-                writer.WriteLine(springConfigGen.generateDataSpringConfig(ns));
+                writer.WriteLine(springConfigGen.GenerateDataSpringConfig(ns));
             }
 
             Service dbService = null;
@@ -446,7 +460,8 @@ namespace MetaDslx.Soal
                     dbService = s;
                 }
             }
-            BindingTypeHolder bindings = CheckForBindings(ns, dbService, dbService.Interface);
+            List<Binding> binds = GetBindings(ns, dbService, dbService.Interface);
+            BindingTypeHolder bindings = CheckForBindings(binds);
 
             //entities
             foreach (Struct entity in entities)
@@ -525,7 +540,7 @@ namespace MetaDslx.Soal
             string filename = Path.Combine(ns.Name + "-Model", "pom.xml");
             using (StreamWriter writer = new StreamWriter(filename))
             {
-                writer.WriteLine(springConfigGen.generateDataPom(ns, "Model"));
+                writer.WriteLine(springConfigGen.GenerateDataPom(ns, "Model"));
             }
 
             // generate persistence.xml
@@ -598,7 +613,8 @@ namespace MetaDslx.Soal
                     writer.WriteLine(springInterfaceGen.GenerateInterfaceImplementation(iface, component.Name.ToLower()));
                 }
 
-                BindingTypeHolder bindingsOfService = CheckForBindings(ns, service, iface);
+                List<Binding> bindings = GetBindings(ns, service, iface);
+                BindingTypeHolder bindingsOfService = CheckForBindings(bindings);
                 CreateBindings(bindingsOfService, springInterfaceGen, component, apiIfDirectory, functionDirectory, iface);
 
                 bindingsOfModule.HasRestBinding         |= bindingsOfService.HasRestBinding;
@@ -627,13 +643,13 @@ namespace MetaDslx.Soal
             {
                 if (component.Name == dataModule)
                 {
-                    writer.WriteLine(springConfigGen.generateDataPom(ns, component.Name + "-API")); // TODO think it through
+                    writer.WriteLine(springConfigGen.GenerateDataPom(ns, component.Name + "-API")); // TODO think it through
                 }
                 else
                 {
                     Component c = new ComponentImpl();
                     c.Name = component.Name + "-API";
-                    string s = springConfigGen.generateComponentPom(ns, c, dependencies,
+                    string s = springConfigGen.GenerateComponentPom(ns, c, dependencies,
                         bindingsOfModule.HasRestBinding, bindingsOfModule.HasWebServiceBinding, bindingsOfModule.HasWebSocketBinding);
                     writer.WriteLine(s);
                 }
@@ -696,18 +712,19 @@ namespace MetaDslx.Soal
             }
         }
 
-        private static BindingTypeHolder CheckForBindings(Namespace ns, Service service, Interface iface)
+        private static BindingTypeHolder CheckForBindings(List<Binding> bindings)
         {
-            BindingTypeHolder bindings = new BindingTypeHolder();
-            foreach (Binding binding in GetBindings(ns, service, iface))
+            BindingTypeHolder result = new BindingTypeHolder();
+
+            foreach (Binding binding in bindings)
             {
                 if (binding.Transport is RestTransportBindingElement)
                 {
-                    bindings.HasRestBinding = true;
+                    result.HasRestBinding = true;
                 }
                 else if (binding.Transport is WebSocketTransportBindingElement)
                 {
-                    bindings.HasWebSocketBinding = true;
+                    result.HasWebSocketBinding = true;
                 }
                 else
                 {
@@ -715,13 +732,13 @@ namespace MetaDslx.Soal
                     {
                         if (encoding is SoapEncodingBindingElement)
                         {
-                            bindings.HasWebServiceBinding = true;
+                            result.HasWebServiceBinding = true;
                         }
                     }
                 }
             }
 
-            return bindings;
+            return result;
         }
 
         private static List<Binding> GetBindings(Namespace ns, Service service, Interface iface)

@@ -50,5 +50,10 @@ namespace MetaDslx.Soal
                 webSocketBinding = value;
             }
         }
+
+        public bool hasAnyBinding()
+        {
+            return HasRestBinding || HasWebServiceBinding || HasWebSocketBinding;
+        }
     }
 }
