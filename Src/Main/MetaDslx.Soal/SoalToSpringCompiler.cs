@@ -497,7 +497,7 @@ namespace MetaDslx.Soal
 
                 if (bindings.HasWebServiceBinding)
                 {
-                    // interface extension goes to API
+                    // interface copy goes to API
                     string interfaceExtFileName = Path.Combine(apiDirectory, entity.Name + "RepositoryWebService.java");
                     using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
                     {
@@ -514,7 +514,7 @@ namespace MetaDslx.Soal
 
                 if (bindings.HasWebSocketBinding)
                 {
-                    // interface extension goes to API
+                    // interface copy goes to API
                     string interfaceExtFileName = Path.Combine(apiDirectory, entity.Name + "RepositoryWebSocket.java");
                     using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
                     {
