@@ -121,6 +121,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 ^
+import cinema.Configuration;
 import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage].[iface.Name][bindingType];
 [SpringGeneratorUtil.GenerateImports(iface, false)]
 ^
@@ -133,6 +134,10 @@ import java.util.stream.Collectors;
 public class [iface.Name][bindingType]Proxy implements [iface.Name][bindingType] {
 ^
 	private RestTemplate restTemplate = new RestTemplate();
+	[string currentComponent = "CinemaWeb"]
+	[string targetComponent = "ReservationLogic"]
+	private String currentComponentName = "Cinema-[currentComponent]";
+    private String targetComponentName = "Cinema-[targetComponent]";
 
 [loop(iface->op:Operations)]
 	^
@@ -150,9 +155,9 @@ public class [iface.Name][bindingType]Proxy implements [iface.Name][bindingType]
 		String url = getUrlOf[op.Name.ToPascalCase()]();
 	[ArrayType array = op.Result.Type as ArrayType]
 	[if (array != null)]
-		[array.InnerType.GetJavaName()]\[\] response = restTemplate.getForObject(url, [array.InnerType.GetJavaName()]\[\].class);
+		[array.InnerType.GetJavaName()]["[]"] response = restTemplate.getForObject(url, [array.InnerType.GetJavaName()]["[]"].class);
 	[else]
-		[op.Result.Type.GetJavaName()]\[\] response = restTemplate.getForObject(url, [op.Result.Type.GetJavaName()]\[\].class);
+		[op.Result.Type.GetJavaName()]["[]"] response = restTemplate.getForObject(url, [op.Result.Type.GetJavaName()]["[]"].class);
 	[end if]
 
 	[if (op.Result.Type.GetJavaName() != "void")]
@@ -173,10 +178,6 @@ public class [iface.Name][bindingType]Proxy implements [iface.Name][bindingType]
 		^
         // eg.: http://127.0.0.2:8080/Cinema-CinemaWeb-1.0/getMoviesFromReservation/
         Link link = linkTo(methodOn(IReservationLogicRest.class).getMoviesFromReservation()).withSelfRel();
-		[string currentComponent = "CinemaWeb"]
-		[string targetComponent = "ReservationLogic"]
-        String currentComponentName = "Cinema-[currentComponent]";
-        String targetComponentName = "Cinema-[targetComponent]";
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
         HttpServletRequest curRequest = ((ServletRequestAttributes) requestAttributes).getRequest();
         String serverName = curRequest.getServerName();
@@ -185,7 +186,7 @@ public class [iface.Name][bindingType]Proxy implements [iface.Name][bindingType]
         // eg.: http://127.0.0.2:8080/Cinema-ReservationLogic-1.0/getMoviesFromReservation/
         String url = link.getHref();
         url = url.replace(serverName, Configuration.getString("[targetComponent][bindingType]Server"));
-        url = url.replace(":" + serverPort, ":" + Configuration.getString([targetComponent][bindingType]Port"));
+        url = url.replace(":" + serverPort, ":" + Configuration.getString("[targetComponent][bindingType]Port"));
         url = url.replace(currentComponentName, targetComponentName);
 		^
         this.urlOf[op.Name.ToPascalCase()] = url;

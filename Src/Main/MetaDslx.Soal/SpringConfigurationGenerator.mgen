@@ -31,6 +31,7 @@ template GenerateMasterPom(Namespace ns, List<string> modules)
 ^
     <properties>
         <springframework.version>4.1.6.RELEASE</springframework.version>
+		<springframework.hateoas.version>0.19.0.RELEASE</springframework.hateoas.version>
 		<springframework.ws.version>2.2.4.RELEASE</springframework.ws.version>
         <spring-data-jpa.version>1.9.0.RELEASE</spring-data-jpa.version>
 		<wsdl4j.version>1.6.3</wsdl4j.version>
@@ -69,7 +70,7 @@ template GenerateMasterPom(Namespace ns, List<string> modules)
 </project>
 end template
 
-template GenerateComponentPom(Namespace ns, Component component, List<string> modules, bool rest, bool webService, bool webSocket)
+template GenerateComponentPom(Namespace ns, Component component, List<string> modules, bool rest, bool webService, bool webSocket, ComponentType cType)
 [GeneratePomStart()]
     <parent>
         <artifactId>[ns.Name]App</artifactId>
@@ -78,7 +79,7 @@ template GenerateComponentPom(Namespace ns, Component component, List<string> mo
     </parent>
 	^
     <artifactId>[ns.Name]-[component.Name]</artifactId>
-	[if (component.Implementation != null && component.Implementation.Name.Equals("JSF"))]
+	[if (cType == ComponentType.WEB || cType == ComponentType.REMOTE)]
 	<packaging>war</packaging>
 	[end if]
 	^
@@ -86,29 +87,44 @@ template GenerateComponentPom(Namespace ns, Component component, List<string> mo
 [loop (module:modules)]
 		[GeneratePomDependency(ns.Name, ns.Name+"-"+module, "1.0", false)]
 [end loop]
+[if (cType == ComponentType.API)]
 ^
 		[GeneratePomDependency("org.springframework", "spring-context", "${springframework.version}", false)]
+[end if]
 [if (rest)]
+^
 		<!-- for rest -->
 		[GeneratePomDependency("org.springframework", "spring-webmvc", "${springframework.version}", false)]
 [end if]
 [if (webService)]
+^
 		<!-- for SOAP -->
 		[GeneratePomDependency("org.springframework.ws", "spring-ws-core", "${springframework.ws.version}", false)]
 		[GeneratePomDependency("wsdl4j", "wsdl4j", "${wsdl4j.version}", false)]
 [end if]
 [if (webSocket)]
+^
 		<!-- for web socket -->
 		[GeneratePomDependency("org.springframework", "spring-messaging", "${springframework.version}", false)]
 [end if]
-[if (component.Implementation != null && component.Implementation.Name.Equals("JSF"))]
+[if (cType == ComponentType.WEB || cType == ComponentType.REMOTE)]
+^
 		<!-- web -->
 		[GeneratePomDependency("org.springframework", "spring-web", "${springframework.version}", false)]
 		[GeneratePomDependency("org.springframework", "spring-webmvc", "${springframework.version}", false)]
-		^
+	[if (cType == ComponentType.WEB)]
+^
 		<!-- thymeleaf -->
 		[GeneratePomDependency("org.thymeleaf", "thymeleaf", "${thymeleaf.version}", false)]
 		[GeneratePomDependency("org.thymeleaf", "thymeleaf-spring4", "${thymeleaf.version}", false)]
+	[end if]
+[end if]
+
+[if (cType == ComponentType.WEB || cType == ComponentType.IMPLEMENTATION)]
+	[if (rest)]
+		[GeneratePomDependency("org.springframework.hateoas", "spring-hateoas", "${springframework.hateoas.version}", false)]
+		[GeneratePomDependency("javax.servlet", "javax.servlet-api", "3.1.0", true)]
+	[end if]
 [end if]
     </dependencies>
 </project>
@@ -159,29 +175,6 @@ template GenerateComponentSpringConfig(Namespace ns)
 </beans>
 end template
 
-template GenerateDataSpringConfig(Namespace ns)
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/data/jpa
-       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
-	   ^
-       <jpa:repositories base-package="[ns.FullName.ToLower()].[SpringGeneratorUtil.Properties.repositoryPackage]"/>
-       ^
-       <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter"/>
-       <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
-              <property name="persistenceUnitName" value="[ns.Name]PU"/>
-              <property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
-       </bean>
-       <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-              <property name="entityManagerFactory" ref="entityManagerFactory"/>
-       </bean>
-</beans>
-end template
-
 
 
 template GeneratePomStart()
@@ -204,4 +197,38 @@ template GeneratePomDependency(string group, string artifact, string version, bo
 	<scope>provided</scope>
 	[end if]
 </dependency>
+end template
+
+
+
+template GenerateConfigClass(Namespace ns)
+package [ns.FullName.ToLower()];
+^
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+^
+public class Configuration {
+	private static final String BUNDLE_NAME = "[ns.FullName.ToLower()].configuration";
+	^
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+	^
+	private Configuration() {
+	}
+	^
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
+		}
+	}
+}
+end template
+
+
+
+template GenerateConfig(Dictionary<string, string> properties)
+	[loop(keyValue : properties)]
+[keyValue.Key]=[keyValue.Value]
+	[end loop]
 end template

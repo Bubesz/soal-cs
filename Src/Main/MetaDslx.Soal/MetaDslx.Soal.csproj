@@ -43,6 +43,7 @@
     <Reference Include="Antlr4.Runtime" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentType.cs" />
     <Compile Include="SpringViewGenerator1.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

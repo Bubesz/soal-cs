@@ -192,12 +192,6 @@ namespace MetaDslx.Soal
                         entities.AddRange(db.Entities);
                     }
 
-                    if (entities.Any() || ns.Declarations.OfType<Enum>().Any())
-                    {
-                        modules.Add("Model");
-                        GenerateModelModule(ns, entities, innerDir, springClassGen, springConfigGen, generatorUtil);
-                    }
-
                     List<Wire> wires = new List<Wire>();
 
                     foreach (Composite comppsoite in ns.Declarations.OfType<Composite>())
@@ -208,21 +202,25 @@ namespace MetaDslx.Soal
                         }
                     }
 
+                    Dictionary<string, string> properties = new Dictionary<string, string>();
                     foreach (Component component in ns.Declarations.OfType<Component>())
                     {
                         modules.Add(component.Name);
+                        ComponentType cType = ComponentType.IMPLEMENTATION;
 
                         List<string> dependencies = GetherDependencies(ns, wires, component);
+                        bool directDataAcess = dependencies.Contains(dataModule);
 
                         if (component.Services.Any())
                         {
-                            GenerateServiceImplementations(ns, innerDir, springInterfaceGen, springClassGen, springConfigGen, generatorUtil, modules, dataModule, component, dependencies);
+                            GenerateServiceImplementations(ns, innerDir, springInterfaceGen, springClassGen, springConfigGen, springViewGen, generatorUtil, modules, dataModule, component, dependencies);
                         }
                         else
                         {
                             if (component.Implementation != null && component.Implementation.Name.Equals("JSF"))
                             {
-                                GenerateWebTier(ns, innerDir, springViewGen, generatorUtil, component);
+                                cType = ComponentType.WEB;
+                                GenerateWebTier(ns, innerDir, springViewGen, generatorUtil, component, directDataAcess);
                             }
                             if (component is Composite)
                             {
@@ -234,10 +232,10 @@ namespace MetaDslx.Soal
                                 }
                             }
                         }
-
-                        if (component.Services.Any())
+                        BindingTypeHolder clientFor = new BindingTypeHolder();
+                        if (component.References.Any())
                         {
-                            dependencies.Add(component.Name + "-API");
+                            clientFor = GenerateReferenceAccessors(ns, innerDir, component, dependencies, properties, springInterfaceGen);
                         }
 
                         if (component.Name == dataModule)
@@ -250,8 +248,8 @@ namespace MetaDslx.Soal
                         string fileName = Path.Combine(ns.Name + "-" + component.Name, "pom.xml");
                         using (StreamWriter writer = new StreamWriter(fileName))
                         {
-                            // bindingsOfModule.HasRestBinding, bindingsOfModule.HasWebServiceBinding, bindingsOfModule.HasWebSocketBinding
-                            string s = springConfigGen.GenerateComponentPom(ns, component, dependencies, false, false, false);
+                            string s = springConfigGen.GenerateComponentPom(ns, component, dependencies,
+                                clientFor.HasRestBinding, clientFor.HasWebServiceBinding, clientFor.HasWebSocketBinding, cType);
                             writer.WriteLine(s);
                         }
 
@@ -262,12 +260,16 @@ namespace MetaDslx.Soal
                         }
                     }
 
+                    if (entities.Any() || ns.Declarations.OfType<Enum>().Any())
+                    {
+                        modules.Add("Model");
+                        GenerateModelModule(ns, entities, innerDir, properties, springClassGen, springConfigGen, generatorUtil);
+                    }
+
                     // generate master pom.xml
                     if (modules.Any())
                     {
-                        string myDirectory = "";
-                        string fileName = Path.Combine(myDirectory, "pom.xml");
-                        using (StreamWriter writer = new StreamWriter(fileName))
+                        using (StreamWriter writer = new StreamWriter("pom.xml"))
                         {
                             writer.WriteLine(springConfigGen.GenerateMasterPom(ns, modules));
                         }
@@ -282,6 +284,7 @@ namespace MetaDslx.Soal
             List<string> dependencies = new List<string>();
             foreach (Reference reference in component.References)
             {
+                bool referenceStatisfied = false;
                 foreach (Wire wire in wires)
                 {
                     // Component comp = (Component)((ModelObject)port).MParent;
@@ -293,30 +296,23 @@ namespace MetaDslx.Soal
                             {
                                 if (wire.Target.Equals(serv))
                                 {
-                                    List<Binding> bindings = new List<Binding>();
-                                    if (serv.Binding != null)
-                                        bindings.Add(serv.Binding);
-                                    if (reference.Binding != null)
-                                        bindings.Add(reference.Binding);
-                                    BindingTypeHolder binding = CheckForBindings(bindings);
-
-                                    if (binding.hasAnyBinding())
-                                    {
-                                        if (!dependencies.Contains(comp.Name + "-API") && !dependencies.Contains(comp.Name))
-                                        {
-                                            dependencies.Add(comp.Name + "-API");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (!dependencies.Contains(comp.Name))
-                                        {
-                                            dependencies.Add(comp.Name);
-                                            dependencies.Remove(comp.Name + "-API");
-                                        }
-                                    }
+                                    referenceStatisfied = true;
+                                    AddDependecy(dependencies, reference, comp, serv);
 
                                 }
+                            }
+                        }
+                    }
+                }
+                if (!referenceStatisfied)
+                {
+                    foreach (Component comp in ns.Declarations.OfType<Component>())
+                    {
+                        foreach (Service serv in comp.Services)
+                        {
+                            if (serv.Interface.Equals(reference.Interface))
+                            {
+                                AddDependecy(dependencies, reference, comp, serv);
                             }
                         }
                     }
@@ -325,7 +321,33 @@ namespace MetaDslx.Soal
             return dependencies;
         }
 
-        private void GenerateWebTier(Namespace ns, string innerDir, SpringViewGenerator springViewGen, SpringGeneratorUtil generatorUtil, Component component)
+        private static void AddDependecy(List<string> dependencies, Reference reference, Component comp, Service serv)
+        {
+            List<Binding> bindings = new List<Binding>();
+            if (serv.Binding != null)
+                bindings.Add(serv.Binding);
+            if (reference.Binding != null)
+                bindings.Add(reference.Binding);
+            BindingTypeHolder binding = CheckForBindings(bindings);
+
+            if (binding.hasAnyBinding())
+            {
+                if (!dependencies.Contains(comp.Name + "-API") && !dependencies.Contains(comp.Name))
+                {
+                    dependencies.Add(comp.Name + "-API");
+                }
+            }
+            else
+            {
+                if (!dependencies.Contains(comp.Name))
+                {
+                    dependencies.Add(comp.Name);
+                    dependencies.Remove(comp.Name + "-API");
+                }
+            }
+        }
+
+        private void GenerateWebTier(Namespace ns, string innerDir, SpringViewGenerator springViewGen, SpringGeneratorUtil generatorUtil, Component component, bool directDataAcess)
         {
             string contollerDir = createJavaDirectory(ns.Name, component.Name, innerDir, generatorUtil.Properties.controllerPackage);
             string viewDir = createWebDirectory(ns.Name, component.Name, "view");
@@ -409,7 +431,7 @@ namespace MetaDslx.Soal
             string webxmlFile = Path.Combine(webinfDir, "web.xml");
             using (StreamWriter writer = new StreamWriter(webxmlFile))
             {
-                writer.WriteLine(springViewGen.GenerateWebXml());
+                writer.WriteLine(springViewGen.GenerateWebXml(ComponentType.WEB));
             }
 
             // deployment-struture
@@ -423,14 +445,14 @@ namespace MetaDslx.Soal
             string ctxFile = Path.Combine(webinfDir, "applicationContext.xml");
             using (StreamWriter writer = new StreamWriter(ctxFile))
             {
-                writer.WriteLine(springViewGen.GenerateAppCtx(ns));
+                writer.WriteLine(springViewGen.GenerateAppCtx(ns, directDataAcess));
             }
 
             // servlet
             string servletFile = Path.Combine(webinfDir, "spring-servlet.xml");
             using (StreamWriter writer = new StreamWriter(servletFile))
             {
-                writer.WriteLine(springViewGen.GenerateServlet(ns));
+                writer.WriteLine(springViewGen.GenerateServlet(ns, ComponentType.WEB));
             }
         }
 
@@ -444,12 +466,6 @@ namespace MetaDslx.Soal
             using (StreamWriter writer = new StreamWriter(filename))
             {
                 writer.WriteLine(springConfigGen.GenerateDataPom(ns, component.Name));
-            }
-
-            filename = Path.Combine(ns.Name + "-" + component.Name, this.mvnJavaDir, "spring-config.xml");
-            using (StreamWriter writer = new StreamWriter(filename))
-            {
-                writer.WriteLine(springConfigGen.GenerateDataSpringConfig(ns));
             }
 
             Service dbService = null;
@@ -532,10 +548,10 @@ namespace MetaDslx.Soal
              
         }
 
-        private void GenerateModelModule(Namespace ns, List<Struct> entities, string innerDir, SpringClassGenerator springClassGen,
-            SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil)
+        private void GenerateModelModule(Namespace ns, List<Struct> entities, string innerDir, Dictionary<string, string> properties,
+            SpringClassGenerator springClassGen, SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil)
         {
-            createJavaDirectory(ns.Name, "Model", "", "");
+            string baseJavaDir = createJavaDirectory(ns.Name, "Model", innerDir, "");
             //pom.xml
             string filename = Path.Combine(ns.Name + "-Model", "pom.xml");
             using (StreamWriter writer = new StreamWriter(filename))
@@ -580,11 +596,26 @@ namespace MetaDslx.Soal
 
                 }
             }
+
+            // manual config
+            string dir = Path.Combine(ns.Name + "-Model", "src", "main", "resources");
+            Directory.CreateDirectory(dir); // TODO make new method
+            filename = Path.Combine(dir, "configuration.properties");
+            using (StreamWriter writer = new StreamWriter(filename))
+            {
+                writer.WriteLine(springConfigGen.GenerateConfig(properties));
+            }
+
+            filename = Path.Combine(baseJavaDir, "Configuration.java");
+            using (StreamWriter writer = new StreamWriter(filename))
+            {
+                writer.WriteLine(springConfigGen.GenerateConfigClass(ns));
+            }
         }
 
         private void GenerateServiceImplementations(Namespace ns, string innerDir,
             SpringInterfaceGenerator springInterfaceGen, SpringClassGenerator springClassGen,
-            SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil,
+            SpringConfigurationGenerator springConfigGen, SpringViewGenerator springViewGen, SpringGeneratorUtil generatorUtil,
             List<string> modules, string dataModule, Component component, List<string> dependencies)
         {
             modules.Add(component.Name + "-API");
@@ -636,25 +667,114 @@ namespace MetaDslx.Soal
             }
 
             // pom.xml of API
-            dependencies.Add("Model");
+            List<string> apiDependencies = new List<string>(dependencies);
+            apiDependencies.Add("Model");
             createJavaDirectory(ns.Name, component.Name + "-API", "", "");
             string fileName = Path.Combine(ns.Name + "-" + component.Name + "-API", "pom.xml");
             using (StreamWriter writer = new StreamWriter(fileName))
             {
                 if (component.Name == dataModule)
                 {
-                    writer.WriteLine(springConfigGen.GenerateDataPom(ns, component.Name + "-API")); // TODO think it through
+                    // TODO think it through (what is needed in data-api pom, where do i generate it, etc)
+                    writer.WriteLine(springConfigGen.GenerateDataPom(ns, component.Name + "-API"));
                 }
                 else
                 {
+                    apiDependencies.Remove(dataModule);
+                    apiDependencies.Remove(dataModule + "-API");
                     Component c = new ComponentImpl();
                     c.Name = component.Name + "-API";
                     string s = springConfigGen.GenerateComponentPom(ns, c, dependencies,
-                        bindingsOfModule.HasRestBinding, bindingsOfModule.HasWebServiceBinding, bindingsOfModule.HasWebSocketBinding);
+                        bindingsOfModule.HasRestBinding, bindingsOfModule.HasWebServiceBinding, bindingsOfModule.HasWebSocketBinding, ComponentType.API);
                     writer.WriteLine(s);
                 }
             }
-            dependencies.Remove("Model");
+            dependencies.Add(component.Name + "-API");
+
+            if (bindingsOfModule.hasAnyBinding())
+            {
+                // generate web tier for remote access
+                Component c = new ComponentImpl();
+                c.Name = component.Name + "-WEB";
+                modules.Add(c.Name);
+
+                List<string> deps = new List<string>();
+                deps.Add(component.Name + "-API");
+                createJavaDirectory(ns.Name, c.Name, "", "");
+                fileName = Path.Combine(ns.Name + "-" + c.Name, "pom.xml");
+                using (StreamWriter writer = new StreamWriter(fileName))
+                {
+                    writer.WriteLine(springConfigGen.GenerateComponentPom(ns, c, deps, false, false, false, ComponentType.REMOTE));
+                }
+
+                // web.xml
+                string webinfDir = createWebDirectory(ns.Name, c.Name, "");
+                string webxmlFile = Path.Combine(webinfDir, "web.xml");
+                using (StreamWriter writer = new StreamWriter(webxmlFile))
+                {
+                    writer.WriteLine(springViewGen.GenerateWebXml(ComponentType.REMOTE));
+                }
+
+                // deployment-struture
+                string jbossFile = Path.Combine(webinfDir, "jboss-deployment-structure.xml");
+                using (StreamWriter writer = new StreamWriter(jbossFile))
+                {
+                    writer.WriteLine(springViewGen.GenerateJboss());
+                }
+
+                // appCtx
+                string ctxFile = Path.Combine(webinfDir, "applicationContext.xml");
+                using (StreamWriter writer = new StreamWriter(ctxFile))
+                {
+                    writer.WriteLine(springViewGen.GenerateAppCtx(ns, dependencies.Contains(dataModule)));
+                }
+
+                // servlet
+                string servletFile = Path.Combine(webinfDir, "spring-servlet.xml");
+                using (StreamWriter writer = new StreamWriter(servletFile))
+                {
+                    writer.WriteLine(springViewGen.GenerateServlet(ns, ComponentType.REMOTE));
+                }
+            }
+        }
+
+        private BindingTypeHolder GenerateReferenceAccessors(Namespace ns, string innerDir, Component component, List<string> dependencies, Dictionary<string, string> properties, SpringInterfaceGenerator springInterfaceGen)
+        {
+            BindingTypeHolder clientFor = new BindingTypeHolder();
+            foreach (Reference reference in component.References)
+            {
+                if (reference.Interface is Database)
+                {
+                    continue;
+                }
+                List<Binding> binds = GetBindings(ns, reference, reference.Interface);
+                BindingTypeHolder binding = CheckForBindings(binds);
+                if (binding.HasRestBinding)
+                {
+                    clientFor.HasRestBinding = true;
+                    KeyValuePair<string, string> keyValue;
+                    keyValue = new KeyValuePair<string, string>(reference.Interface.Name + "RestServer", "localhost");
+                    if (!properties.Contains(keyValue))
+                    {
+                        properties.Add(keyValue.Key, keyValue.Value);
+                    }
+                    keyValue = new KeyValuePair<string, string>(reference.Interface.Name + "RestPort", "8080");
+                    if (!properties.Contains(keyValue))
+                    {
+                        properties.Add(keyValue.Key, keyValue.Value);
+                    }
+
+                    string proxyDir = createJavaDirectory(ns.Name, component.Name, innerDir, "proxy");
+                    string accessorFile = Path.Combine(proxyDir, reference.Interface.Name+"RestProxy.java");
+                    using (StreamWriter writer = new StreamWriter(accessorFile))
+                    {
+                        writer.WriteLine(springInterfaceGen.GenerateProxyForInterface(reference.Interface, component.Name.ToLower(), "Rest"));
+                    }
+                }
+                // TODO Ws & Ws
+            }
+
+            return clientFor;
         }
 
         private static void CreateBindings(BindingTypeHolder bindings, SpringInterfaceGenerator springInterfaceGen,
@@ -741,13 +861,13 @@ namespace MetaDslx.Soal
             return result;
         }
 
-        private static List<Binding> GetBindings(Namespace ns, Service service, Interface iface)
+        private static List<Binding> GetBindings(Namespace ns, Port interfaceReference, Interface iface)
         {
             HashSet<Binding> bindings = new HashSet<Binding>();
 
-            if (service.Binding != null)
+            if (interfaceReference.Binding != null)
             {
-                bindings.Add(service.Binding);
+                bindings.Add(interfaceReference.Binding);
             }
 
             foreach (Composite composite in ns.Declarations.OfType<Composite>())
@@ -755,11 +875,11 @@ namespace MetaDslx.Soal
                 foreach (Wire wire in composite.Wires)
                 {
                     Port port = null;
-                    if (wire.Source.Equals(service))
+                    if (wire.Source.Equals(interfaceReference))
                     {
                         port = wire.Target;
                     }
-                    if (wire.Target.Equals(service))
+                    if (wire.Target.Equals(interfaceReference))
                     {
                         port = wire.Source;
                     }
@@ -790,6 +910,7 @@ namespace MetaDslx.Soal
             return new List<Binding>(bindings);
         }
 
+        // TODO use Namespace inst of Ns.Name
         private string createJavaDirectory(string namespaceName, string projectSuffix, string innerDir, string subDir)
         {
             string projectDir = "";

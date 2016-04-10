@@ -378,7 +378,7 @@ end template
 
 
 
-template GenerateWebXml()
+template GenerateWebXml(ComponentType cType)
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -399,6 +399,7 @@ template GenerateWebXml()
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
+[if (cType == ComponentType.WEB)]
 ^
     <filter>
         <filter-name>characterEncodingFilter</filter-name>
@@ -413,12 +414,13 @@ template GenerateWebXml()
         <filter-name>characterEncodingFilter</filter-name>
         <servlet-name>spring</servlet-name>
     </filter-mapping>
+[end if]
 ^
 </web-app>
 end template
 
 
-template GenerateServlet(Namespace ns)
+template GenerateServlet(Namespace ns, ComponentType cType)
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
@@ -434,6 +436,7 @@ template GenerateServlet(Namespace ns)
     <context:component-scan base-package="[ns.FullName.ToLower()].[SpringGeneratorUtil.Properties.controllerPackage]"/>
 ^
     <mvc:annotation-driven/>
+[if (cType == ComponentType.WEB)]
 ^
     <!--<mvc:resources mapping="/favicon.ico" location="/WEB-INF/resources/img/"/>-->
     <mvc:resources mapping="/resources/**" location="/WEB-INF/resources/"/>
@@ -463,6 +466,7 @@ template GenerateServlet(Namespace ns)
     </bean>
 ^
     <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"/>
+[end if]
 ^
 </beans>
 end template
@@ -482,7 +486,7 @@ template GenerateJboss()
 end template
 
 
-template GenerateAppCtx(Namespace ns)
+template GenerateAppCtx(Namespace ns, bool hasDirectDataLink)
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -495,9 +499,10 @@ template GenerateAppCtx(Namespace ns)
        http://www.springframework.org/schema/data/jpa
        http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
 	   ^
-       <jpa:repositories base-package="[ns.FullName.ToLower()].[SpringGeneratorUtil.Properties.repositoryPackage]"/>
        <context:component-scan base-package="[ns.FullName.ToLower()]"/>
-       ^
+[if (hasDirectDataLink)]
+	   ^
+       <jpa:repositories base-package="[ns.FullName.ToLower()].[SpringGeneratorUtil.Properties.repositoryPackage]"/>
 	   ^
        <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter"/>
        <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
@@ -507,5 +512,7 @@ template GenerateAppCtx(Namespace ns)
        <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
               <property name="entityManagerFactory" ref="entityManagerFactory"/>
        </bean>
+[end if]
+^
 </beans>
 end template

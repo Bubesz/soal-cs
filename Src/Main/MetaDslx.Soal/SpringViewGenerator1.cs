@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringViewGenerator_418060360;
-    namespace __Hidden_SpringViewGenerator_418060360
+    using __Hidden_SpringViewGenerator_1334591793;
+    namespace __Hidden_SpringViewGenerator_1334591793
     {
         internal static class __Extensions
         {
@@ -1811,7 +1811,7 @@ namespace MetaDslx.Soal //1:1
             return __out.ToString();
         }
 
-        public string GenerateWebXml() //381:1
+        public string GenerateWebXml(ComponentType cType) //381:1
         {
             StringBuilder __out = new StringBuilder();
             __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //382:1
@@ -1851,65 +1851,68 @@ namespace MetaDslx.Soal //1:1
             __out.AppendLine(false); //400:95
             __out.Append("    </listener>"); //401:1
             __out.AppendLine(false); //401:16
-            __out.AppendLine(true); //402:1
-            __out.Append("    <filter>"); //403:1
-            __out.AppendLine(false); //403:13
-            __out.Append("        <filter-name>characterEncodingFilter</filter-name>"); //404:1
-            __out.AppendLine(false); //404:59
-            __out.Append("        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>"); //405:1
-            __out.AppendLine(false); //405:92
-            __out.Append("        <init-param>"); //406:1
-            __out.AppendLine(false); //406:21
-            __out.Append("            <param-name>encoding</param-name>"); //407:1
-            __out.AppendLine(false); //407:46
-            __out.Append("            <param-value>UTF-8</param-value>"); //408:1
-            __out.AppendLine(false); //408:45
-            __out.Append("        </init-param>"); //409:1
-            __out.AppendLine(false); //409:22
-            __out.Append("    </filter>"); //410:1
-            __out.AppendLine(false); //410:14
-            __out.AppendLine(true); //411:1
-            __out.Append("    <filter-mapping>"); //412:1
-            __out.AppendLine(false); //412:21
-            __out.Append("        <filter-name>characterEncodingFilter</filter-name>"); //413:1
-            __out.AppendLine(false); //413:59
-            __out.Append("        <servlet-name>spring</servlet-name>"); //414:1
-            __out.AppendLine(false); //414:44
-            __out.Append("    </filter-mapping>"); //415:1
-            __out.AppendLine(false); //415:22
-            __out.AppendLine(true); //416:1
-            __out.Append("</web-app>"); //417:1
-            __out.AppendLine(false); //417:11
+            if (cType == ComponentType.WEB) //402:2
+            {
+                __out.AppendLine(true); //403:1
+                __out.Append("    <filter>"); //404:1
+                __out.AppendLine(false); //404:13
+                __out.Append("        <filter-name>characterEncodingFilter</filter-name>"); //405:1
+                __out.AppendLine(false); //405:59
+                __out.Append("        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>"); //406:1
+                __out.AppendLine(false); //406:92
+                __out.Append("        <init-param>"); //407:1
+                __out.AppendLine(false); //407:21
+                __out.Append("            <param-name>encoding</param-name>"); //408:1
+                __out.AppendLine(false); //408:46
+                __out.Append("            <param-value>UTF-8</param-value>"); //409:1
+                __out.AppendLine(false); //409:45
+                __out.Append("        </init-param>"); //410:1
+                __out.AppendLine(false); //410:22
+                __out.Append("    </filter>"); //411:1
+                __out.AppendLine(false); //411:14
+                __out.AppendLine(true); //412:1
+                __out.Append("    <filter-mapping>"); //413:1
+                __out.AppendLine(false); //413:21
+                __out.Append("        <filter-name>characterEncodingFilter</filter-name>"); //414:1
+                __out.AppendLine(false); //414:59
+                __out.Append("        <servlet-name>spring</servlet-name>"); //415:1
+                __out.AppendLine(false); //415:44
+                __out.Append("    </filter-mapping>"); //416:1
+                __out.AppendLine(false); //416:22
+            }
+            __out.AppendLine(true); //418:1
+            __out.Append("</web-app>"); //419:1
+            __out.AppendLine(false); //419:11
             return __out.ToString();
         }
 
-        public string GenerateServlet(Namespace ns) //421:1
+        public string GenerateServlet(Namespace ns, ComponentType cType) //423:1
         {
             StringBuilder __out = new StringBuilder();
-            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //422:1
-            __out.AppendLine(false); //422:39
-            __out.Append("<beans xmlns=\"http://www.springframework.org/schema/beans\""); //423:1
-            __out.AppendLine(false); //423:59
-            __out.Append("       xmlns:mvc=\"http://www.springframework.org/schema/mvc\""); //424:1
-            __out.AppendLine(false); //424:61
-            __out.Append("       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //425:1
-            __out.AppendLine(false); //425:61
-            __out.Append("       xmlns:context=\"http://www.springframework.org/schema/context\""); //426:1
-            __out.AppendLine(false); //426:69
-            __out.Append("       xsi:schemaLocation=\"http://www.springframework.org/schema/beans"); //427:1
-            __out.AppendLine(false); //427:71
-            __out.Append("                           http://www.springframework.org/schema/beans/spring-beans.xsd"); //428:1
-            __out.AppendLine(false); //428:88
-            __out.Append("                           http://www.springframework.org/schema/context"); //429:1
-            __out.AppendLine(false); //429:73
-            __out.Append("                           http://www.springframework.org/schema/context/spring-context.xsd"); //430:1
-            __out.AppendLine(false); //430:92
-            __out.Append("                           http://www.springframework.org/schema/mvc"); //431:1
-            __out.AppendLine(false); //431:69
-            __out.Append("                           http://www.springframework.org/schema/mvc/spring-mvc.xsd\">"); //432:1
-            __out.AppendLine(false); //432:86
-            __out.AppendLine(true); //433:1
-            string __tmp2Line = "    <context:component-scan base-package=\""; //434:1
+            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //424:1
+            __out.AppendLine(false); //424:39
+            __out.Append("<beans xmlns=\"http://www.springframework.org/schema/beans\""); //425:1
+            __out.AppendLine(false); //425:59
+            __out.Append("       xmlns:mvc=\"http://www.springframework.org/schema/mvc\""); //426:1
+            __out.AppendLine(false); //426:61
+            __out.Append("       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //427:1
+            __out.AppendLine(false); //427:61
+            __out.Append("       xmlns:context=\"http://www.springframework.org/schema/context\""); //428:1
+            __out.AppendLine(false); //428:69
+            __out.Append("       xsi:schemaLocation=\"http://www.springframework.org/schema/beans"); //429:1
+            __out.AppendLine(false); //429:71
+            __out.Append("                           http://www.springframework.org/schema/beans/spring-beans.xsd"); //430:1
+            __out.AppendLine(false); //430:88
+            __out.Append("                           http://www.springframework.org/schema/context"); //431:1
+            __out.AppendLine(false); //431:73
+            __out.Append("                           http://www.springframework.org/schema/context/spring-context.xsd"); //432:1
+            __out.AppendLine(false); //432:92
+            __out.Append("                           http://www.springframework.org/schema/mvc"); //433:1
+            __out.AppendLine(false); //433:69
+            __out.Append("                           http://www.springframework.org/schema/mvc/spring-mvc.xsd\">"); //434:1
+            __out.AppendLine(false); //434:86
+            __out.AppendLine(true); //435:1
+            string __tmp2Line = "    <context:component-scan base-package=\""; //436:1
             if (__tmp2Line != null) __out.Append(__tmp2Line);
             StringBuilder __tmp3 = new StringBuilder();
             __tmp3.Append(ns.FullName.ToLower());
@@ -1926,7 +1929,7 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp3_last) __out.AppendLine(true);
                 }
             }
-            string __tmp4Line = "."; //434:66
+            string __tmp4Line = "."; //436:66
             if (__tmp4Line != null) __out.Append(__tmp4Line);
             StringBuilder __tmp5 = new StringBuilder();
             __tmp5.Append(SpringGeneratorUtil.Properties.controllerPackage);
@@ -1943,121 +1946,124 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp5_last) __out.AppendLine(true);
                 }
             }
-            string __tmp6Line = "\"/>"; //434:117
+            string __tmp6Line = "\"/>"; //436:117
             if (__tmp6Line != null) __out.Append(__tmp6Line);
-            __out.AppendLine(false); //434:120
-            __out.AppendLine(true); //435:1
-            __out.Append("    <mvc:annotation-driven/>"); //436:1
-            __out.AppendLine(false); //436:29
+            __out.AppendLine(false); //436:120
             __out.AppendLine(true); //437:1
-            __out.Append("    <!--<mvc:resources mapping=\"/favicon.ico\" location=\"/WEB-INF/resources/img/\"/>-->"); //438:1
-            __out.AppendLine(false); //438:86
-            __out.Append("    <mvc:resources mapping=\"/resources/**\" location=\"/WEB-INF/resources/\"/>"); //439:1
-            __out.AppendLine(false); //439:76
-            __out.AppendLine(true); //440:1
-            __out.Append("    <mvc:interceptors>"); //441:1
-            __out.AppendLine(false); //441:23
-            __out.Append("        <bean class=\"org.springframework.web.servlet.i18n.LocaleChangeInterceptor\">"); //442:1
-            __out.AppendLine(false); //442:84
-            __out.Append("            <property name=\"paramName\" value=\"lang\"/>"); //443:1
-            __out.AppendLine(false); //443:54
-            __out.Append("        </bean>"); //444:1
-            __out.AppendLine(false); //444:16
-            __out.Append("    </mvc:interceptors>"); //445:1
-            __out.AppendLine(false); //445:24
-            __out.AppendLine(true); //446:1
-            __out.Append("    <bean id=\"templateResolver\" class=\"org.thymeleaf.templateresolver.ServletContextTemplateResolver\">"); //447:1
-            __out.AppendLine(false); //447:103
-            __out.Append("        <property name=\"prefix\" value=\"/WEB-INF/view/\"/>"); //448:1
-            __out.AppendLine(false); //448:57
-            __out.Append("        <property name=\"suffix\" value=\".html\"/>"); //449:1
-            __out.AppendLine(false); //449:48
-            __out.Append("        <property name=\"characterEncoding\" value=\"UTF-8\"/>"); //450:1
-            __out.AppendLine(false); //450:59
-            __out.Append("        <property name=\"templateMode\" value=\"HTML5\"/>"); //451:1
-            __out.AppendLine(false); //451:54
-            __out.Append("        <property name=\"cacheable\" value=\"false\"/>"); //452:1
-            __out.AppendLine(false); //452:51
-            __out.Append("    </bean>"); //453:1
-            __out.AppendLine(false); //453:12
-            __out.AppendLine(true); //454:1
-            __out.Append("    <bean id=\"templateEngine\" class=\"org.thymeleaf.spring4.SpringTemplateEngine\">"); //455:1
-            __out.AppendLine(false); //455:82
-            __out.Append("        <property name=\"templateResolver\" ref=\"templateResolver\"/>"); //456:1
-            __out.AppendLine(false); //456:67
-            __out.Append("    </bean>"); //457:1
-            __out.AppendLine(false); //457:12
-            __out.AppendLine(true); //458:1
-            __out.Append("    <bean class=\"org.thymeleaf.spring4.view.ThymeleafViewResolver\">"); //459:1
-            __out.AppendLine(false); //459:68
-            __out.Append("        <property name=\"templateEngine\" ref=\"templateEngine\"/>"); //460:1
-            __out.AppendLine(false); //460:63
-            __out.Append("        <property name=\"contentType\" value=\"text/html; charset=UTF-8\"/>"); //461:1
-            __out.AppendLine(false); //461:72
-            __out.Append("        <property name=\"characterEncoding\" value=\"UTF-8\"/>"); //462:1
-            __out.AppendLine(false); //462:59
-            __out.Append("    </bean>"); //463:1
-            __out.AppendLine(false); //463:12
-            __out.AppendLine(true); //464:1
-            __out.Append("    <bean id=\"localeResolver\" class=\"org.springframework.web.servlet.i18n.SessionLocaleResolver\"/>"); //465:1
-            __out.AppendLine(false); //465:99
-            __out.AppendLine(true); //466:1
-            __out.Append("</beans>"); //467:1
-            __out.AppendLine(false); //467:9
+            __out.Append("    <mvc:annotation-driven/>"); //438:1
+            __out.AppendLine(false); //438:29
+            if (cType == ComponentType.WEB) //439:2
+            {
+                __out.AppendLine(true); //440:1
+                __out.Append("    <!--<mvc:resources mapping=\"/favicon.ico\" location=\"/WEB-INF/resources/img/\"/>-->"); //441:1
+                __out.AppendLine(false); //441:86
+                __out.Append("    <mvc:resources mapping=\"/resources/**\" location=\"/WEB-INF/resources/\"/>"); //442:1
+                __out.AppendLine(false); //442:76
+                __out.AppendLine(true); //443:1
+                __out.Append("    <mvc:interceptors>"); //444:1
+                __out.AppendLine(false); //444:23
+                __out.Append("        <bean class=\"org.springframework.web.servlet.i18n.LocaleChangeInterceptor\">"); //445:1
+                __out.AppendLine(false); //445:84
+                __out.Append("            <property name=\"paramName\" value=\"lang\"/>"); //446:1
+                __out.AppendLine(false); //446:54
+                __out.Append("        </bean>"); //447:1
+                __out.AppendLine(false); //447:16
+                __out.Append("    </mvc:interceptors>"); //448:1
+                __out.AppendLine(false); //448:24
+                __out.AppendLine(true); //449:1
+                __out.Append("    <bean id=\"templateResolver\" class=\"org.thymeleaf.templateresolver.ServletContextTemplateResolver\">"); //450:1
+                __out.AppendLine(false); //450:103
+                __out.Append("        <property name=\"prefix\" value=\"/WEB-INF/view/\"/>"); //451:1
+                __out.AppendLine(false); //451:57
+                __out.Append("        <property name=\"suffix\" value=\".html\"/>"); //452:1
+                __out.AppendLine(false); //452:48
+                __out.Append("        <property name=\"characterEncoding\" value=\"UTF-8\"/>"); //453:1
+                __out.AppendLine(false); //453:59
+                __out.Append("        <property name=\"templateMode\" value=\"HTML5\"/>"); //454:1
+                __out.AppendLine(false); //454:54
+                __out.Append("        <property name=\"cacheable\" value=\"false\"/>"); //455:1
+                __out.AppendLine(false); //455:51
+                __out.Append("    </bean>"); //456:1
+                __out.AppendLine(false); //456:12
+                __out.AppendLine(true); //457:1
+                __out.Append("    <bean id=\"templateEngine\" class=\"org.thymeleaf.spring4.SpringTemplateEngine\">"); //458:1
+                __out.AppendLine(false); //458:82
+                __out.Append("        <property name=\"templateResolver\" ref=\"templateResolver\"/>"); //459:1
+                __out.AppendLine(false); //459:67
+                __out.Append("    </bean>"); //460:1
+                __out.AppendLine(false); //460:12
+                __out.AppendLine(true); //461:1
+                __out.Append("    <bean class=\"org.thymeleaf.spring4.view.ThymeleafViewResolver\">"); //462:1
+                __out.AppendLine(false); //462:68
+                __out.Append("        <property name=\"templateEngine\" ref=\"templateEngine\"/>"); //463:1
+                __out.AppendLine(false); //463:63
+                __out.Append("        <property name=\"contentType\" value=\"text/html; charset=UTF-8\"/>"); //464:1
+                __out.AppendLine(false); //464:72
+                __out.Append("        <property name=\"characterEncoding\" value=\"UTF-8\"/>"); //465:1
+                __out.AppendLine(false); //465:59
+                __out.Append("    </bean>"); //466:1
+                __out.AppendLine(false); //466:12
+                __out.AppendLine(true); //467:1
+                __out.Append("    <bean id=\"localeResolver\" class=\"org.springframework.web.servlet.i18n.SessionLocaleResolver\"/>"); //468:1
+                __out.AppendLine(false); //468:99
+            }
+            __out.AppendLine(true); //470:1
+            __out.Append("</beans>"); //471:1
+            __out.AppendLine(false); //471:9
             return __out.ToString();
         }
 
-        public string GenerateJboss() //472:1
+        public string GenerateJboss() //476:1
         {
             StringBuilder __out = new StringBuilder();
-            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //473:1
-            __out.AppendLine(false); //473:39
-            __out.Append("<jboss-deployment-structure>"); //474:1
-            __out.AppendLine(false); //474:29
-            __out.Append("    <deployment>"); //475:1
-            __out.AppendLine(false); //475:17
-            __out.Append("        <dependencies>"); //476:1
-            __out.AppendLine(false); //476:23
-            __out.Append("            <module name=\"com.h2database.h2\" />"); //477:1
-            __out.AppendLine(false); //477:48
-            __out.Append("			<module name=\"org.eclipse.persistence\" />"); //478:1
-            __out.AppendLine(false); //478:45
-            __out.Append("        </dependencies>"); //479:1
-            __out.AppendLine(false); //479:24
-            __out.Append("    </deployment>"); //480:1
-            __out.AppendLine(false); //480:18
-            __out.Append("</jboss-deployment-structure>"); //481:1
-            __out.AppendLine(false); //481:30
+            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //477:1
+            __out.AppendLine(false); //477:39
+            __out.Append("<jboss-deployment-structure>"); //478:1
+            __out.AppendLine(false); //478:29
+            __out.Append("    <deployment>"); //479:1
+            __out.AppendLine(false); //479:17
+            __out.Append("        <dependencies>"); //480:1
+            __out.AppendLine(false); //480:23
+            __out.Append("            <module name=\"com.h2database.h2\" />"); //481:1
+            __out.AppendLine(false); //481:48
+            __out.Append("			<module name=\"org.eclipse.persistence\" />"); //482:1
+            __out.AppendLine(false); //482:45
+            __out.Append("        </dependencies>"); //483:1
+            __out.AppendLine(false); //483:24
+            __out.Append("    </deployment>"); //484:1
+            __out.AppendLine(false); //484:18
+            __out.Append("</jboss-deployment-structure>"); //485:1
+            __out.AppendLine(false); //485:30
             return __out.ToString();
         }
 
-        public string GenerateAppCtx(Namespace ns) //485:1
+        public string GenerateAppCtx(Namespace ns, bool hasDirectDataLink) //489:1
         {
             StringBuilder __out = new StringBuilder();
-            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //486:1
-            __out.AppendLine(false); //486:39
-            __out.Append("<beans xmlns=\"http://www.springframework.org/schema/beans\""); //487:1
-            __out.AppendLine(false); //487:59
-            __out.Append("       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //488:1
-            __out.AppendLine(false); //488:61
-            __out.Append("       xmlns:context=\"http://www.springframework.org/schema/context\""); //489:1
-            __out.AppendLine(false); //489:69
-            __out.Append("       xmlns:jpa=\"http://www.springframework.org/schema/data/jpa\""); //490:1
-            __out.AppendLine(false); //490:66
-            __out.Append("       xsi:schemaLocation=\"http://www.springframework.org/schema/beans"); //491:1
-            __out.AppendLine(false); //491:71
-            __out.Append("       http://www.springframework.org/schema/beans/spring-beans.xsd"); //492:1
-            __out.AppendLine(false); //492:68
-            __out.Append("       http://www.springframework.org/schema/context"); //493:1
-            __out.AppendLine(false); //493:53
-            __out.Append("       http://www.springframework.org/schema/context/spring-context.xsd"); //494:1
-            __out.AppendLine(false); //494:72
-            __out.Append("       http://www.springframework.org/schema/data/jpa"); //495:1
-            __out.AppendLine(false); //495:54
-            __out.Append("       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd\">"); //496:1
-            __out.AppendLine(false); //496:71
-            __out.AppendLine(true); //497:5
-            string __tmp2Line = "       <jpa:repositories base-package=\""; //498:1
+            __out.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //490:1
+            __out.AppendLine(false); //490:39
+            __out.Append("<beans xmlns=\"http://www.springframework.org/schema/beans\""); //491:1
+            __out.AppendLine(false); //491:59
+            __out.Append("       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""); //492:1
+            __out.AppendLine(false); //492:61
+            __out.Append("       xmlns:context=\"http://www.springframework.org/schema/context\""); //493:1
+            __out.AppendLine(false); //493:69
+            __out.Append("       xmlns:jpa=\"http://www.springframework.org/schema/data/jpa\""); //494:1
+            __out.AppendLine(false); //494:66
+            __out.Append("       xsi:schemaLocation=\"http://www.springframework.org/schema/beans"); //495:1
+            __out.AppendLine(false); //495:71
+            __out.Append("       http://www.springframework.org/schema/beans/spring-beans.xsd"); //496:1
+            __out.AppendLine(false); //496:68
+            __out.Append("       http://www.springframework.org/schema/context"); //497:1
+            __out.AppendLine(false); //497:53
+            __out.Append("       http://www.springframework.org/schema/context/spring-context.xsd"); //498:1
+            __out.AppendLine(false); //498:72
+            __out.Append("       http://www.springframework.org/schema/data/jpa"); //499:1
+            __out.AppendLine(false); //499:54
+            __out.Append("       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd\">"); //500:1
+            __out.AppendLine(false); //500:71
+            __out.AppendLine(true); //501:5
+            string __tmp2Line = "       <context:component-scan base-package=\""; //502:1
             if (__tmp2Line != null) __out.Append(__tmp2Line);
             StringBuilder __tmp3 = new StringBuilder();
             __tmp3.Append(ns.FullName.ToLower());
@@ -2074,84 +2080,88 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp3_last) __out.AppendLine(true);
                 }
             }
-            string __tmp4Line = "."; //498:63
+            string __tmp4Line = "\"/>"; //502:69
             if (__tmp4Line != null) __out.Append(__tmp4Line);
-            StringBuilder __tmp5 = new StringBuilder();
-            __tmp5.Append(SpringGeneratorUtil.Properties.repositoryPackage);
-            using(StreamReader __tmp5Reader = new StreamReader(this.__ToStream(__tmp5.ToString())))
+            __out.AppendLine(false); //502:72
+            if (hasDirectDataLink) //503:2
             {
-                bool __tmp5_first = true;
-                bool __tmp5_last = __tmp5Reader.EndOfStream;
-                while(__tmp5_first || !__tmp5_last)
+                __out.AppendLine(true); //504:5
+                string __tmp6Line = "       <jpa:repositories base-package=\""; //505:1
+                if (__tmp6Line != null) __out.Append(__tmp6Line);
+                StringBuilder __tmp7 = new StringBuilder();
+                __tmp7.Append(ns.FullName.ToLower());
+                using(StreamReader __tmp7Reader = new StreamReader(this.__ToStream(__tmp7.ToString())))
                 {
-                    __tmp5_first = false;
-                    string __tmp5Line = __tmp5Reader.ReadLine();
-                    __tmp5_last = __tmp5Reader.EndOfStream;
-                    if (__tmp5Line != null) __out.Append(__tmp5Line);
-                    if (!__tmp5_last) __out.AppendLine(true);
+                    bool __tmp7_first = true;
+                    bool __tmp7_last = __tmp7Reader.EndOfStream;
+                    while(__tmp7_first || !__tmp7_last)
+                    {
+                        __tmp7_first = false;
+                        string __tmp7Line = __tmp7Reader.ReadLine();
+                        __tmp7_last = __tmp7Reader.EndOfStream;
+                        if (__tmp7Line != null) __out.Append(__tmp7Line);
+                        if (!__tmp7_last) __out.AppendLine(true);
+                    }
                 }
-            }
-            string __tmp6Line = "\"/>"; //498:114
-            if (__tmp6Line != null) __out.Append(__tmp6Line);
-            __out.AppendLine(false); //498:117
-            string __tmp8Line = "       <context:component-scan base-package=\""; //499:1
-            if (__tmp8Line != null) __out.Append(__tmp8Line);
-            StringBuilder __tmp9 = new StringBuilder();
-            __tmp9.Append(ns.FullName.ToLower());
-            using(StreamReader __tmp9Reader = new StreamReader(this.__ToStream(__tmp9.ToString())))
-            {
-                bool __tmp9_first = true;
-                bool __tmp9_last = __tmp9Reader.EndOfStream;
-                while(__tmp9_first || !__tmp9_last)
+                string __tmp8Line = "."; //505:63
+                if (__tmp8Line != null) __out.Append(__tmp8Line);
+                StringBuilder __tmp9 = new StringBuilder();
+                __tmp9.Append(SpringGeneratorUtil.Properties.repositoryPackage);
+                using(StreamReader __tmp9Reader = new StreamReader(this.__ToStream(__tmp9.ToString())))
                 {
-                    __tmp9_first = false;
-                    string __tmp9Line = __tmp9Reader.ReadLine();
-                    __tmp9_last = __tmp9Reader.EndOfStream;
-                    if (__tmp9Line != null) __out.Append(__tmp9Line);
-                    if (!__tmp9_last) __out.AppendLine(true);
+                    bool __tmp9_first = true;
+                    bool __tmp9_last = __tmp9Reader.EndOfStream;
+                    while(__tmp9_first || !__tmp9_last)
+                    {
+                        __tmp9_first = false;
+                        string __tmp9Line = __tmp9Reader.ReadLine();
+                        __tmp9_last = __tmp9Reader.EndOfStream;
+                        if (__tmp9Line != null) __out.Append(__tmp9Line);
+                        if (!__tmp9_last) __out.AppendLine(true);
+                    }
                 }
-            }
-            string __tmp10Line = "\"/>"; //499:69
-            if (__tmp10Line != null) __out.Append(__tmp10Line);
-            __out.AppendLine(false); //499:72
-            __out.AppendLine(true); //500:8
-            __out.AppendLine(true); //501:5
-            __out.Append("       <bean id=\"jpaVendorAdapter\" class=\"org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter\"/>"); //502:1
-            __out.AppendLine(false); //502:108
-            __out.Append("       <bean id=\"entityManagerFactory\" class=\"org.springframework.orm.jpa.LocalEntityManagerFactoryBean\">"); //503:1
-            __out.AppendLine(false); //503:106
-            string __tmp12Line = "              <property name=\"persistenceUnitName\" value=\""; //504:1
-            if (__tmp12Line != null) __out.Append(__tmp12Line);
-            StringBuilder __tmp13 = new StringBuilder();
-            __tmp13.Append(ns.Name);
-            using(StreamReader __tmp13Reader = new StreamReader(this.__ToStream(__tmp13.ToString())))
-            {
-                bool __tmp13_first = true;
-                bool __tmp13_last = __tmp13Reader.EndOfStream;
-                while(__tmp13_first || !__tmp13_last)
+                string __tmp10Line = "\"/>"; //505:114
+                if (__tmp10Line != null) __out.Append(__tmp10Line);
+                __out.AppendLine(false); //505:117
+                __out.AppendLine(true); //506:5
+                __out.Append("       <bean id=\"jpaVendorAdapter\" class=\"org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter\"/>"); //507:1
+                __out.AppendLine(false); //507:108
+                __out.Append("       <bean id=\"entityManagerFactory\" class=\"org.springframework.orm.jpa.LocalEntityManagerFactoryBean\">"); //508:1
+                __out.AppendLine(false); //508:106
+                string __tmp12Line = "              <property name=\"persistenceUnitName\" value=\""; //509:1
+                if (__tmp12Line != null) __out.Append(__tmp12Line);
+                StringBuilder __tmp13 = new StringBuilder();
+                __tmp13.Append(ns.Name);
+                using(StreamReader __tmp13Reader = new StreamReader(this.__ToStream(__tmp13.ToString())))
                 {
-                    __tmp13_first = false;
-                    string __tmp13Line = __tmp13Reader.ReadLine();
-                    __tmp13_last = __tmp13Reader.EndOfStream;
-                    if (__tmp13Line != null) __out.Append(__tmp13Line);
-                    if (!__tmp13_last) __out.AppendLine(true);
+                    bool __tmp13_first = true;
+                    bool __tmp13_last = __tmp13Reader.EndOfStream;
+                    while(__tmp13_first || !__tmp13_last)
+                    {
+                        __tmp13_first = false;
+                        string __tmp13Line = __tmp13Reader.ReadLine();
+                        __tmp13_last = __tmp13Reader.EndOfStream;
+                        if (__tmp13Line != null) __out.Append(__tmp13Line);
+                        if (!__tmp13_last) __out.AppendLine(true);
+                    }
                 }
+                string __tmp14Line = "PU\"/>"; //509:68
+                if (__tmp14Line != null) __out.Append(__tmp14Line);
+                __out.AppendLine(false); //509:73
+                __out.Append("              <property name=\"jpaVendorAdapter\" ref=\"jpaVendorAdapter\"/>"); //510:1
+                __out.AppendLine(false); //510:73
+                __out.Append("       </bean>"); //511:1
+                __out.AppendLine(false); //511:15
+                __out.Append("       <bean id=\"transactionManager\" class=\"org.springframework.orm.jpa.JpaTransactionManager\">"); //512:1
+                __out.AppendLine(false); //512:96
+                __out.Append("              <property name=\"entityManagerFactory\" ref=\"entityManagerFactory\"/>"); //513:1
+                __out.AppendLine(false); //513:81
+                __out.Append("       </bean>"); //514:1
+                __out.AppendLine(false); //514:15
             }
-            string __tmp14Line = "PU\"/>"; //504:68
-            if (__tmp14Line != null) __out.Append(__tmp14Line);
-            __out.AppendLine(false); //504:73
-            __out.Append("              <property name=\"jpaVendorAdapter\" ref=\"jpaVendorAdapter\"/>"); //505:1
-            __out.AppendLine(false); //505:73
-            __out.Append("       </bean>"); //506:1
-            __out.AppendLine(false); //506:15
-            __out.Append("       <bean id=\"transactionManager\" class=\"org.springframework.orm.jpa.JpaTransactionManager\">"); //507:1
-            __out.AppendLine(false); //507:96
-            __out.Append("              <property name=\"entityManagerFactory\" ref=\"entityManagerFactory\"/>"); //508:1
-            __out.AppendLine(false); //508:81
-            __out.Append("       </bean>"); //509:1
-            __out.AppendLine(false); //509:15
-            __out.Append("</beans>"); //510:1
-            __out.AppendLine(false); //510:9
+            __out.AppendLine(true); //516:1
+            __out.Append("</beans>"); //517:1
+            __out.AppendLine(false); //517:9
             return __out.ToString();
         }
 
