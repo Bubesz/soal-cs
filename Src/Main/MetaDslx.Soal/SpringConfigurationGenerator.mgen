@@ -87,41 +87,43 @@ template GenerateComponentPom(Namespace ns, Component component, List<string> mo
 [loop (module:modules)]
 		[GeneratePomDependency(ns.Name, ns.Name+"-"+module, "1.0", false)]
 [end loop]
-[if (cType == ComponentType.API)]
-^
-		[GeneratePomDependency("org.springframework", "spring-context", "${springframework.version}", false)]
-[end if]
-[if (rest)]
-^
-		<!-- for rest -->
-		[GeneratePomDependency("org.springframework", "spring-webmvc", "${springframework.version}", false)]
-[end if]
-[if (webService)]
-^
-		<!-- for SOAP -->
-		[GeneratePomDependency("org.springframework.ws", "spring-ws-core", "${springframework.ws.version}", false)]
-		[GeneratePomDependency("wsdl4j", "wsdl4j", "${wsdl4j.version}", false)]
-[end if]
-[if (webSocket)]
-^
-		<!-- for web socket -->
-		[GeneratePomDependency("org.springframework", "spring-messaging", "${springframework.version}", false)]
-[end if]
+[bool webmvc = false]
+
 [if (cType == ComponentType.WEB || cType == ComponentType.REMOTE)]
-^
+		^
+	[webmvc = true]
 		<!-- web -->
 		[GeneratePomDependency("org.springframework", "spring-web", "${springframework.version}", false)]
 		[GeneratePomDependency("org.springframework", "spring-webmvc", "${springframework.version}", false)]
 	[if (cType == ComponentType.WEB)]
-^
+		^
 		<!-- thymeleaf -->
 		[GeneratePomDependency("org.thymeleaf", "thymeleaf", "${thymeleaf.version}", false)]
 		[GeneratePomDependency("org.thymeleaf", "thymeleaf-spring4", "${thymeleaf.version}", false)]
 	[end if]
 [end if]
 
+[if (rest && !webmvc)]
+		^
+		<!-- for rest service -->
+		[GeneratePomDependency("org.springframework", "spring-webmvc", "${springframework.version}", false)]
+[end if]
+[if (webService)]
+		^
+		<!-- for SOAP service -->
+		[GeneratePomDependency("org.springframework.ws", "spring-ws-core", "${springframework.ws.version}", false)]
+		[GeneratePomDependency("wsdl4j", "wsdl4j", "${wsdl4j.version}", false)]
+[end if]
+[if (webSocket)]
+		^
+		<!-- for web socket service -->
+		[GeneratePomDependency("org.springframework", "spring-messaging", "${springframework.version}", false)]
+[end if]
+
 [if (cType == ComponentType.WEB || cType == ComponentType.IMPLEMENTATION)]
 	[if (rest)]
+		^
+		<!-- for rest client -->
 		[GeneratePomDependency("org.springframework.hateoas", "spring-hateoas", "${springframework.hateoas.version}", false)]
 		[GeneratePomDependency("javax.servlet", "javax.servlet-api", "3.1.0", true)]
 	[end if]
@@ -171,7 +173,7 @@ template GenerateComponentSpringConfig(Namespace ns)
        http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
 	   ^
        <jpa:repositories base-package="[ns.FullName.ToLower()].[SpringGeneratorUtil.Properties.repositoryPackage]"/>
-       <context:component-scan base-package="[ns.FullName.ToLower()].[SpringGeneratorUtil.Properties.serviceFacadePackage]"/>
+       <context:component-scan base-package="[ns.FullName.ToLower()]"/>
 </beans>
 end template
 

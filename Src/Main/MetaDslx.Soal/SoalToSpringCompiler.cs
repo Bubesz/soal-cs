@@ -200,7 +200,7 @@ namespace MetaDslx.Soal
                         ComponentType cType = ComponentType.IMPLEMENTATION;
 
                         List<string> dependencies = GetherDependencies(ns, wires, component);
-                        bool directDataAcess = dependencies.Contains(dataModule);
+                        bool directDataAccess = HasDirectDataAccess(ns, wires, component, dataModule);
 
                         if (component.Services.Any())
                         {
@@ -211,7 +211,7 @@ namespace MetaDslx.Soal
                             if (component.Implementation != null && component.Implementation.Name.Equals("JSF"))
                             {
                                 cType = ComponentType.WEB;
-                                GenerateWebTier(ns, springViewGen, generatorUtil, component, directDataAcess);
+                                GenerateWebTier(ns, springViewGen, generatorUtil, component, directDataAccess);
                             }
                             if (component is Composite)
                             {
@@ -267,6 +267,90 @@ namespace MetaDslx.Soal
                     }
                 }
             }
+        }
+
+        private bool HasDirectDataAccess(Namespace ns, List<Wire> wires, Component component, string dataModule)
+        {
+            // collecting module dependencies
+            bool hasDirectDataAccess = false;
+            foreach (Reference reference in component.References)
+            {
+                if (hasDirectDataAccess) // stop algorithm if found a direct access
+                {
+                    return true;
+                }
+
+                bool referenceStatisfied = false;
+                foreach (Wire wire in wires)
+                {
+                    // Component comp = (Component)((ModelObject)port).MParent;
+                    if (wire.Source.Equals(reference))
+                    {
+                        foreach (Component comp in ns.Declarations.OfType<Component>())
+                        {
+                            foreach (Service serv in comp.Services)
+                            {
+                                if (wire.Target.Equals(serv))
+                                {
+                                    referenceStatisfied = true;
+                                    hasDirectDataAccess = CheckDirectDataAccess(ns, wires, dataModule, reference, comp, serv);
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!referenceStatisfied)
+                {
+                    foreach (Component comp in ns.Declarations.OfType<Component>())
+                    {
+                        foreach (Service serv in comp.Services)
+                        {
+                            if (serv.Interface.Equals(reference.Interface))
+                            {
+                                List<Binding> bindings = new List<Binding>();
+                                if (serv.Binding != null)
+                                    bindings.Add(serv.Binding);
+                                if (reference.Binding != null)
+                                    bindings.Add(reference.Binding);
+                                BindingTypeHolder binding = CheckForBindings(bindings);
+
+                                if (!binding.hasAnyBinding())
+                                {
+                                    hasDirectDataAccess = CheckDirectDataAccess(ns, wires, dataModule, reference, comp, serv);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return hasDirectDataAccess;
+        }
+
+        private bool CheckDirectDataAccess(Namespace ns, List<Wire> wires, string dataModule, Reference reference, Component comp, Service serv)
+        {
+            bool hasDirectDataAccess = false;
+            List<Binding> bindings = new List<Binding>();
+            if (serv.Binding != null)
+                bindings.Add(serv.Binding);
+            if (reference.Binding != null)
+                bindings.Add(reference.Binding);
+            BindingTypeHolder binding = CheckForBindings(bindings);
+
+            if (!binding.hasAnyBinding())
+            {
+                // direct access
+                if (comp.Name == dataModule)
+                {
+                    hasDirectDataAccess = true;
+                }
+                else
+                {
+                    // need to check
+                    hasDirectDataAccess = HasDirectDataAccess(ns, wires, comp, dataModule);
+                }
+            }
+
+            return hasDirectDataAccess;
         }
 
         private List<string> GetherDependencies(Namespace ns, List<Wire> wires, Component component)
@@ -338,7 +422,7 @@ namespace MetaDslx.Soal
             }
         }
 
-        private void GenerateWebTier(Namespace ns, SpringViewGenerator springViewGen, SpringGeneratorUtil generatorUtil, Component component, bool directDataAcess)
+        private void GenerateWebTier(Namespace ns, SpringViewGenerator springViewGen, SpringGeneratorUtil generatorUtil, Component component, bool directDataAccess)
         {
             string contollerDir = createJavaDirectory(ns, component.Name, generatorUtil.Properties.controllerPackage);
             string viewDir = createWebDirectory(ns, component.Name, "view");
@@ -436,7 +520,7 @@ namespace MetaDslx.Soal
             string ctxFile = Path.Combine(webinfDir, "applicationContext.xml");
             using (StreamWriter writer = new StreamWriter(ctxFile))
             {
-                writer.WriteLine(springViewGen.GenerateAppCtx(ns, directDataAcess));
+                writer.WriteLine(springViewGen.GenerateAppCtx(ns, directDataAccess));
             }
 
             // servlet

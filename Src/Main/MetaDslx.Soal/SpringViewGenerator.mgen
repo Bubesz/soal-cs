@@ -54,19 +54,20 @@ public class [reference.Name]Controller {
 	
 			[string javaReturn = op.Result.Type.GetJavaName()]
 			[string name = op.Name]
+			[string method = "POST"]
 			[if (name.StartsWith("Get"))]
+				[method = "GET"]
 				[name = op.Name.Substring(3)]
 			[end if]
-
-			[if (javaReturn.Contains("List"))]
-	@RequestMapping("/[name]")  // + POST
-			[else]
-	@RequestMapping(value="/", params={"action=[name]"})
+			[if (method == "POST")]
+	@RequestMapping(value = "/[name]", method = RequestMethod.POST) /* TODO consider other method */
+			[else if (method == "GET")]
+	@RequestMapping("/[name]")
 			[end if]
 	public String [op.Name.ToCamelCase()](Model model\
 			[loop (op->param:Parameters)]
 ,
-		@RequestParam(value="[param.Name.ToString().ToCamelCase()]") [param.Type.GetJavaName()] [param.Name.ToString().ToCamelCase()]\
+		[MethodParameterAnnotated(param)]\
 			[end loop]
 ) {
 	[if(op.Exceptions.Any())]
@@ -74,6 +75,7 @@ public class [reference.Name]Controller {
 			[ControllerMethodImpl(reference, op)]
 		[loop(op->ex:Exceptions)]
 		} catch ([ex.GetJavaName()] e) {
+			// TODO handle execption properly
 			throw new RuntimeException(e);
 		[end loop]
 		}
@@ -105,6 +107,15 @@ model.addAttribute("[array.InnerType.GetJavaName()]List", result);
 model.addAttribute("[op.Result.Type.GetJavaName()]", result);
 	[end if]
 [end if]
+end template
+
+
+
+template MethodParameterAnnotated(InputParameter param)
+	[if (param.Type.IsJavaPrimitiveType()) ]
+@RequestParam(value="[param.Name.ToString().ToCamelCase()]")\
+	[end if]
+[param.Type.GetJavaName()] [param.Name.ToString().ToCamelCase()]
 end template
 
 
@@ -178,28 +189,22 @@ template GenerateView(Reference reference)
 [int ids = 0]
 [loop(reference.Interface->action:Operations)]
 	[string actionName = action.Name]
+	[string method = "POST"]
 	[if (actionName.StartsWith("Get"))]
+		[method = "POST"]
 		[actionName = actionName.Substring(3)]
 	[end if]
 
 	[string javaReturn = action.Result.Type.GetJavaName()]
 
 	[if (javaReturn.Contains("List") && !action.Parameters.Any())]
-		<a href="[actionName].html">[actionName]</a>
+		<a href="[actionName]">[actionName]</a>
 	[else]
-		[if (javaReturn.Contains("List"))]
-		<form action="[actionName].html">
-		[else]
-		<form>
-		[end if]
+		<form action="[actionName]" method="[method]">
 
 		[if(action.Parameters.Any())]
 			<fieldset>
 				<legend>[actionName]</legend>
-		[end if]
-
-		[if (javaReturn != "void" && !javaReturn.Contains("List"))]
-				<input type="hidden" name="action" value="[actionName]" />
 		[end if]
 
 		[loop(action->input:Parameters)]

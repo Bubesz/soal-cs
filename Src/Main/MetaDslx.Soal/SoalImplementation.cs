@@ -697,6 +697,27 @@ namespace MetaDslx.Soal
             return null;
         }
 
+        public static bool IsJavaPrimitiveType(this SoalType type)
+        {
+            PrimitiveType pType = type as PrimitiveType;
+            if (pType == null)
+                return false;
+            
+            switch (pType.Name)
+            {
+                case "void":
+                case "int":
+                case "long":
+                case "float":
+                case "double":
+                case "byte":
+                case "string":
+                case "bool":
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
         public static string GetPackageOfJavaType(this string type)
         {
