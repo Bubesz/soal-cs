@@ -11,14 +11,15 @@ properties Properties
 	string enumPackage = "enums";
 	string serviceFacadePackage = "facade";
 	string controllerPackage = "controller";
+	string proxyPackage = "proxy";
 end properties
 
 
 
 template GenerateGetter(Property prop)
 ^
-public [prop.Type.GetJavaName()] get[prop.Name.ToString().ToPascalCase()]() {
-	return this.[prop.Name.ToString().ToCamelCase()];
+public [prop.Type.GetJavaName()] get[prop.Name.ToPascalCase()]() {
+	return this.[prop.Name.ToCamelCase()];
 }
 end template
 
@@ -26,8 +27,8 @@ end template
 
 template GenerateSetter(Property prop)
 ^
-public void set[prop.Name.ToString().ToPascalCase()]([prop.Type.GetJavaName()] [prop.Name.ToString().ToCamelCase()]) {
-	this.[prop.Name.ToString().ToCamelCase()] = [prop.Name.ToString().ToCamelCase()];
+public void set[prop.Name.ToPascalCase()]([prop.Type.GetJavaName()] [prop.Name.ToCamelCase()]) {
+	this.[prop.Name.ToCamelCase()] = [prop.Name.ToCamelCase()];
 }
 end template
 
@@ -55,7 +56,7 @@ end template
 function string GetParameterList(Operation op)
     string result = "";
     loop (op->param:Parameters; string delimiter = ""; delimiter = ", ")
-        result = result + delimiter + param.Type.GetJavaName() + " " + param.Name.ToString().ToCamelCase();
+        result = result + delimiter + param.Type.GetJavaName() + " " + param.Name.ToCamelCase();
     end loop
     return result;
 end function
@@ -65,7 +66,17 @@ end function
 function string GetParameterNameList(Operation op)
     string result = "";
     loop (op->param:Parameters; string delimiter = ""; delimiter = ", ")
-        result = result + delimiter + param.Name.ToString().ToCamelCase();
+        result = result + delimiter + param.Name.ToCamelCase();
+    end loop
+    return result;
+end function
+
+
+
+function string GetParameterTypeList(Operation op)
+    string result = "";
+    loop (op->param:Parameters; string delimiter = ""; delimiter = ", ")
+        result = result + delimiter + param.Type.GetJavaName() + ".class";
     end loop
     return result;
 end function
@@ -85,7 +96,7 @@ end function
 function string GetPropertyList(Struct sType)
     string result = "";
     loop (sType->p:Properties; string delimiter = ""; delimiter = ", ")
-        result = result + delimiter + p.Type.GetJavaName() + " " + p.Name.ToString().ToCamelCase();
+        result = result + delimiter + p.Type.GetJavaName() + " " + p.Name.ToCamelCase();
     end loop
     return result;
 end function
@@ -95,7 +106,7 @@ end function
 function int GetNumberOfFieldWithIdSuffix(Struct sType)
 	int result = 0;
 	loop (sType->p:Properties)
-		if (p.Name.ToString().EndsWith("Id"))
+		if (p.Name.EndsWith("Id"))
 			result++;
 		end if
     end loop
