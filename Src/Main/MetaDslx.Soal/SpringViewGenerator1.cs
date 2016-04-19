@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringViewGenerator_1188758562;
-    namespace __Hidden_SpringViewGenerator_1188758562
+    using __Hidden_SpringViewGenerator_1220138986;
+    namespace __Hidden_SpringViewGenerator_1220138986
     {
         internal static class __Extensions
         {
@@ -406,7 +406,7 @@ namespace MetaDslx.Soal //1:1
                 string javaReturn = op.Result.Type.GetJavaName(); //55:5
                 string name = op.Name; //56:5
                 string method = "POST"; //57:5
-                if (name.StartsWith("Get")) //58:5
+                if (name.ToPascalCase().StartsWith("Get")) //58:5
                 {
                     method = "GET";
                     name = op.Name.Substring(3);
@@ -430,9 +430,9 @@ namespace MetaDslx.Soal //1:1
                             if (!__tmp40_last) __out.AppendLine(true);
                         }
                     }
-                    string __tmp41Line = "\", method = RequestMethod.POST) /* TODO consider other method */"; //63:34
+                    string __tmp41Line = "\", method = RequestMethod.POST) // TODO consider other method"; //63:34
                     if (__tmp41Line != null) __out.Append(__tmp41Line);
-                    __out.AppendLine(false); //63:98
+                    __out.AppendLine(false); //63:95
                 }
                 else if (method == "GET") //64:5
                 {
@@ -848,7 +848,7 @@ namespace MetaDslx.Soal //1:1
                         if (!__tmp3_last) __out.AppendLine(true);
                     }
                 }
-                string __tmp4Line = "\")"; //116:59
+                string __tmp4Line = "\") "; //116:59
                 if (__tmp4Line != null) __out.Append(__tmp4Line);
             }
             StringBuilder __tmp6 = new StringBuilder();
@@ -1058,7 +1058,7 @@ namespace MetaDslx.Soal //1:1
                 var action = __tmp5.action;
                 string actionName = action.Name; //191:3
                 string method = "POST"; //192:3
-                if (actionName.StartsWith("Get")) //193:3
+                if (actionName.ToPascalCase().StartsWith("Get")) //193:3
                 {
                     method = "POST";
                     actionName = actionName.Substring(3);

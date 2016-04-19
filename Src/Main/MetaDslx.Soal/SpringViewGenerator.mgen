@@ -55,12 +55,12 @@ public class [reference.Name]Controller {
 			[string javaReturn = op.Result.Type.GetJavaName()]
 			[string name = op.Name]
 			[string method = "POST"]
-			[if (name.StartsWith("Get"))]
+			[if (name.ToPascalCase().StartsWith("Get"))]
 				[method = "GET"]
 				[name = op.Name.Substring(3)]
 			[end if]
 			[if (method == "POST")]
-	@RequestMapping(value = "/[name]", method = RequestMethod.POST) /* TODO consider other method */
+	@RequestMapping(value = "/[name]", method = RequestMethod.POST) // TODO consider other method
 			[else if (method == "GET")]
 	@RequestMapping("/[name]")
 			[end if]
@@ -113,7 +113,7 @@ end template
 
 template MethodParameterAnnotated(InputParameter param)
 	[if (param.Type.IsJavaPrimitiveType()) ]
-@RequestParam(value="[param.Name.ToString().ToCamelCase()]")\
+@RequestParam(value="[param.Name.ToString().ToCamelCase()]") \
 	[end if]
 [param.Type.GetJavaName()] [param.Name.ToString().ToCamelCase()]
 end template
@@ -190,7 +190,7 @@ template GenerateView(Reference reference)
 [loop(reference.Interface->action:Operations)]
 	[string actionName = action.Name]
 	[string method = "POST"]
-	[if (actionName.StartsWith("Get"))]
+	[if (actionName.ToPascalCase().StartsWith("Get"))]
 		[method = "POST"]
 		[actionName = actionName.Substring(3)]
 	[end if]
