@@ -199,7 +199,8 @@ namespace MetaDslx.Soal
                         modules.Add(component.Name);
                         ComponentType cType = ComponentType.IMPLEMENTATION;
 
-                        List<string> dependencies = GetherDependencies(ns, wires, component);
+                        Dictionary<Reference, Component> dependencyMap = GetherDependencyMap(ns, wires, component);
+                        List<string> dependencies = GetherDependencies(dependencyMap);
                         bool directDataAccess = HasDirectDataAccess(ns, wires, component, dataModule);
 
                         if (component.Services.Any())
@@ -226,7 +227,7 @@ namespace MetaDslx.Soal
                         BindingTypeHolder clientFor = new BindingTypeHolder();
                         if (component.References.Any())
                         {
-                            clientFor = GenerateReferenceAccessors(ns, component, dependencies, properties, springInterfaceGen, generatorUtil);
+                            clientFor = GenerateReferenceAccessors(ns, component, dependencyMap, properties, springInterfaceGen, generatorUtil);
                         }
 
                         if (component.Name == dataModule)
@@ -343,10 +344,54 @@ namespace MetaDslx.Soal
             return hasDirectDataAccess;
         }
 
-        private List<string> GetherDependencies(Namespace ns, List<Wire> wires, Component component)
+        private List<string> GetherDependencies(Dictionary<Reference, Component> dependecyMap)
         {
             // collecting module dependencies
             List<string> dependencies = new List<string>();
+            foreach (KeyValuePair<Reference, Component> entry in dependecyMap)
+            {
+                List<Binding> bindings = new List<Binding>();
+                Reference reference = entry.Key;
+                Component comp = entry.Value;
+                string businessComponentName = comp.Name;
+                if (businessComponentName.Contains("-API") || businessComponentName.Contains("-WEB"))
+                {
+                    businessComponentName = businessComponentName.Split(new string[] { "-API", "-WEB" }, StringSplitOptions.RemoveEmptyEntries)[0];
+                }
+                foreach (Service service in entry.Value.Services)
+                {
+                    if (service.Interface.Equals(reference.Interface) && service.Binding != null)
+                    {
+                        bindings.Add(service.Binding);
+                    }
+                }
+                if (reference.Binding != null)
+                    bindings.Add(reference.Binding);
+                BindingTypeHolder binding = CheckForBindings(bindings);
+
+                if (binding.hasAnyBinding())
+                {
+                    if (!dependencies.Contains(businessComponentName + "-API") && !dependencies.Contains(businessComponentName))
+                    {
+                        dependencies.Add(businessComponentName + "-API");
+                    }
+                }
+                else
+                {
+                    if (!dependencies.Contains(businessComponentName))
+                    {
+                        dependencies.Add(businessComponentName);
+                        dependencies.Remove(businessComponentName + "-API");
+                    }
+                }
+            }
+            return dependencies;
+        }
+
+        private Dictionary<Reference, Component> GetherDependencyMap(Namespace ns, List<Wire> wires, Component component)
+        {
+            // collecting module dependencies
+            Dictionary<Reference, Component> dependencies = new Dictionary<Reference, Component>();
             foreach (Reference reference in component.References)
             {
                 bool referenceStatisfied = false;
@@ -362,7 +407,7 @@ namespace MetaDslx.Soal
                                 if (wire.Target.Equals(serv))
                                 {
                                     referenceStatisfied = true;
-                                    AddDependecy(dependencies, reference, comp, serv);
+                                    PutDependecy(dependencies, reference, serv, comp);
 
                                 }
                             }
@@ -377,7 +422,7 @@ namespace MetaDslx.Soal
                         {
                             if (serv.Interface.Equals(reference.Interface))
                             {
-                                AddDependecy(dependencies, reference, comp, serv);
+                                PutDependecy(dependencies, reference, serv, comp);
                             }
                         }
                     }
@@ -386,7 +431,7 @@ namespace MetaDslx.Soal
             return dependencies;
         }
 
-        private static void AddDependecy(List<string> dependencies, Reference reference, Component comp, Service serv)
+        private static void PutDependecy(Dictionary<Reference, Component> dependencies, Reference reference, Service serv, Component comp)
         {
             List<Binding> bindings = new List<Binding>();
             if (serv.Binding != null)
@@ -395,20 +440,16 @@ namespace MetaDslx.Soal
                 bindings.Add(reference.Binding);
             BindingTypeHolder binding = CheckForBindings(bindings);
 
+            Component api = new ComponentImpl();
+            api.Name = comp.Name + "-API";
+
             if (binding.hasAnyBinding())
             {
-                if (!dependencies.Contains(comp.Name + "-API") && !dependencies.Contains(comp.Name))
-                {
-                    dependencies.Add(comp.Name + "-API");
-                }
+                dependencies.Add(reference, api);
             }
             else
             {
-                if (!dependencies.Contains(comp.Name))
-                {
-                    dependencies.Add(comp.Name);
-                    dependencies.Remove(comp.Name + "-API");
-                }
+                dependencies.Add(reference, comp);
             }
         }
 
@@ -802,7 +843,7 @@ namespace MetaDslx.Soal
             }
         }
 
-        private BindingTypeHolder GenerateReferenceAccessors(Namespace ns, Component component, List<string> dependencies, Dictionary<string, string> properties, SpringInterfaceGenerator springInterfaceGen, SpringGeneratorUtil generatorUtil)
+        private BindingTypeHolder GenerateReferenceAccessors(Namespace ns, Component component, Dictionary<Reference, Component> dependencyMap, Dictionary<string, string> properties, SpringInterfaceGenerator springInterfaceGen, SpringGeneratorUtil generatorUtil)
         {
             BindingTypeHolder clientFor = new BindingTypeHolder();
             foreach (Reference reference in component.References)
@@ -830,8 +871,15 @@ namespace MetaDslx.Soal
 
                     string proxyDir = createJavaDirectory(ns, component.Name, generatorUtil.Properties.proxyPackage);
                     string accessorFile = Path.Combine(proxyDir, reference.Interface.Name+"RestProxy.java");
-                    string currentComponent = ns.Name + "-" + component.Name;
-                    string targetComponent = null; // TODO
+                    string currentComponent = component.Name;
+                    string targetComponent = dependencyMap[reference].Name;
+                    if (targetComponent.Contains("-API") || targetComponent.Contains("-WEB"))
+                    {
+                        targetComponent = targetComponent.Split(new string[] { "-API", "-WEB" }, StringSplitOptions.RemoveEmptyEntries)[0];
+                    }
+
+                    Console.WriteLine("poxy between: " + currentComponent + " <-> " + targetComponent);
+
                     using (StreamWriter writer = new StreamWriter(accessorFile))
                     {
                         writer.WriteLine(springInterfaceGen.GenerateProxyForInterface(reference.Interface, "Rest", currentComponent, targetComponent));
