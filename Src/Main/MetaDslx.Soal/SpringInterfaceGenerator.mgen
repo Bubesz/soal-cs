@@ -10,6 +10,7 @@ package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.
 [if (bindingType.Equals("Rest"))]
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 [end if]
 [if (bindingType.Equals("WebService"))]
@@ -25,10 +26,10 @@ import org.springframework.web.bind.annotation.RestController;
 public interface [iface.Name][bindingType] {
 [loop (iface->op:Operations)]
 ^
-[OperationAnnotation(bindingType, op)]
+[OperationAnnotation(op, bindingType)]
 	[op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()](\
 	[loop (op->param:Parameters; string delimiter = ""; delimiter = ", ")]
-[delimiter][ParameterAnnotation(bindingType)][param.Type.GetJavaName()] [param.Name.ToString().ToCamelCase()]\
+[delimiter][ParameterAnnotation(param, bindingType)][param.Type.GetJavaName()] [param.Name.ToString().ToCamelCase()]\
     [end loop]
 )\
 	[if (op.Exceptions.Any())]
@@ -108,13 +109,15 @@ end template
 
 
 // accessor of remote service (TODO for any tpye ?)
-template GenerateProxyForInterface(Interface iface, string functionName, string bindingType)
-package [SpringGeneratorUtil.GetPackage(iface)].proxy;
+template GenerateProxyForInterface(Interface iface, string bindingType, string currentComponent, string targetComponent)
+package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.proxyPackage];
 ^
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 ^
 import org.springframework.hateoas.Link;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestAttributes;
@@ -127,64 +130,106 @@ import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.i
 ^
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 ^
 @Service
 public class [iface.Name][bindingType]Proxy implements [iface.Name][bindingType] {
 ^
 	private RestTemplate restTemplate = new RestTemplate();
-	[string currentComponent = "CinemaWeb"]
-	[string targetComponent = "ReservationLogic"]
-	private String currentComponentName = "Cinema-[currentComponent]";
-    private String targetComponentName = "Cinema-[targetComponent]";
-
-[loop(iface->op:Operations)]
+	private final String currentComponentName = "Cinema-[currentComponent]";
+    private final String targetComponentName = "Cinema-[targetComponent]";
 	^
+[loop(iface->op:Operations)]
 	private String urlOf[op.Name.ToPascalCase()];
 [end loop]
 
 [loop(iface->op:Operations)]
 ^
+	[string resultJavaName = op.Result.Type.GetJavaName()]
 	@Override
-	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
+	public [resultJavaName] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
 	[if (op.Exceptions.Any())]
  throws [SpringGeneratorUtil.GetExceptionList(op)] \
 	[end if]
 {
-		String url = getUrlOf[op.Name.ToPascalCase()]();
-	[ArrayType array = op.Result.Type as ArrayType]
-	[if (array != null)]
-		[array.InnerType.GetJavaName()]["[]"] response = restTemplate.getForObject(url, [array.InnerType.GetJavaName()]["[]"].class);
-	[else]
-		[op.Result.Type.GetJavaName()]["[]"] response = restTemplate.getForObject(url, [op.Result.Type.GetJavaName()]["[]"].class);
+		String url = getUrlOf[op.Name.ToPascalCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
+		
+	[string method = "POST"]
+	[if (op.Name.ToPascalCase().StartsWith("Get"))]
+		[method = "GET"]
 	[end if]
 
-	[if (op.Result.Type.GetJavaName() != "void")]
-		return Arrays.stream(response).collect(Collectors.toList());
+	[string extraVariable = ""]
+	[if (method == "POST")]
+		[extraVariable = "request, "]
+		HttpEntity<?> request = null;
+		this.restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+		[loop(op->param:Parameters where !param.Type.IsJavaPrimitiveType())]
+		request = new HttpEntity<[param.Type.GetJavaName()]>([param.Name]);
+		[end loop]
+	[end if]
+
+	[ArrayType array = op.Result.Type as ArrayType]
+	[if (array != null)]
+		[array.InnerType.GetJavaName()]["[]"] response = restTemplate.[method.ToLower()]ForObject(url, [extraVariable][array.InnerType.GetJavaName()]["[]"].class);
+	[else if (resultJavaName != "void" )]
+		[resultJavaName] response = restTemplate.[method.ToLower()]ForObject(url, [extraVariable][resultJavaName].class);
 	[else]
-			//FIXME
-		//[iface.Name.ToCamelCase()]Impl.[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
+		restTemplate.[method.ToLower()]ForObject(url, [extraVariable]Object.class);
+	[end if]
+
+	[if (array != null)]
+		return Arrays.stream(response).collect(Collectors.toList());
+	[else if (resultJavaName != "void" )]
+		return response;
+	[else]
+		return;
 	[end if]
 	}
 [end loop]
 
 [loop(iface->op:Operations)]
 	^
-	private String getUrlOf[op.Name.ToPascalCase()]() {
+	private String getUrlOf[op.Name.ToPascalCase()]([SpringGeneratorUtil.GetParameterList(op)]) {
         if (this.urlOf[op.Name.ToPascalCase()] != null) {
             return this.urlOf[op.Name.ToPascalCase()];
         }
 		^
-        // eg.: http://127.0.0.2:8080/Cinema-CinemaWeb-1.0/getMoviesFromReservation/
-        Link link = linkTo(methodOn(IReservationLogicRest.class).getMoviesFromReservation()).withSelfRel();
+        // eg.: http://localhost/localapp-1.0/getMoviesFromReservation/
+	[if (op.Result.Type.GetJavaName() == "void")]
+		String url = null;
+		try {
+			java.lang.reflect.Method method = [iface.Name + bindingType].class.getMethod("[op.Name.ToCamelCase()]", [SpringGeneratorUtil.GetParameterTypeList(op)]);
+			Link link = linkTo([iface.Name + bindingType].class, method, [SpringGeneratorUtil.GetParameterNameList(op)]).withSelfRel();
+			url = link.getHref();
+		[loop(op->ex:Exceptions)]
+		} catch (NoSuchMethodException e) {
+			// TODO handle execption properly
+			throw new RuntimeException(e);
+		[end loop]
+		}
+
+	[else if(op.Exceptions.Any())]
+		String url = null;
+		try {
+			Link link = linkTo(methodOn([iface.Name + bindingType].class).[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)])).withSelfRel();
+			url = link.getHref();
+		[loop(op->ex:Exceptions)]
+		} catch ([ex.GetJavaName()] e) {
+			// TODO handle execption properly
+			throw new RuntimeException(e);
+		[end loop]
+		}
+	[else]
+		Link link = linkTo(methodOn([iface.Name + bindingType].class).[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)])).withSelfRel();
+		String url = link.getHref();
+	[end if]
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
         HttpServletRequest curRequest = ((ServletRequestAttributes) requestAttributes).getRequest();
         String serverName = curRequest.getServerName();
         String serverPort = String.valueOf(curRequest.getServerPort());
 		^
-        // eg.: http://127.0.0.2:8080/Cinema-ReservationLogic-1.0/getMoviesFromReservation/
-        String url = link.getHref();
+        // eg.: http://remotehost/remoteapp-1.0/getMoviesFromReservation/
         url = url.replace(serverName, Configuration.getString("[targetComponent][bindingType]Server"));
         url = url.replace(":" + serverPort, ":" + Configuration.getString("[targetComponent][bindingType]Port"));
         url = url.replace(currentComponentName, targetComponentName);
@@ -308,6 +353,7 @@ end template
 template InterfaceAnnotation(string bindingType)
 	[if (bindingType.Equals("Rest"))]
 @RestController
+@RequestMapping(method = RequestMethod.GET)
 	[else if (bindingType.Equals("WebService"))]
 //@WebService
 	[else if (bindingType.Equals("WebSockett"))]
@@ -317,9 +363,19 @@ end template
 
 
 
-template OperationAnnotation(string bindingType, Operation op)
+template OperationAnnotation(Operation op, string bindingType)
 	[if (bindingType.Equals("Rest"))]
-	@RequestMapping(value="[op.Name.ToCamelCase()]")
+	@RequestMapping(value = "/[op.Name.ToCamelCase()]\
+		[loop(op->param:Parameters)]
+			[if (param.Type.IsJavaPrimitiveType())]
+/{[param.Name]}\
+			[end if]
+		[end loop]
+"\
+		[if (!op.Name.ToPascalCase().StartsWith("Get"))]
+, method = RequestMethod.POST /* TODO consider other method */\
+		[end if]
+)
 	[else if (bindingType.Equals("WebService"))]
 	//@WebService
 	[else if (bindingType.Equals("WebSockett"))]
@@ -328,10 +384,12 @@ template OperationAnnotation(string bindingType, Operation op)
 end template
 
 
-
-template ParameterAnnotation(string bindingType)
+// TODO what if not primitive? (also check view generator "MethodParameterAnnotated" !)
+template ParameterAnnotation(InputParameter parameter, string bindingType)
 	[if (bindingType.Equals("Rest"))]
+		[if (parameter.Type.IsJavaPrimitiveType())]
 @PathVariable \
+		[end if]
 	[else if (bindingType.Equals("WebService"))]
 		
 	[else if (bindingType.Equals("WebSockett"))]

@@ -226,7 +226,7 @@ namespace MetaDslx.Soal
                         BindingTypeHolder clientFor = new BindingTypeHolder();
                         if (component.References.Any())
                         {
-                            clientFor = GenerateReferenceAccessors(ns, component, dependencies, properties, springInterfaceGen);
+                            clientFor = GenerateReferenceAccessors(ns, component, dependencies, properties, springInterfaceGen, generatorUtil);
                         }
 
                         if (component.Name == dataModule)
@@ -307,17 +307,7 @@ namespace MetaDslx.Soal
                         {
                             if (serv.Interface.Equals(reference.Interface))
                             {
-                                List<Binding> bindings = new List<Binding>();
-                                if (serv.Binding != null)
-                                    bindings.Add(serv.Binding);
-                                if (reference.Binding != null)
-                                    bindings.Add(reference.Binding);
-                                BindingTypeHolder binding = CheckForBindings(bindings);
-
-                                if (!binding.hasAnyBinding())
-                                {
-                                    hasDirectDataAccess = CheckDirectDataAccess(ns, wires, dataModule, reference, comp, serv);
-                                }
+                                hasDirectDataAccess = CheckDirectDataAccess(ns, wires, dataModule, reference, comp, serv);
                             }
                         }
                     }
@@ -812,7 +802,7 @@ namespace MetaDslx.Soal
             }
         }
 
-        private BindingTypeHolder GenerateReferenceAccessors(Namespace ns, Component component, List<string> dependencies, Dictionary<string, string> properties, SpringInterfaceGenerator springInterfaceGen)
+        private BindingTypeHolder GenerateReferenceAccessors(Namespace ns, Component component, List<string> dependencies, Dictionary<string, string> properties, SpringInterfaceGenerator springInterfaceGen, SpringGeneratorUtil generatorUtil)
         {
             BindingTypeHolder clientFor = new BindingTypeHolder();
             foreach (Reference reference in component.References)
@@ -838,11 +828,13 @@ namespace MetaDslx.Soal
                         properties.Add(keyValue.Key, keyValue.Value);
                     }
 
-                    string proxyDir = createJavaDirectory(ns, component.Name, "proxy");
+                    string proxyDir = createJavaDirectory(ns, component.Name, generatorUtil.Properties.proxyPackage);
                     string accessorFile = Path.Combine(proxyDir, reference.Interface.Name+"RestProxy.java");
+                    string currentComponent = ns.Name + "-" + component.Name;
+                    string targetComponent = null; // TODO
                     using (StreamWriter writer = new StreamWriter(accessorFile))
                     {
-                        writer.WriteLine(springInterfaceGen.GenerateProxyForInterface(reference.Interface, component.Name.ToLower(), "Rest"));
+                        writer.WriteLine(springInterfaceGen.GenerateProxyForInterface(reference.Interface, "Rest", currentComponent, targetComponent));
                     }
                 }
                 // TODO Ws & Ws
