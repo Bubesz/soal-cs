@@ -7,18 +7,7 @@ using generator SpringGeneratorUtil;
 template GenerateInterface(Interface iface, string bindingType)
 package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
 ^
-[if (bindingType.Equals("Rest"))]
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-[end if]
-[if (bindingType.Equals("WebService"))]
-//import ?;
-[end if]
-[if (bindingType.Equals("WebSockett"))]
-//import ?;
-[end if]
+[GenerateImportsForBinding(bindingType)]
 
 [SpringGeneratorUtil.GenerateImports(iface, false)]
 ^
@@ -43,13 +32,14 @@ end template
 
 
 
-template GenerateInterfaceImplementation(Interface iface, string functionName)
+template GenerateInterfaceImplementation(Interface iface, string functionName, string dataBinding)
 package [SpringGeneratorUtil.GetPackage(iface)].[functionName];
 ^
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 ^
 import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage].[iface.Name];
+^
 [SpringGeneratorUtil.GenerateImports(iface)]
 ^
 @Service
@@ -57,7 +47,7 @@ public class [iface.Name]Impl implements [iface.Name] {
 [loop (iface->repo:GetRepositories())]
 ^
 	@Autowired
-	private [repo];
+	private [repo][dataBinding];
 [end loop]
 [loop(iface->op:Operations)]
 ^
@@ -248,8 +238,15 @@ package [namespaceName.ToLower()].[SpringGeneratorUtil.Properties.interfacePacka
 ^
 import [namespaceName.ToLower()].[SpringGeneratorUtil.Properties.entityPackage].[entityName];
 ^
+[GenerateImportsForBinding(bindingType)]
+^
+[InterfaceAnnotation(bindingType)]
 public interface [entityName]Repository[bindingType] {
 	// should copy CrudRepository<[entityName], Long>
+
+	[if (bindingType == "Rest")]
+[GenerateCrudMethodsForRest(entityName)]
+	[else]
 ^
 	public long count();
 ^
@@ -272,8 +269,62 @@ public interface [entityName]Repository[bindingType] {
 	public <S extends [entityName]> S save(S entity);
 ^
 	public <S extends [entityName]> Iterable<S> save(Iterable<S> entities);
+	[end if]
 ^
 }
+end template
+
+
+template GenerateImportsForBinding(string bindingType)
+	[if (bindingType == "Rest")]
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+	[end if]
+	[if (bindingType.Equals("WebService"))]
+//import ?;
+	[end if]
+	[if (bindingType.Equals("WebSocket"))]
+//import ?;
+	[end if]
+end template
+
+
+template GenerateCrudMethodsForRest(string entityName)
+^
+	@RequestMapping(value = "/count")
+	public long count();
+^
+	@RequestMapping(value = "/delete/{id}", method = RequestMethod.POST) // TODO Http.Delete method?
+	public void delete(@PathVariable Long id);
+^
+	@RequestMapping(value = "/delete", method = RequestMethod.POST) // TODO Http.Delete method?
+	public void delete(@RequestBody [entityName] entity);
+^
+	@RequestMapping(value = "/delete", method = RequestMethod.POST) // TODO Http.Delete method?
+	public void delete(@RequestBody Iterable<? extends [entityName]> entities);
+^
+	@RequestMapping(value = "/deleteAll", method = RequestMethod.POST) // TODO Http.Delete method?
+	public void deleteAll();
+^
+	@RequestMapping(value = "/exists/{id}")
+	public boolean exists(@PathVariable Long id) ;
+^
+	@RequestMapping(value = "/findAll")
+	public Iterable<[entityName]> findAll();
+^
+	@RequestMapping(value = "/findAll")
+	public Iterable<[entityName]> findAll(@RequestBody Iterable<Long> entities);
+^
+	@RequestMapping(value = "/findOne/{id}")
+	public [entityName] findOne(@PathVariable Long id);
+^
+	@RequestMapping(value = "/save")
+	public <S extends [entityName]> S save(@RequestBody S entity);
+^
+	@RequestMapping(value = "/save")
+	public <S extends [entityName]> Iterable<S> save(@RequestBody Iterable<S> entities);
 end template
 
 

@@ -726,6 +726,23 @@ namespace MetaDslx.Soal
             modules.Add(component.Name + "-API");
             BindingTypeHolder bindingsOfModule = new BindingTypeHolder();
 
+
+            string dataBinding = "";
+            foreach (Reference reference in component.References)
+            {
+                if (reference.Interface is Database)
+                {
+                    List<Binding> binds = GetBindings(ns, reference, reference.Interface);
+                    BindingTypeHolder binding = CheckForBindings(binds);
+                    if (binding.HasRestBinding)
+                        dataBinding = "Rest";
+                    else if (binding.HasWebServiceBinding)
+                        dataBinding = "WebService";
+                    else if (binding.HasWebSocketBinding)
+                        dataBinding = "WebSocket";
+                }
+            }
+
             // TODO collect repo interfaces!
             foreach (Service service in component.Services)
             {
@@ -746,7 +763,7 @@ namespace MetaDslx.Soal
                 string javaFileName = Path.Combine(functionDirectory, iface.Name + "Impl.java");
                 using (StreamWriter writer = new StreamWriter(javaFileName))
                 {
-                    writer.WriteLine(springInterfaceGen.GenerateInterfaceImplementation(iface, component.Name.ToLower()));
+                    writer.WriteLine(springInterfaceGen.GenerateInterfaceImplementation(iface, component.Name.ToLower(), dataBinding));
                 }
 
                 List<Binding> bindings = GetBindings(ns, service, iface);
@@ -877,8 +894,6 @@ namespace MetaDslx.Soal
                     {
                         targetComponent = targetComponent.Split(new string[] { "-API", "-WEB" }, StringSplitOptions.RemoveEmptyEntries)[0];
                     }
-
-                    Console.WriteLine("poxy between: " + currentComponent + " <-> " + targetComponent);
 
                     using (StreamWriter writer = new StreamWriter(accessorFile))
                     {
