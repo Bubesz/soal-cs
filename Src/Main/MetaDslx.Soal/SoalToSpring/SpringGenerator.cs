@@ -1,4 +1,5 @@
 ﻿using MetaDslx.Core;
+using MetaDslx.Soal.SoalToSpring.Contollers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -127,43 +128,187 @@ namespace MetaDslx.Soal
                         }
                     }
                 }
+
+                this.manipulateModel(ns);
             }
-            foreach (var ns in namespaces)
+        }
+
+        private void manipulateModel(Namespace ns)
+        {
+            Dictionary<Component, List<Database>> databasesByComponent = new Dictionary<Component, List<Database>>();
+            var components = ns.Declarations.OfType<Component>();
+            foreach (Component comp in components)
             {
-                if (ns.Uri != null)
+                foreach (Service service in comp.Services)
                 {
-                    foreach (var decl in ns.Declarations)
+                    Database db = service.Interface as Database;
+                    if (db != null)
                     {
-                        Interface intf = decl as Interface;
-                        if (intf != null)
+                        if (!databasesByComponent.ContainsKey(comp))
                         {
-                            foreach (var op in intf.Operations)
-                            {
-                                this.CheckXsdNamespace(op.Result.Type, (ModelObject)op);
-                                foreach (var param in op.Parameters)
-                                {
-                                    this.CheckXsdNamespace(param.Type, (ModelObject)param);
-                                }
-                            }
+                            databasesByComponent.Add(comp, new List<Database>());
                         }
-                        Struct stype = decl as Struct;
-                        if (stype != null)
+                        databasesByComponent[comp].Add(db);
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<Component, List<Database>> entry in databasesByComponent)
+            {
+                Component comp = entry.Key;
+                foreach (Database db in entry.Value)
+                {
+                    using (new ModelContextScope(this.Model))
+                    {
+                        foreach (Struct entity in db.Entities)
                         {
-                            foreach (var prop in stype.Properties)
+                            SoalFactory f = SoalFactory.Instance;
+                            Interface repository = f.CreateInterface();
+                            repository.Name = entity.Name + "Repository";
+                            Service repoServ = f.CreateService();
+                            //repoServ.Name = "asd"; FIXME (read only)
+                            repoServ.OptionalName = "asd";
+                            //((ModelObject)repoServ).
+                            repoServ.Interface = repository;
+                            repository.Namespace = ns;
+                            comp.Services.Add(repoServ);
+
+                            // Operations ...
                             {
-                                this.CheckXsdNamespace(prop.Type, (ModelObject)prop);
+                                // count()
+                                Operation op = f.CreateOperation();
+                                op.Name = "count";
+                                op.Action = "count";
+                                op.Result.Type = SoalInstance.Void;
+                                repository.Operations.Add(op);
+                            }
+                            {
+                                // delete(id);
+                                Operation op = f.CreateOperation();
+                                op.Name = "delete";
+                                op.Action = "count";
+                                op.Result.Type = SoalInstance.Void;
+                                InputParameter param = f.CreateInputParameter();
+                                param.Type = SoalInstance.Long;
+                                param.Name = "id";
+                                op.Parameters.Add(param);
+                                repository.Operations.Add(op);
+                            }
+                            {
+                                // delete(entity);
+                                Operation op = f.CreateOperation();
+                                op.Name = "delete";
+                                op.Action = "count";
+                                op.Result.Type = SoalInstance.Void;
+                                InputParameter param = f.CreateInputParameter();
+                                param.Type = entity;
+                                param.Name = "entity";
+                                op.Parameters.Add(param);
+                                repository.Operations.Add(op);
+                            }
+                            {
+                                // delete(entities);
+                                Operation op = f.CreateOperation();
+                                op.Name = "delete";
+                                op.Action = "count";
+                                op.Result.Type = SoalInstance.Void;
+                                InputParameter param = f.CreateInputParameter();
+                                ArrayType array = f.CreateArrayType();
+                                array.InnerType = entity;
+                                param.Type = array;
+                                param.Name = "entities";
+                                op.Parameters.Add(param);
+                                repository.Operations.Add(op);
+                            }
+                            {
+                                // deleteAll();
+                                Operation op = f.CreateOperation();
+                                op.Name = "deleteAll";
+                                op.Action = "count";
+                                op.Result.Type = SoalInstance.Void;
+                                repository.Operations.Add(op);
+                            }
+                            {
+                                // exists(id);
+                                Operation op = f.CreateOperation();
+                                op.Name = "exists";
+                                op.Action = "count";
+                                op.Result.Type = SoalInstance.Bool;
+                                InputParameter param = f.CreateInputParameter();
+                                param.Type = SoalInstance.Long;
+                                op.Parameters.Add(param);
+                                param.Name = "id";
+                                repository.Operations.Add(op);
+                            }
+                            {
+                                // findAll();
+                                Operation op = f.CreateOperation();
+                                op.Name = "findAll";
+                                op.Action = "count";
+                                ArrayType array = f.CreateArrayType();
+                                array.InnerType = entity;
+                                op.Result.Type = array;
+                                repository.Operations.Add(op);
+                            }
+                            {
+                                // findAll(ids);
+                                Operation op = f.CreateOperation();
+                                op.Name = "findAll";
+                                op.Action = "count";
+                                ArrayType array = f.CreateArrayType();
+                                array.InnerType = entity;
+                                op.Result.Type = array;
+                                InputParameter param = f.CreateInputParameter();
+                                ArrayType array2 = f.CreateArrayType();
+                                array2.InnerType = SoalInstance.Long;
+                                param.Type = array2;
+                                param.Name = "ids";
+                                op.Parameters.Add(param);
+                                repository.Operations.Add(op);
+                            }
+                            {
+                                // findOne(id);
+                                Operation op = f.CreateOperation();
+                                op.Name = "findOne";
+                                op.Action = "count";
+                                op.Result.Type = entity;
+                                InputParameter param = f.CreateInputParameter();
+                                param.Type = SoalInstance.Long;
+                                param.Name = "id";
+                                op.Parameters.Add(param);
+                                repository.Operations.Add(op);
+                            }
+                            {
+                                // save(entity);
+                                Operation op = f.CreateOperation();
+                                op.Name = "save";
+                                op.Action = "count";
+                                op.Result.Type = entity;
+                                InputParameter param = f.CreateInputParameter();
+                                param.Type = entity;
+                                param.Name = "entity";
+                                op.Parameters.Add(param);
+                                repository.Operations.Add(op);
+                            }
+                            {
+                                // save(entities);
+                                Operation op = f.CreateOperation();
+                                op.Name = "save";
+                                op.Action = "count";
+                                ArrayType array = f.CreateArrayType();
+                                array.InnerType = entity;
+                                op.Result.Type = array;
+                                InputParameter param = f.CreateInputParameter();
+                                ArrayType array2 = f.CreateArrayType();
+                                array2.InnerType = entity;
+                                param.Type = array2;
+                                param.Name = "entities";
+                                op.Parameters.Add(param);
+                                repository.Operations.Add(op);
                             }
                         }
                     }
                 }
-            }
-        }
-
-        private void CheckXsdNamespace(SoalType type, ModelObject symbol)
-        {
-            if (!type.HasXsdNamespace())
-            {
-                this.Diagnostics.AddError("The type of this element has no XSD namespace.", this.FileName, symbol);
             }
         }
 
@@ -190,24 +335,136 @@ namespace MetaDslx.Soal
             var namespaces = this.Model.Instances.OfType<Namespace>().ToList();
             foreach (var ns in namespaces)
             {
+                SpringClassGenerator springClassGen = new SpringClassGenerator(ns);
+                SpringInterfaceGenerator springInterfaceGen = new SpringInterfaceGenerator(ns);
+                SpringConfigurationGenerator springConfigGen = new SpringConfigurationGenerator(ns);
+                SpringViewGenerator springViewGen = new SpringViewGenerator(ns);
+                SpringGeneratorUtil generatorUtil = new SpringGeneratorUtil(ns);
+                //generatorUtil.Properties.entityPackage = "asdasd";
+
+                BindingGenerator bindingGenerator = new BindingGenerator(springInterfaceGen);
+                DirectoryHandler directoryHandler = new DirectoryHandler();
+                DependencyDiscoverer dependencyDiscoverer = new DependencyDiscoverer(bindingGenerator);
+                DataAccessFinder dataAccessFinder = new DataAccessFinder(bindingGenerator);
+                ModelGenerator modelGenerator = new ModelGenerator(directoryHandler);
+                JSFGenerator jSFGenerator = new JSFGenerator(springViewGen, generatorUtil, directoryHandler);
+                ComponentGenerator componentGenerator =
+                    new ComponentGenerator(springInterfaceGen, springClassGen, springConfigGen, springViewGen, generatorUtil, bindingGenerator, directoryHandler);
+                DataGenerator dataGenerator =
+                    new DataGenerator(springInterfaceGen, springClassGen, springConfigGen, generatorUtil, bindingGenerator, directoryHandler);
+
+
                 if (ns.Uri != null)
                 {
-                    if (!this.SingleFileWsdl)
+                    List<Struct> entities = new List<Struct>();
+                    List<string> modules = new List<string>();
+                    string dataModule = ""; // FIXME
+
+                    //foreach (Component component in ns.Declarations.OfType<Component>())
+                    //{
+                    //    foreach (Service service in component.Services)
+                    //    {
+                    //        if (service.Interface is Database)
+                    //        {
+                    //            if (dataModule != "")
+                    //            {
+                    //                Console.WriteLine("Multiple data components are not allowed.");
+                    //                return;
+                    //            }
+                    //            dataModule = component.Name;
+                    //        }
+                    //    }
+                    //}
+
+                    foreach (Database db in ns.Declarations.OfType<Database>())
                     {
-                        string xsdFileName = Path.Combine(xsdDirectory, ns.FullName + ".xsd");
-                        using (StreamWriter writer = new StreamWriter(xsdFileName))
+                        entities.AddRange(db.Entities);
+                    }
+
+                    List<Wire> wires = new List<Wire>();
+
+                    foreach (Composite comppsoite in ns.Declarations.OfType<Composite>())
+                    {
+                        foreach (Wire wire in comppsoite.Wires)
                         {
-                            XsdGenerator xsdGen = new XsdGenerator(ns);
-                            writer.WriteLine(xsdGen.Generate(ns));
+                            wires.Add(wire);
                         }
                     }
-                    string wsdlFileName = Path.Combine(wsdlDirectory, ns.FullName + ".wsdl");
-                    using (StreamWriter writer = new StreamWriter(wsdlFileName))
+
+                    Dictionary<string, string> properties = new Dictionary<string, string>();
+                    foreach (Component component in ns.Declarations.OfType<Component>())
                     {
-                        WsdlGenerator wsdlGen = new WsdlGenerator(ns);
-                        wsdlGen.Properties.SingleFileWsdl = this.SingleFileWsdl;
-                        wsdlGen.Properties.SeparateXsdWsdl = this.SeparateXsdWsdl;
-                        writer.WriteLine(wsdlGen.Generate(ns));
+                        modules.Add(component.Name);
+                        ComponentType cType = ComponentType.IMPLEMENTATION;
+
+                        Dictionary<Reference, Component> dependencyMap = dependencyDiscoverer.GetherDependencyMap(ns, wires, component);
+                        List<string> dependencies = dependencyDiscoverer.GetherDependencies(dependencyMap);
+                        bool directDataAccess = dataAccessFinder.HasDirectDataAccess(ns, wires, component, dataModule);
+
+
+                        if (component.Services.Any())
+                        {
+                            componentGenerator.GenerateServiceImplementations(ns, modules, dataModule, component, dependencies);
+                        }
+                        else
+                        {
+                            if (component.Implementation != null && component.Implementation.Name.Equals("JSF"))
+                            {
+                                cType = ComponentType.WEB;
+                                jSFGenerator.GenerateWebTier(ns, component, directDataAccess);
+                            }
+                            if (component is Composite)
+                            {
+                                string facadeDir = directoryHandler.createJavaDirectory(ns, component.Name, generatorUtil.Properties.serviceFacadePackage);
+                                string facadeFile = Path.Combine(facadeDir, component.Name + "Facade.java");
+                                using (StreamWriter writer = new StreamWriter(facadeFile))
+                                {
+                                    writer.WriteLine(springClassGen.GenerateComponent(component));
+                                }
+                            }
+                        }
+                        BindingTypeHolder clientFor = new BindingTypeHolder();
+                        if (component.References.Any())
+                        {
+                            clientFor = componentGenerator.GenerateReferenceAccessors(ns, component, dependencyMap, properties, springInterfaceGen, generatorUtil);
+                        }
+
+                        if (component.Name == dataModule)
+                        {
+                            //GenerateDataModule(ns, component, springClassGen, springConfigGen, generatorUtil, springInterfaceGen, entities, modules);
+                        }
+
+                        // generate pom.xml and spring-config.xml
+                        directoryHandler.createJavaDirectory(ns, component.Name, "");
+                        string fileName = Path.Combine(ns.Name + "-" + component.Name, "pom.xml");
+                        using (StreamWriter writer = new StreamWriter(fileName))
+                        {
+                            string s = springConfigGen.GenerateComponentPom(ns, component, dependencies,
+                                clientFor.HasRestBinding, clientFor.HasWebServiceBinding, clientFor.HasWebSocketBinding, cType);
+                            writer.WriteLine(s);
+                        }
+
+                        string mvnJavaDir = Path.Combine("src", "main", "java"); // FIXME
+                        fileName = Path.Combine(ns.Name + "-" + component.Name, mvnJavaDir, "spring-config.xml");
+                        using (StreamWriter writer = new StreamWriter(fileName))
+                        {
+                            writer.WriteLine(springConfigGen.GenerateComponentSpringConfig(ns));
+                        }
+                    }
+
+                    if (entities.Any() || ns.Declarations.OfType<Enum>().Any())
+                    {
+                        modules.Add("Model");
+                        modelGenerator.GenerateModelModule(ns, entities, properties, springClassGen, springConfigGen, generatorUtil);
+                    }
+
+                    // generate master pom.xml
+                    if (modules.Any())
+                    {
+                        using (StreamWriter writer = new StreamWriter("pom.xml"))
+                        {
+                            writer.WriteLine(springConfigGen.GenerateMasterPom(ns, modules));
+                        }
                     }
                 }
             }

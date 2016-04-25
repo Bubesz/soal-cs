@@ -118,7 +118,6 @@
       <DependentUpon>XsdGenerator.mgen</DependentUpon>
     </Compile>
     <Compile Include="XsdReader.cs" />
-    <Compile Include="SoalToSpring\SoalToSpringCompiler.cs" />
     <Compile Include="SoalToSpring\Generators\SpringConfigurationGenerator.cs">
       <DependentUpon>SpringConfigurationGenerator.mgen</DependentUpon>
       <AutoGen>True</AutoGen>

@@ -1,4 +1,6 @@
-﻿using MetaDslx.Soal;
+﻿
+using MetaDslx.Core;
+using MetaDslx.Soal;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -77,10 +79,12 @@ namespace Soal
                 using (StreamReader reader = new StreamReader(fileName))
                 {
                     string source = reader.ReadToEnd();
-                    SoalToSpringCompiler compiler = new SoalToSpringCompiler(source, outputDirectory, Path.GetFileName(fileName));
+                    SpringCompiler compiler = new SpringCompiler(source, Path.GetFileName(fileName));
                     compiler.Compile();
                     if (!compiler.Diagnostics.HasErrors())
                     {
+                        Model model = compiler.Model;
+                        //GenJpaInterface(model);
                         SoalGenerator generator = new SoalGenerator(compiler.Model, outputDirectory, compiler.Diagnostics, compiler.FileName);
                         generator.SeparateXsdWsdl = separateXsdWsdl;
                         generator.SingleFileWsdl = singleFileWsdl;
