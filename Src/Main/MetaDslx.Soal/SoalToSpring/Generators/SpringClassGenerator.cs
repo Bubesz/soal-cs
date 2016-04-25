@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringClassGenerator_1295978090;
-    namespace __Hidden_SpringClassGenerator_1295978090
+    using __Hidden_SpringClassGenerator_1189907174;
+    namespace __Hidden_SpringClassGenerator_1189907174
     {
         internal static class __Extensions
         {

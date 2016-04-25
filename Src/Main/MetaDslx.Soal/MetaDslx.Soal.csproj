@@ -43,14 +43,24 @@
     <Reference Include="Antlr4.Runtime" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ComponentType.cs" />
-    <Compile Include="SpringViewGenerator1.cs">
+    <Compile Include="SoalToSpring\ComponentType.cs" />
+    <Compile Include="SoalToSpring\Contollers\BindingGenerator.cs" />
+    <Compile Include="SoalToSpring\Contollers\ComponentGenerator.cs" />
+    <Compile Include="SoalToSpring\Contollers\DataAccessFinder.cs" />
+    <Compile Include="SoalToSpring\Contollers\DataGenerator.cs" />
+    <Compile Include="SoalToSpring\Contollers\DependencyDiscoverer.cs" />
+    <Compile Include="SoalToSpring\Contollers\DirectoryHandler.cs" />
+    <Compile Include="SoalToSpring\Contollers\JSFGenerator.cs" />
+    <Compile Include="SoalToSpring\Contollers\ModelGenerator.cs" />
+    <Compile Include="SoalToSpring\SpringGenerator.cs" />
+    <Compile Include="SoalToSpring\SpringCompiler.cs" />
+    <Compile Include="SoalToSpring\Generators\SpringViewGenerator1.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>SpringViewGenerator.mgen</DependentUpon>
     </Compile>
-    <Compile Include="ViewInfoHolder.cs" />
-    <Compile Include="BindingTypeHolder.cs" />
+    <Compile Include="SoalToSpring\ViewInfoHolder.cs" />
+    <Compile Include="SoalToSpring\BindingTypeHolder.cs" />
     <Compile Include="SoalParser.cs">
       <DependentUpon>SoalParser.ag4</DependentUpon>
     </Compile>
@@ -69,7 +79,7 @@
     <Compile Include="SoalParserVisitor.cs">
       <DependentUpon>SoalParser.ag4</DependentUpon>
     </Compile>
-    <Compile Include="SpringInterfaceGenerator.cs">
+    <Compile Include="SoalToSpring\Generators\SpringInterfaceGenerator.cs">
       <DependentUpon>SpringInterfaceGenerator.mgen</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -108,18 +118,18 @@
       <DependentUpon>XsdGenerator.mgen</DependentUpon>
     </Compile>
     <Compile Include="XsdReader.cs" />
-    <Compile Include="SoalToSpringCompiler.cs" />
-    <Compile Include="SpringConfigurationGenerator.cs">
+    <Compile Include="SoalToSpring\SoalToSpringCompiler.cs" />
+    <Compile Include="SoalToSpring\Generators\SpringConfigurationGenerator.cs">
       <DependentUpon>SpringConfigurationGenerator.mgen</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="SpringClassGenerator.cs">
+    <Compile Include="SoalToSpring\Generators\SpringClassGenerator.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>SpringClassGenerator.mgen</DependentUpon>
     </Compile>
-    <Compile Include="SpringGeneratorUtil.cs">
+    <Compile Include="SoalToSpring\Generators\SpringGeneratorUtil.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>SpringGeneratorUtil.mgen</DependentUpon>
@@ -160,11 +170,11 @@
       <Generator>MetaGenerator</Generator>
       <LastGenOutput>SoalPrinter.cs</LastGenOutput>
     </None>
-    <None Include="SpringViewGenerator.mgen">
+    <None Include="SoalToSpring\Generators\SpringViewGenerator.mgen">
       <Generator>MetaGenerator</Generator>
       <LastGenOutput>SpringViewGenerator1.cs</LastGenOutput>
     </None>
-    <None Include="SpringInterfaceGenerator.mgen">
+    <None Include="SoalToSpring\Generators\SpringInterfaceGenerator.mgen">
       <Generator>MetaGenerator</Generator>
       <LastGenOutput>SpringInterfaceGenerator.cs</LastGenOutput>
     </None>
@@ -176,15 +186,15 @@
       <Generator>MetaGenerator</Generator>
       <LastGenOutput>XsdGenerator.cs</LastGenOutput>
     </None>
-    <None Include="SpringConfigurationGenerator.mgen">
+    <None Include="SoalToSpring\Generators\SpringConfigurationGenerator.mgen">
       <Generator>MetaGenerator</Generator>
       <LastGenOutput>SpringConfigurationGenerator.cs</LastGenOutput>
     </None>
-    <None Include="SpringGeneratorUtil.mgen">
+    <None Include="SoalToSpring\Generators\SpringGeneratorUtil.mgen">
       <Generator>MetaGenerator</Generator>
       <LastGenOutput>SpringGeneratorUtil.cs</LastGenOutput>
     </None>
-    <None Include="SpringClassGenerator.mgen">
+    <None Include="SoalToSpring\Generators\SpringClassGenerator.mgen">
       <Generator>MetaGenerator</Generator>
       <LastGenOutput>SpringClassGenerator.cs</LastGenOutput>
     </None>

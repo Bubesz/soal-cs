@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal
 {
-    class BindingTypeHolder
+    public class BindingTypeHolder
     {
         private bool restBinding = false;
         private bool webServiceBinding = false;
