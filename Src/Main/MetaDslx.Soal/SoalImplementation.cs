@@ -63,26 +63,16 @@ namespace MetaDslx.Soal
             {
                 if (@this.OptionalName != null)
                 {
-                    Console.WriteLine(@this.OptionalName);
                     return @this.OptionalName;
                 }
                 else
                 {
-                    if (@this.Interface != null)
-                    {
-                        Console.WriteLine("IFname: " + @this.Interface.Name);
-                        return @this.Interface.Name;
-                    }
-                    else
-                    {
-                        Console.WriteLine("empty");
-                        return string.Empty;
-                    }
+                    if (@this.Interface != null) return @this.Interface.Name;
+                    else return string.Empty;
                 }
             }
             else
             {
-                Console.WriteLine("op: " + @this.OptionalName);
                 return @this.OptionalName ?? string.Empty;
             }
         }
@@ -615,9 +605,6 @@ namespace MetaDslx.Soal
                     {
                         javaName = dec.Name;
                     }
-                } else
-                {
-                    //Console.WriteLine(type.GetJavaName() +" is not dec");
                 }
             }
             
