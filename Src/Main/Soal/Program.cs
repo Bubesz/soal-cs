@@ -85,7 +85,7 @@ namespace Soal
                     {
                         Model model = compiler.Model;
                         //GenJpaInterface(model);
-                        SoalGenerator generator = new SoalGenerator(compiler.Model, outputDirectory, compiler.Diagnostics, compiler.FileName);
+                        SpringGenerator generator = new SpringGenerator(compiler.Model, outputDirectory, compiler.Diagnostics, compiler.FileName);
                         generator.SeparateXsdWsdl = separateXsdWsdl;
                         generator.SingleFileWsdl = singleFileWsdl;
                         generator.Generate();
