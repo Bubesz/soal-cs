@@ -8,9 +8,9 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
 {
     public class DataAccessFinder
     {
-        private BindingGenerator bindingGenerator;
+        private BindingDiscoverer bindingGenerator;
 
-        public DataAccessFinder(BindingGenerator bindingGenerator)
+        public DataAccessFinder(BindingDiscoverer bindingGenerator)
         {
             this.bindingGenerator = bindingGenerator;
         }

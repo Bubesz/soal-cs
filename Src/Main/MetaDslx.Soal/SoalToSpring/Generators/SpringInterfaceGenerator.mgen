@@ -4,12 +4,12 @@ generator SpringInterfaceGenerator for object;
 using generator SpringGeneratorUtil;
 
 
-template GenerateInterface(Interface iface, string bindingType)
-package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage];
+template GenerateInterface(Interface iface, string bindingType, string package)
+package [SpringGeneratorUtil.GetPackage(iface)].[package];
 ^
 [GenerateImportsForBinding(bindingType)]
 
-[SpringGeneratorUtil.GenerateImports(iface, false)]
+[SpringGeneratorUtil.GenerateImports(iface)]
 ^
 [InterfaceAnnotation(bindingType)]
 public interface [iface.Name][bindingType] {
@@ -40,22 +40,22 @@ import org.springframework.stereotype.Service;
 ^
 import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage].[iface.Name];
 ^
-[SpringGeneratorUtil.GenerateImports(iface)]
+[SpringGeneratorUtil.GenerateImports(iface, true, dataBinding)]
 ^
 @Service
 public class [iface.Name]Impl implements [iface.Name] {
-[loop (iface->repo:GetRepositories())]
+[loop (iface->repo:GetRepositories(dataBinding))]
 ^
 	@Autowired
-	private [repo][dataBinding];
+	private [repo] [repo.ToLower()];
 [end loop]
 [loop(iface->op:Operations)]
 ^
 	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
 	[if (op.Exceptions.Any())]
- throws [SpringGeneratorUtil.GetExceptionList(op)] \
+ throws [SpringGeneratorUtil.GetExceptionList(op)]\
 	[end if]
-{
+ {
 		// TODO implement method
 		throw new UnsupportedOperationException("Not yet implemented.");
 	}
@@ -65,32 +65,37 @@ end template
 
 
 // proxies to business logic
-template GenerateProxyInterfaceImplementation(Interface iface, string functionName, string bindingType)
+template GenerateProxyInterfaceImplementation(Interface iface, string functionName, string bindingType, string package, string dataBinding)
 package [SpringGeneratorUtil.GetPackage(iface)].[functionName];
 ^
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 ^
-import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage].[iface.Name][bindingType];
-[SpringGeneratorUtil.GenerateImports(iface, false)]
+import [SpringGeneratorUtil.GetPackage(iface)].[package].[iface.Name][bindingType];
+[SpringGeneratorUtil.GenerateImports(iface, true, dataBinding)]
 ^
 @Service
 public class [iface.Name][bindingType]Impl implements [iface.Name][bindingType] {
 ^
+	[string impl=""]
+	[if (package == SpringGeneratorUtil.Properties.interfacePackage)]
+		[impl="Impl"]
+	[end if]
+
 	@Autowired
-	private [iface.Name]Impl [iface.Name.ToCamelCase()]Impl;
+	private [iface.Name][impl] [iface.Name.ToCamelCase()][impl];
 
 [loop(iface->op:Operations)]
 ^
-	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
+	public [op.Result.Type.GetJavaName()] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)]) \
 	[if (op.Exceptions.Any())]
- throws [SpringGeneratorUtil.GetExceptionList(op)] \
+ throws [SpringGeneratorUtil.GetExceptionList(op)]\
 	[end if]
-{
+ {
 			[if (op.Result.Type.GetJavaName() != "void")]
-		return [iface.Name.ToCamelCase()]Impl.[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
+		return [iface.Name.ToCamelCase()][impl].[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
 			[else]
-		[iface.Name.ToCamelCase()]Impl.[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
+		[iface.Name.ToCamelCase()][impl].[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
 			[end if]
 	}
 [end loop]
@@ -116,7 +121,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 ^
 import cinema.Configuration;
 import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage].[iface.Name][bindingType];
-[SpringGeneratorUtil.GenerateImports(iface, false)]
+[SpringGeneratorUtil.GenerateImports(iface)]
 ^
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
@@ -139,9 +144,9 @@ public class [iface.Name][bindingType]Proxy implements [iface.Name][bindingType]
 	@Override
 	public [resultJavaName] [op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterList(op)])\
 	[if (op.Exceptions.Any())]
- throws [SpringGeneratorUtil.GetExceptionList(op)] \
+ throws [SpringGeneratorUtil.GetExceptionList(op)]\
 	[end if]
-{
+ {
 		String url = getUrlOf[op.Name.ToPascalCase()]([SpringGeneratorUtil.GetParameterNameList(op)]);
 		
 	[string method = "POST"]

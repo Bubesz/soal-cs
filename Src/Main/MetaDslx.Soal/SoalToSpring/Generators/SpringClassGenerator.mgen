@@ -172,7 +172,7 @@ import [SpringGeneratorUtil.GetPackage(reference.Interface)].[SpringGeneratorUti
 @Service
 public class [component.Name]Facade {
 ^
-[loop (component->repo:GetRepositories())]
+[loop (component->repo:GetRepositories(""))]
 	@Autowired
 	[repo];
 ^

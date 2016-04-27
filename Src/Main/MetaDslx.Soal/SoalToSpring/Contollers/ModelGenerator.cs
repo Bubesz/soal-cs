@@ -22,9 +22,12 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             string baseJavaDir = directoryHandler.createJavaDirectory(ns, "Model", "");
             //pom.xml
             string filename = Path.Combine(ns.Name + "-Model", "pom.xml");
+            Component comp = new ComponentImpl();
+            comp.Name = "Model";
+
             using (StreamWriter writer = new StreamWriter(filename))
             {
-                writer.WriteLine(springConfigGen.GenerateDataPom(ns, "Model"));
+                writer.WriteLine(springConfigGen.GenerateComponentPom(ns, comp, new List<string>(), false, false, false, ComponentType.DATA));
             }
 
             // generate persistence.xml

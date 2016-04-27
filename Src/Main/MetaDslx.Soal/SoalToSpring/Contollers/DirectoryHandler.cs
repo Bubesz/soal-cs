@@ -36,7 +36,7 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             return directory;
         }
 
-        public string createJavaDirectory(Namespace ns, string projectSuffix, string subDir)
+        public string createJavaDirectory(Namespace ns, string projectSuffix, string subDir, bool addInnerDir=true)
         {
             string innerDir = Path.Combine(ns.FullName.ToLower().Split('.'));
             string projectDir = "";
@@ -45,7 +45,15 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             else
                 projectDir = ns.Name;
 
-            string directory = Path.Combine(projectDir, this.mvnJavaDir, innerDir, subDir);
+            string directory;
+            if (addInnerDir)
+            {
+                directory = Path.Combine(projectDir, this.mvnJavaDir, innerDir, subDir);
+            }
+            else
+            {
+                directory = Path.Combine(projectDir, this.mvnJavaDir, subDir);
+            }
             Directory.CreateDirectory(directory);
 
             return directory;

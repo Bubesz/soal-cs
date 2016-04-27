@@ -35,14 +35,15 @@ end template
 
 
 template GenerateImports(Declaration declaration)
-[GenerateImports(declaration, true)]
+[GenerateImports(declaration, false, "")]
 end template
 
 
 
-template GenerateImports(Declaration declaration, bool reposNeeded)
-	[if (declaration.GetImports().Any())]
-		[loop (declaration->import:GetImports())]
+template GenerateImports(Declaration declaration, bool reposNeeded, string dataBinding)
+	[var imports = declaration.GetImports(dataBinding)]
+	[if (imports.Any())]
+		[loop (import : imports)]
 			[if ( !(import.Contains("repo") && reposNeeded==false ))]
 [import]
 			[end if]

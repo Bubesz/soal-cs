@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringViewGenerator_1810516831;
-    namespace __Hidden_SpringViewGenerator_1810516831
+    using __Hidden_SpringViewGenerator_46587992;
+    namespace __Hidden_SpringViewGenerator_46587992
     {
         internal static class __Extensions
         {
@@ -251,7 +251,7 @@ namespace MetaDslx.Soal //1:1
             if (__tmp15Line != null) __out.Append(__tmp15Line);
             __out.AppendLine(false); //38:186
             StringBuilder __tmp17 = new StringBuilder();
-            __tmp17.Append(SpringGeneratorUtil.GenerateImports(reference.Interface, false));
+            __tmp17.Append(SpringGeneratorUtil.GenerateImports(reference.Interface));
             using(StreamReader __tmp17Reader = new StreamReader(this.__ToStream(__tmp17.ToString())))
             {
                 bool __tmp17_first = true;
@@ -263,7 +263,7 @@ namespace MetaDslx.Soal //1:1
                     __tmp17_last = __tmp17Reader.EndOfStream;
                     if (__tmp17Line != null) __out.Append(__tmp17Line);
                     if (!__tmp17_last) __out.AppendLine(true);
-                    __out.AppendLine(false); //39:66
+                    __out.AppendLine(false); //39:59
                 }
             }
             __out.AppendLine(true); //40:1

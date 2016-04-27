@@ -1,21 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MetaDslx.Soal.SoalToSpring.Contollers
 {
-    public class BindingGenerator
+    public class BindingDiscoverer
     {
-        private SpringInterfaceGenerator springInterfaceGen;
-
-        public BindingGenerator(SpringInterfaceGenerator springInterfaceGen)
-        {
-            this.springInterfaceGen = springInterfaceGen;
-        }
-
         public BindingTypeHolder CheckForBindings(List<Binding> bindings)
         {
             BindingTypeHolder result = new BindingTypeHolder();
@@ -45,43 +37,51 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             return result;
         }
 
-        public List<Binding> GetBindings(Namespace ns, Port interfaceReference, Interface iface)
+        public List<Binding> GetBindings(Namespace ns, Port port)
         {
-            HashSet<Binding> bindings = new HashSet<Binding>();
 
-            if (interfaceReference.Binding != null)
+            if (port.Interface.Name.Contains("Repository"))
             {
-                bindings.Add(interfaceReference.Binding);
-            }
-
-            foreach (Composite composite in ns.Declarations.OfType<Composite>())
-            {
-                foreach (Wire wire in composite.Wires)
+                foreach (Service service in port.Component.Services)
                 {
-                    Port port = null;
-                    if (wire.Source.Equals(interfaceReference))
+                    Database db = service.Interface as Database;
+                    if (db != null)
                     {
-                        port = wire.Target;
-                    }
-                    if (wire.Target.Equals(interfaceReference))
-                    {
-                        port = wire.Source;
-                    }
-                    if (port != null)
-                    {
-                        if (port.Binding != null)
-                        {
-                            bindings.Add(port.Binding);
-                        }
+                        return GetBindings(ns, service);
                     }
                 }
             }
 
+            HashSet<Binding> bindings = new HashSet<Binding>();
+
+            // check port
+            if (port.Binding != null)
+            {
+                bindings.Add(port.Binding);
+            }
+
+            // check other side of wires
+            foreach (Composite composite in ns.Declarations.OfType<Composite>())
+            {
+                foreach (Wire wire in composite.Wires)
+                {
+                    if (wire.Source.Equals(port))
+                    {
+                        bindings.Add(wire.Target.Binding);
+                    }
+                    if (wire.Target.Equals(port))
+                    {
+                        bindings.Add(wire.Source.Binding);
+                    }
+                }
+            }
+
+            // check references
             foreach (Component component in ns.Declarations.OfType<Component>())
             {
                 foreach (Reference reference in component.References)
                 {
-                    if (reference.Interface.Equals(iface))
+                    if (reference.Interface.Equals(port.Interface))
                     {
                         if (reference.Binding != null)
                         {
@@ -91,6 +91,22 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                 }
             }
 
+            // check services
+            foreach (Component component in ns.Declarations.OfType<Component>())
+            {
+                foreach (Service service in component.Services)
+                {
+                    if (service.Interface.Equals(port.Interface))
+                    {
+                        if (service.Binding != null)
+                        {
+                            bindings.Add(service.Binding);
+                        }
+                    }
+                }
+            }
+
+            bindings.Remove(null);
             return new List<Binding>(bindings);
         }
     }

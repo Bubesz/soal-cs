@@ -44,10 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SoalToSpring\ComponentType.cs" />
-    <Compile Include="SoalToSpring\Contollers\BindingGenerator.cs" />
+    <Compile Include="SoalToSpring\Contollers\BindingDiscoverer.cs" />
     <Compile Include="SoalToSpring\Contollers\ComponentGenerator.cs" />
     <Compile Include="SoalToSpring\Contollers\DataAccessFinder.cs" />
-    <Compile Include="SoalToSpring\Contollers\DataGenerator.cs" />
     <Compile Include="SoalToSpring\Contollers\DependencyDiscoverer.cs" />
     <Compile Include="SoalToSpring\Contollers\DirectoryHandler.cs" />
     <Compile Include="SoalToSpring\Contollers\JSFGenerator.cs" />

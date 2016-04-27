@@ -127,15 +127,34 @@ namespace MetaDslx.Soal
                             }
                         }
                     }
-                }
 
-                this.manipulateModel(ns);
+                    foreach (Component component in ns.Declarations.OfType<Component>())
+                    {
+                        foreach (Component comp in ns.Declarations.OfType<Component>())
+                        {
+                            bool hasDataAccess = false;
+                            foreach (Reference reference in component.References)
+                            {
+                                if (reference.Interface is Database)
+                                {
+                                    if (hasDataAccess)
+                                    {
+                                        this.Diagnostics.AddError("Multiple data components are not allowed to be referenced in one component.", this.FileName, comp);
+                                    }
+                                    hasDataAccess = true;
+                                }
+                            }
+                        }
+                    }
+
+                    this.manipulateModel(ns);
+                }
             }
         }
 
         private void manipulateModel(Namespace ns)
         {
-            Dictionary<Component, List<Database>> databasesByComponent = new Dictionary<Component, List<Database>>();
+            Dictionary<Component, List<Service>> databasesByComponent = new Dictionary<Component, List<Service>>();
             var components = ns.Declarations.OfType<Component>();
             foreach (Component comp in components)
             {
@@ -146,18 +165,19 @@ namespace MetaDslx.Soal
                     {
                         if (!databasesByComponent.ContainsKey(comp))
                         {
-                            databasesByComponent.Add(comp, new List<Database>());
+                            databasesByComponent.Add(comp, new List<Service>());
                         }
-                        databasesByComponent[comp].Add(db);
+                        databasesByComponent[comp].Add(service);
                     }
                 }
             }
 
-            foreach (KeyValuePair<Component, List<Database>> entry in databasesByComponent)
+            foreach (KeyValuePair<Component, List<Service>> entry in databasesByComponent)
             {
                 Component comp = entry.Key;
-                foreach (Database db in entry.Value)
+                foreach (Service dbServ in entry.Value)
                 {
+                    Database db = dbServ.Interface as Database;
                     using (new ModelContextScope(this.Model))
                     {
                         foreach (Struct entity in db.Entities)
@@ -166,10 +186,8 @@ namespace MetaDslx.Soal
                             Interface repository = f.CreateInterface();
                             repository.Name = entity.Name + "Repository";
                             Service repoServ = f.CreateService();
-                            //repoServ.Name = "asd"; FIXME (read only)
-                            repoServ.OptionalName = "asd";
-                            //((ModelObject)repoServ).
                             repoServ.Interface = repository;
+                            repoServ.Binding = dbServ.Binding;
                             repository.Namespace = ns;
                             comp.Services.Add(repoServ);
 
@@ -316,23 +334,8 @@ namespace MetaDslx.Soal
         {
             this.PrepareGeneration();
             if (this.Diagnostics.HasErrors()) return;
-            if (this.SingleFileWsdl)
-            {
-                this.SeparateXsdWsdl = false;
-            }
-            string xsdDirectory = Path.Combine(this.OutputDirectory, "xsd");
-            string wsdlDirectory = Path.Combine(this.OutputDirectory, "wsdl");
-            if (this.SeparateXsdWsdl)
-            {
-                Directory.CreateDirectory(xsdDirectory);
-            }
-            else
-            {
-                xsdDirectory = wsdlDirectory;
-            }
-            Directory.CreateDirectory(wsdlDirectory);
 
-            var namespaces = this.Model.Instances.OfType<Namespace>().ToList();
+            var namespaces = this.Model.Instances.OfType<Namespace>();
             foreach (var ns in namespaces)
             {
                 SpringClassGenerator springClassGen = new SpringClassGenerator(ns);
@@ -342,47 +345,28 @@ namespace MetaDslx.Soal
                 SpringGeneratorUtil generatorUtil = new SpringGeneratorUtil(ns);
                 //generatorUtil.Properties.entityPackage = "asdasd";
 
-                BindingGenerator bindingGenerator = new BindingGenerator(springInterfaceGen);
+                BindingDiscoverer bindingDiscoverer = new BindingDiscoverer();
                 DirectoryHandler directoryHandler = new DirectoryHandler();
-                DependencyDiscoverer dependencyDiscoverer = new DependencyDiscoverer(bindingGenerator);
-                DataAccessFinder dataAccessFinder = new DataAccessFinder(bindingGenerator);
+                DependencyDiscoverer dependencyDiscoverer = new DependencyDiscoverer(bindingDiscoverer);
+                DataAccessFinder dataAccessFinder = new DataAccessFinder(bindingDiscoverer);
                 ModelGenerator modelGenerator = new ModelGenerator(directoryHandler);
                 JSFGenerator jSFGenerator = new JSFGenerator(springViewGen, generatorUtil, directoryHandler);
-                ComponentGenerator componentGenerator =
-                    new ComponentGenerator(springInterfaceGen, springClassGen, springConfigGen, springViewGen, generatorUtil, bindingGenerator, directoryHandler);
-                DataGenerator dataGenerator =
-                    new DataGenerator(springInterfaceGen, springClassGen, springConfigGen, generatorUtil, bindingGenerator, directoryHandler);
 
+                ComponentGenerator componentGenerator =
+                    new ComponentGenerator(springInterfaceGen, springClassGen, springConfigGen, springViewGen, generatorUtil,
+                    bindingDiscoverer, directoryHandler, dependencyDiscoverer, dataAccessFinder, jSFGenerator);
 
                 if (ns.Uri != null)
                 {
-                    List<Struct> entities = new List<Struct>();
                     List<string> modules = new List<string>();
-                    string dataModule = ""; // FIXME
 
-                    //foreach (Component component in ns.Declarations.OfType<Component>())
-                    //{
-                    //    foreach (Service service in component.Services)
-                    //    {
-                    //        if (service.Interface is Database)
-                    //        {
-                    //            if (dataModule != "")
-                    //            {
-                    //                Console.WriteLine("Multiple data components are not allowed.");
-                    //                return;
-                    //            }
-                    //            dataModule = component.Name;
-                    //        }
-                    //    }
-                    //}
-
+                    List<Struct> entities = new List<Struct>();
                     foreach (Database db in ns.Declarations.OfType<Database>())
                     {
                         entities.AddRange(db.Entities);
                     }
 
                     List<Wire> wires = new List<Wire>();
-
                     foreach (Composite comppsoite in ns.Declarations.OfType<Composite>())
                     {
                         foreach (Wire wire in comppsoite.Wires)
@@ -391,66 +375,7 @@ namespace MetaDslx.Soal
                         }
                     }
 
-                    Dictionary<string, string> properties = new Dictionary<string, string>();
-                    foreach (Component component in ns.Declarations.OfType<Component>())
-                    {
-                        modules.Add(component.Name);
-                        ComponentType cType = ComponentType.IMPLEMENTATION;
-
-                        Dictionary<Reference, Component> dependencyMap = dependencyDiscoverer.GetherDependencyMap(ns, wires, component);
-                        List<string> dependencies = dependencyDiscoverer.GetherDependencies(dependencyMap);
-                        bool directDataAccess = dataAccessFinder.HasDirectDataAccess(ns, wires, component, dataModule);
-
-
-                        if (component.Services.Any())
-                        {
-                            componentGenerator.GenerateServiceImplementations(ns, modules, dataModule, component, dependencies);
-                        }
-                        else
-                        {
-                            if (component.Implementation != null && component.Implementation.Name.Equals("JSF"))
-                            {
-                                cType = ComponentType.WEB;
-                                jSFGenerator.GenerateWebTier(ns, component, directDataAccess);
-                            }
-                            if (component is Composite)
-                            {
-                                string facadeDir = directoryHandler.createJavaDirectory(ns, component.Name, generatorUtil.Properties.serviceFacadePackage);
-                                string facadeFile = Path.Combine(facadeDir, component.Name + "Facade.java");
-                                using (StreamWriter writer = new StreamWriter(facadeFile))
-                                {
-                                    writer.WriteLine(springClassGen.GenerateComponent(component));
-                                }
-                            }
-                        }
-                        BindingTypeHolder clientFor = new BindingTypeHolder();
-                        if (component.References.Any())
-                        {
-                            clientFor = componentGenerator.GenerateReferenceAccessors(ns, component, dependencyMap, properties, springInterfaceGen, generatorUtil);
-                        }
-
-                        if (component.Name == dataModule)
-                        {
-                            //GenerateDataModule(ns, component, springClassGen, springConfigGen, generatorUtil, springInterfaceGen, entities, modules);
-                        }
-
-                        // generate pom.xml and spring-config.xml
-                        directoryHandler.createJavaDirectory(ns, component.Name, "");
-                        string fileName = Path.Combine(ns.Name + "-" + component.Name, "pom.xml");
-                        using (StreamWriter writer = new StreamWriter(fileName))
-                        {
-                            string s = springConfigGen.GenerateComponentPom(ns, component, dependencies,
-                                clientFor.HasRestBinding, clientFor.HasWebServiceBinding, clientFor.HasWebSocketBinding, cType);
-                            writer.WriteLine(s);
-                        }
-
-                        string mvnJavaDir = Path.Combine("src", "main", "java"); // FIXME
-                        fileName = Path.Combine(ns.Name + "-" + component.Name, mvnJavaDir, "spring-config.xml");
-                        using (StreamWriter writer = new StreamWriter(fileName))
-                        {
-                            writer.WriteLine(springConfigGen.GenerateComponentSpringConfig(ns));
-                        }
-                    }
+                    Dictionary<string, string> properties = componentGenerator.GenerateComponent(ns, wires, modules);
 
                     if (entities.Any() || ns.Declarations.OfType<Enum>().Any())
                     {

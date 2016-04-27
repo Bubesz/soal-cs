@@ -128,24 +128,9 @@ template GenerateComponentPom(Namespace ns, Component component, List<string> mo
 		[GeneratePomDependency("javax.servlet", "javax.servlet-api", "3.1.0", true)]
 	[end if]
 [end if]
-    </dependencies>
-</project>
-end template
 
-template GenerateDataPom(Namespace ns, string moduleName)
-[GeneratePomStart()]
-    <parent>
-        <artifactId>[ns.Name]App</artifactId>
-        <groupId>[ns.Name]</groupId>
-        <version>1.0</version>
-    </parent>
-	^
-    <artifactId>[ns.Name]-[moduleName]</artifactId>
-	^
-    <dependencies>
-	[if (moduleName != "Model")]
-		[GeneratePomDependency(ns.Name, ns.Name+"-Model", "1.0", false)]
-	[end if]
+[if (cType == ComponentType.DATA)]
+		^
 		<!-- spring data -->
 		[GeneratePomDependency("org.springframework","spring-orm", "${springframework.version}", false)]
 		[GeneratePomDependency("org.springframework.data", "spring-data-jpa", "${spring-data-jpa.version}", false)]
@@ -155,7 +140,8 @@ template GenerateDataPom(Namespace ns, string moduleName)
                     <artifactId>spring-orm</artifactId>
                 </exclusion>
             </exclusions> -->
-	</dependencies>
+[end if]
+    </dependencies>
 </project>
 end template
 

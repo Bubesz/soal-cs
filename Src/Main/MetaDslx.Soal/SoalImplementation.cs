@@ -435,10 +435,10 @@ namespace MetaDslx.Soal
             return "";
         }
 
-        public static List<string> GetRepositories(this Declaration type)
+        public static List<string> GetRepositories(this Declaration type, string dataBinding)
         {
             List<string> repos = new List<string>();
-            List<string> imports = type.GetImports();
+            List<string> imports = type.GetImports(dataBinding);
             foreach (string import in imports)
             {
                 if (import.Contains("repository"))
@@ -446,25 +446,25 @@ namespace MetaDslx.Soal
                     string[] parts = import.Split('.');
                     string lastPart = parts[parts.Length - 1];
                     lastPart = lastPart.Replace(";", "");
-                    repos.Add(lastPart + " " + lastPart.ToCamelCase());
+                    repos.Add(lastPart);
                 }
             }
 
             return repos;
         }
 
-        public static List<string> GetImports(this Declaration declaration)
+        public static List<string> GetImports(this Declaration declaration, string dataBinding)
         {
             HashSet<string> imported = new HashSet<string>();
             List<string> repoImports;
-            List<SoalType> imports = declaration.GetTypes(out repoImports);
+            List<SoalType> imports = declaration.GetTypes(out repoImports, dataBinding);
 
             foreach (SoalType import in imports)
             {
-                if (import is ArrayType)
-                {
-                    imported.Add("import java.util.List;");
-                }
+                //if (import is ArrayType)
+                //{
+                //    imported.Add("import java.util.List;");
+                //}
                 imported.Add(import.GetImportString());
             }
 
@@ -478,7 +478,7 @@ namespace MetaDslx.Soal
             return result;
         }
 
-        public static List<SoalType> GetTypes(this Declaration declaration, out List<string> repoImports)
+        public static List<SoalType> GetTypes(this Declaration declaration, out List<string> repoImports, string dataBinding)
         {
             List<SoalType> result = new List<SoalType>();
             repoImports = new List<string>();
@@ -497,7 +497,7 @@ namespace MetaDslx.Soal
             {
                 foreach (Operation operation in iface.Operations)
                 {
-                    GetImportsOfOperation(repoImports, result, operation);
+                    GetImportsOfOperation(repoImports, result, operation, dataBinding);
                 }
             }
 
@@ -508,15 +508,15 @@ namespace MetaDslx.Soal
                 {
                     foreach (Operation operation in service.Interface.Operations)
                     {
-                        GetImportsOfOperation(repoImports, result, operation);
+                        GetImportsOfOperation(repoImports, result, operation, dataBinding);
                     }
                 }
-                //result.Add(component.BaseComponent); TODO mi volt eddig?
+                //result.Add(component.BaseComponent); TODO what was it before?
             }
             return result;
         }
 
-        private static void GetImportsOfOperation(List<string> repoImports, List<SoalType> result, Operation operation)
+        private static void GetImportsOfOperation(List<string> repoImports, List<SoalType> result, Operation operation, string dataBinding)
         {
             foreach (InputParameter param in operation.Parameters)
             {
@@ -537,7 +537,8 @@ namespace MetaDslx.Soal
             }
             if (entityImport != null)
             {
-                repoImports.Add(entityImport.Replace("entity", "repository").Replace(";", "Repository;"));
+                // FIXME binding
+                repoImports.Add(entityImport.Replace("entity", "repository").Replace(";", "Repository" + dataBinding + ";"));
             }
             result.AddRange(im);
 
@@ -570,7 +571,17 @@ namespace MetaDslx.Soal
         private static string SubPackage(SoalType type)
         {
             if (type is Interface)
-                return ".interfaces";
+            {
+                Interface iface = type as Interface;
+                if (iface.Name.Contains("Repository"))
+                {
+                    return ".repository";
+                }
+                else
+                {
+                    return ".interfaces";
+                }
+            }
             if (type is Enum)
                 return ".enums";
             Struct str = type as Struct;
@@ -679,7 +690,7 @@ namespace MetaDslx.Soal
             if (aType != null)
             {
                 if (aType.InnerType == SoalInstance.Byte) return "byte[]";
-                else return ("List<"+GetJavaName(((ArrayType)type).InnerType) + ">");
+                else return ("Iterable<"+GetJavaName(((ArrayType)type).InnerType) + ">");
             }
             Enum etype = type as Enum;
             if (etype != null)

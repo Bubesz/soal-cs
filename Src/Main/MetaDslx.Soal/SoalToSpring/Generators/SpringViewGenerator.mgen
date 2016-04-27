@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 ^
 import [SpringGeneratorUtil.GetPackage(reference.Interface)].[SpringGeneratorUtil.Properties.interfacePackage].[reference.Interface.Name][SpringGeneratorUtil.GetBindingType(reference)];
-[SpringGeneratorUtil.GenerateImports(reference.Interface, false)]
+[SpringGeneratorUtil.GenerateImports(reference.Interface)]
 ^
 @Controller
 @RequestMapping(value = "[reference.Name]", method = RequestMethod.GET)

@@ -8,9 +8,9 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
 {
     public class DependencyDiscoverer
     {
-        private BindingGenerator bindingGenerator;
+        private BindingDiscoverer bindingGenerator;
 
-        public DependencyDiscoverer(BindingGenerator bindingGenerator)
+        public DependencyDiscoverer(BindingDiscoverer bindingGenerator)
         {
             this.bindingGenerator = bindingGenerator;
         }
@@ -59,29 +59,23 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             return dependencies;
         }
 
+        // collecting module dependencies
         public Dictionary<Reference, Component> GetherDependencyMap(Namespace ns, List<Wire> wires, Component component)
         {
-            // collecting module dependencies
             Dictionary<Reference, Component> dependencies = new Dictionary<Reference, Component>();
             foreach (Reference reference in component.References)
             {
                 bool referenceStatisfied = false;
                 foreach (Wire wire in wires)
                 {
-                    // Component comp = (Component)((ModelObject)port).MParent;
                     if (wire.Source.Equals(reference))
                     {
-                        foreach (Component comp in ns.Declarations.OfType<Component>())
+                        Component comp = wire.Target.Component;
+                        Service target = wire.Target as Service;
+                        if (target != null)
                         {
-                            foreach (Service serv in comp.Services)
-                            {
-                                if (wire.Target.Equals(serv))
-                                {
-                                    referenceStatisfied = true;
-                                    PutDependecy(dependencies, reference, serv, comp);
-
-                                }
-                            }
+                            referenceStatisfied = true;
+                            PutDependecy(dependencies, reference, target, comp);
                         }
                     }
                 }
@@ -123,6 +117,5 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                 dependencies.Add(reference, comp);
             }
         }
-
     }
 }
