@@ -8,6 +8,6 @@ namespace MetaDslx.Soal
 {
     public enum ComponentType
     {
-        IMPLEMENTATION, API, REMOTE, WEB
+        IMPLEMENTATION, API, REMOTE, WEB, DATA
     }
 }
