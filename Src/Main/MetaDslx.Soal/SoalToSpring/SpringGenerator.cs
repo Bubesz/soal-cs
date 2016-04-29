@@ -197,7 +197,7 @@ namespace MetaDslx.Soal
                                 Operation op = f.CreateOperation();
                                 op.Name = "count";
                                 op.Action = "count";
-                                op.Result.Type = SoalInstance.Void;
+                                op.Result.Type = SoalInstance.Long;
                                 repository.Operations.Add(op);
                             }
                             {
