@@ -61,9 +61,9 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                     }
                 }
 
-                Dictionary<Reference, Component> dependencyMap = dependencyDiscoverer.GetherDependencyMap(ns, wires, component);
-                List<string> dependencies = dependencyDiscoverer.GetherDependencies(dependencyMap);
-                bool directDataAccess = dataAccessFinder.HasDirectDataAccess(ns, wires, component, dataModule);
+                Dictionary<Reference, Component> dependencyMap = this.dependencyDiscoverer.GetherDependencyMap(ns, wires, component);
+                List<string> dependencies = this.dependencyDiscoverer.GetherDependencies(dependencyMap);
+                bool directDataAccess = this.dataAccessFinder.HasDirectDataAccess(ns, wires, component, dataModule);
 
                 if (component.Services.Any())
                 {
@@ -74,15 +74,15 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                     if (component.Implementation != null && component.Implementation.Name.Equals("JSF"))
                     {
                         cType = ComponentType.WEB;
-                        jSFGenerator.GenerateWebTier(ns, component, directDataAccess);
+                        this.jSFGenerator.GenerateWebTier(ns, component, directDataAccess);
                     }
                     if (component is Composite)
                     {
-                        string facadeDir = directoryHandler.createJavaDirectory(ns, component.Name, generatorUtil.Properties.serviceFacadePackage);
+                        string facadeDir = this.directoryHandler.createJavaDirectory(ns, component.Name, generatorUtil.Properties.serviceFacadePackage);
                         string facadeFile = Path.Combine(facadeDir, component.Name + "Facade.java");
                         using (StreamWriter writer = new StreamWriter(facadeFile))
                         {
-                            writer.WriteLine(springClassGen.GenerateComponent(component));
+                            writer.WriteLine(this.springClassGen.GenerateComponent(component));
                         }
                     }
                 }
@@ -93,20 +93,20 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                 }
 
                 // generate pom.xml and spring-config.xml of Business Logic module
-                directoryHandler.createJavaDirectory(ns, component.Name, "");
+                this.directoryHandler.createJavaDirectory(ns, component.Name, "");
                 string fileName = Path.Combine(ns.Name + "-" + component.Name, "pom.xml");
                 using (StreamWriter writer = new StreamWriter(fileName))
                 {
-                    string s = springConfigGen.GenerateComponentPom(ns, component, dependencies,
+                    string s = this.springConfigGen.GenerateComponentPom(ns, component, dependencies,
                         clientFor.HasRestBinding, clientFor.HasWebServiceBinding, clientFor.HasWebSocketBinding, cType);
                     writer.WriteLine(s);
                 }
 
-                string javaDir = directoryHandler.createJavaDirectory(ns, component.Name, "", false);
+                string javaDir = this.directoryHandler.createJavaDirectory(ns, component.Name, "", false);
                 fileName = Path.Combine(javaDir, "spring-config.xml");
                 using (StreamWriter writer = new StreamWriter(fileName))
                 {
-                    writer.WriteLine(springConfigGen.GenerateComponentSpringConfig(ns));
+                    writer.WriteLine(this.springConfigGen.GenerateComponentSpringConfig(ns));
                 }
             }
             return properties;
@@ -132,7 +132,7 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                         dataBinding = "WebSocket";
                 }
             }
-            bool hasDirectDataAccess = dataBinding == "" && dataAccessFinder.HasDirectDataAccess(ns, wires, component, dataModule);
+            bool hasDirectDataAccess = dataBinding == "" && this.dataAccessFinder.HasDirectDataAccess(ns, wires, component, dataModule);
 
             foreach (Service service in component.Services)
             {
@@ -140,24 +140,24 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
 
                 if (iface is Database) { continue; } // Repositry interfaces have been generated already
 
-                string package = iface.Name.Contains("Repository") ? generatorUtil.Properties.repositoryPackage : generatorUtil.Properties.interfacePackage;
-                string apiIfDirectory = directoryHandler.createJavaDirectory(ns, component.Name + "-API", package);
-                string functionDirectory = directoryHandler.createJavaDirectory(ns, component.Name, component.Name.ToLower());
+                string package = this.PackageOf(iface);
+                string apiIfDirectory = this.directoryHandler.createJavaDirectory(ns, component.Name + "-API", package);
+                string functionDirectory = this.directoryHandler.createJavaDirectory(ns, component.Name, component.Name.ToLower());
 
-                if (package == generatorUtil.Properties.interfacePackage)
+                if (package == this.generatorUtil.Properties.interfacePackage)
                 {
                     // interface goes to API
                     string interfaceFileName = Path.Combine(apiIfDirectory, iface.Name + ".java");
                     using (StreamWriter writer = new StreamWriter(interfaceFileName))
                     {
-                        writer.WriteLine(springInterfaceGen.GenerateInterface(iface, "", package));
+                        writer.WriteLine(this.springInterfaceGen.GenerateInterface(iface, "", package));
                     }
-                
+
                     // implementaton goes to component
                     string javaFileName = Path.Combine(functionDirectory, iface.Name + "Impl.java");
                     using (StreamWriter writer = new StreamWriter(javaFileName))
                     {
-                        writer.WriteLine(springInterfaceGen.GenerateInterfaceImplementation(iface, component.Name.ToLower(), dataBinding));
+                        writer.WriteLine(this.springInterfaceGen.GenerateInterfaceImplementation(iface, component.Name.ToLower(), dataBinding));
                     }
                 }
                 else // a Spring Repository
@@ -183,13 +183,13 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                         string javaFileName = Path.Combine(apiIfDirectory, entity.Name + "Repository.java");
                         using (StreamWriter writer = new StreamWriter(javaFileName))
                         {
-                            writer.WriteLine(springClassGen.GenerateRepository(entity));
+                            writer.WriteLine(this.springClassGen.GenerateRepository(entity));
                         }
                     }
                 }
 
-                List<Binding> bindings = bindingGenerator.GetBindings(ns, service);
-                BindingTypeHolder bindingsOfService = bindingGenerator.CheckForBindings(bindings);
+                List<Binding> bindings = this.bindingGenerator.GetBindings(ns, service);
+                BindingTypeHolder bindingsOfService = this.bindingGenerator.CheckForBindings(bindings);
 
                 this.CreateBindings(bindingsOfService, component, iface, apiIfDirectory, functionDirectory, package, dataBinding);
 
@@ -201,11 +201,11 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                 {
                     foreach (Struct exception in op.Exceptions)
                     {
-                        string apiExDirectory = directoryHandler.createJavaDirectory(ns, component.Name + "-API", generatorUtil.Properties.exceptionPackage);
+                        string apiExDirectory = this.directoryHandler.createJavaDirectory(ns, component.Name + "-API", generatorUtil.Properties.exceptionPackage);
                         string exFileName = Path.Combine(apiExDirectory, exception.Name + ".java");
                         using (StreamWriter writer = new StreamWriter(exFileName))
                         {
-                            writer.WriteLine(springClassGen.GenerateException(exception));
+                            writer.WriteLine(this.springClassGen.GenerateException(exception));
                         }
                     }
                 }
@@ -214,7 +214,7 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             // pom.xml of API
             List<string> apiDependencies = new List<string>(dependencies);
             apiDependencies.Add("Model");
-            directoryHandler.createJavaDirectory(ns, component.Name + "-API", "");
+            this.directoryHandler.createJavaDirectory(ns, component.Name + "-API", "");
             string fileName = Path.Combine(ns.Name + "-" + component.Name + "-API", "pom.xml");
             using (StreamWriter writer = new StreamWriter(fileName))
             {
@@ -224,7 +224,7 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
 
                 Component c = new ComponentImpl();
                 c.Name = component.Name + "-API";
-                string output = springConfigGen.GenerateComponentPom(ns, c, apiDependencies,
+                string output = this.springConfigGen.GenerateComponentPom(ns, c, apiDependencies,
                     bindingsOfModule.HasRestBinding, bindingsOfModule.HasWebServiceBinding, bindingsOfModule.HasWebSocketBinding, ComponentType.API);
                 writer.WriteLine(output);
             }
@@ -239,40 +239,40 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
 
                 List<string> deps = new List<string>();
                 deps.Add(component.Name + "-API");
-                directoryHandler.createJavaDirectory(ns, c.Name, "");
+                this.directoryHandler.createJavaDirectory(ns, c.Name, "");
                 fileName = Path.Combine(ns.Name + "-" + c.Name, "pom.xml");
                 using (StreamWriter writer = new StreamWriter(fileName))
                 {
-                    writer.WriteLine(springConfigGen.GenerateComponentPom(ns, c, deps, false, false, false, ComponentType.REMOTE));
+                    writer.WriteLine(this.springConfigGen.GenerateComponentPom(ns, c, deps, false, false, false, ComponentType.REMOTE));
                 }
 
                 // web.xml
-                string webinfDir = directoryHandler.createWebDirectory(ns, c.Name, "");
+                string webinfDir = this.directoryHandler.createWebDirectory(ns, c.Name, "");
                 string webxmlFile = Path.Combine(webinfDir, "web.xml");
                 using (StreamWriter writer = new StreamWriter(webxmlFile))
                 {
-                    writer.WriteLine(springViewGen.GenerateWebXml(ComponentType.REMOTE));
+                    writer.WriteLine(this.springViewGen.GenerateWebXml(ComponentType.REMOTE));
                 }
 
                 // deployment-struture
                 string jbossFile = Path.Combine(webinfDir, "jboss-deployment-structure.xml");
                 using (StreamWriter writer = new StreamWriter(jbossFile))
                 {
-                    writer.WriteLine(springViewGen.GenerateJboss());
+                    writer.WriteLine(this.springViewGen.GenerateJboss());
                 }
 
                 // appCtx
                 string ctxFile = Path.Combine(webinfDir, "applicationContext.xml");
                 using (StreamWriter writer = new StreamWriter(ctxFile))
                 {
-                    writer.WriteLine(springViewGen.GenerateAppCtx(ns, hasDirectDataAccess));
+                    writer.WriteLine(this.springViewGen.GenerateAppCtx(ns, hasDirectDataAccess));
                 }
 
                 // servlet
                 string servletFile = Path.Combine(webinfDir, "spring-servlet.xml");
                 using (StreamWriter writer = new StreamWriter(servletFile))
                 {
-                    writer.WriteLine(springViewGen.GenerateServlet(ns, ComponentType.REMOTE));
+                    writer.WriteLine(this.springViewGen.GenerateServlet(ns, ComponentType.REMOTE));
                 }
             }
         }
@@ -282,45 +282,65 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             BindingTypeHolder clientFor = new BindingTypeHolder();
             foreach (Reference reference in component.References)
             {
+                Component referencedComp = dependencyMap[reference];
                 if (reference.Interface is Database)
                 {
-                    continue;
+                    if (referencedComp.Name.EndsWith("API"))
+                    {
+                        referencedComp = referencedComp.BaseComponent;
+                    }
+                    foreach (Service service in referencedComp.Services)
+                    {
+                        if (!(service.Interface is Database))
+                        {
+                            this.GenerateAccessor(ns, component, referencedComp, properties, clientFor, service);
+                        }
+                    }
                 }
-                List<Binding> binds = bindingGenerator.GetBindings(ns, reference);
-                BindingTypeHolder binding = bindingGenerator.CheckForBindings(binds);
-                if (binding.HasRestBinding)
+                else
                 {
-                    clientFor.HasRestBinding = true;
-                    KeyValuePair<string, string> keyValue;
-                    keyValue = new KeyValuePair<string, string>(reference.Interface.Name + "RestServer", "localhost");
-                    if (!properties.Contains(keyValue))
-                    {
-                        properties.Add(keyValue.Key, keyValue.Value);
-                    }
-                    keyValue = new KeyValuePair<string, string>(reference.Interface.Name + "RestPort", "8080");
-                    if (!properties.Contains(keyValue))
-                    {
-                        properties.Add(keyValue.Key, keyValue.Value);
-                    }
-
-                    string proxyDir = directoryHandler.createJavaDirectory(ns, component.Name, generatorUtil.Properties.proxyPackage);
-                    string accessorFile = Path.Combine(proxyDir, reference.Interface.Name + "RestProxy.java");
-                    string currentComponent = component.Name;
-                    string targetComponent = dependencyMap[reference].Name;
-                    if (targetComponent.Contains("-API") || targetComponent.Contains("-WEB"))
-                    {
-                        targetComponent = targetComponent.Split(new string[] { "-API", "-WEB" }, StringSplitOptions.RemoveEmptyEntries)[0];
-                    }
-
-                    using (StreamWriter writer = new StreamWriter(accessorFile))
-                    {
-                        writer.WriteLine(springInterfaceGen.GenerateProxyForInterface(reference.Interface, "Rest", currentComponent, targetComponent));
-                    }
+                    this.GenerateAccessor(ns, component, referencedComp, properties, clientFor, reference);
                 }
-                // TODO Ws & Ws
             }
 
             return clientFor;
+        }
+
+        private void GenerateAccessor(Namespace ns, Component component, Component referencedComp, Dictionary<string, string> properties, BindingTypeHolder clientFor, Port reference)
+        {
+            List<Binding> binds = this.bindingGenerator.GetBindings(ns, reference);
+            BindingTypeHolder binding = this.bindingGenerator.CheckForBindings(binds);
+            if (binding.HasRestBinding)
+            {
+                clientFor.HasRestBinding = true;
+                KeyValuePair<string, string> keyValue;
+                keyValue = new KeyValuePair<string, string>(reference.Interface.Name + "RestServer", "localhost");
+                if (!properties.Contains(keyValue))
+                {
+                    properties.Add(keyValue.Key, keyValue.Value);
+                }
+                keyValue = new KeyValuePair<string, string>(reference.Interface.Name + "RestPort", "8080");
+                if (!properties.Contains(keyValue))
+                {
+                    properties.Add(keyValue.Key, keyValue.Value);
+                }
+
+                string package = this.PackageOf(reference.Interface);
+                string proxyDir = this.directoryHandler.createJavaDirectory(ns, component.Name, generatorUtil.Properties.proxyPackage);
+                string accessorFile = Path.Combine(proxyDir, reference.Interface.Name + "RestProxy.java");
+                string currentComponent = component.Name;
+                string targetComponent = referencedComp.Name;
+                if (targetComponent.Contains("-API") || targetComponent.Contains("-WEB"))
+                {
+                    targetComponent = targetComponent.Split(new string[] { "-API", "-WEB" }, StringSplitOptions.RemoveEmptyEntries)[0];
+                }
+
+                using (StreamWriter writer = new StreamWriter(accessorFile))
+                {
+                    writer.WriteLine(this.springInterfaceGen.GenerateProxyForInterface(reference.Interface, "Rest", package, currentComponent, targetComponent));
+                }
+            }
+            // TODO Ws & Ws
         }
 
         public void CreateBindings(BindingTypeHolder bindings, Component component, Interface iface, string apiDirectory, string functionDirectory, string package, string dataBinding)
@@ -331,14 +351,14 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                 string interfaceExtFileName = Path.Combine(apiDirectory, iface.Name + "Rest.java");
                 using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
                 {
-                    writer.WriteLine(springInterfaceGen.GenerateInterface(iface, "Rest", package));
+                    writer.WriteLine(this.springInterfaceGen.GenerateInterface(iface, "Rest", package));
                 }
 
                 // implementation of the above goes to component
                 string implFileName = Path.Combine(functionDirectory, iface.Name + "RestImpl.java");
                 using (StreamWriter writer = new StreamWriter(implFileName))
                 {
-                    writer.WriteLine(springInterfaceGen.GenerateProxyInterfaceImplementation(iface, component.Name.ToLower(), "Rest", package, dataBinding));
+                    writer.WriteLine(this.springInterfaceGen.GenerateProxyInterfaceImplementation(iface, component.Name.ToLower(), "Rest", package, dataBinding));
                 }
             }
 
@@ -348,14 +368,14 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                 string interfaceExtFileName = Path.Combine(apiDirectory, iface.Name + "WebService.java");
                 using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
                 {
-                    writer.WriteLine(springInterfaceGen.GenerateInterface(iface, "WebService", package));
+                    writer.WriteLine(this.springInterfaceGen.GenerateInterface(iface, "WebService", package));
                 }
 
                 // implementation of the above goes to component
                 string implFileName = Path.Combine(functionDirectory, iface.Name + "WebServiceImpl.java");
                 using (StreamWriter writer = new StreamWriter(implFileName))
                 {
-                    writer.WriteLine(springInterfaceGen.GenerateProxyInterfaceImplementation(iface, component.Name.ToLower(), "WebService", package, dataBinding));
+                    writer.WriteLine(this.springInterfaceGen.GenerateProxyInterfaceImplementation(iface, component.Name.ToLower(), "WebService", package, dataBinding));
                 }
             }
 
@@ -365,17 +385,21 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                 string interfaceExtFileName = Path.Combine(apiDirectory, iface.Name + "WebSocket.java");
                 using (StreamWriter writer = new StreamWriter(interfaceExtFileName))
                 {
-                    writer.WriteLine(springInterfaceGen.GenerateInterface(iface, "WebSocket", package));
+                    writer.WriteLine(this.springInterfaceGen.GenerateInterface(iface, "WebSocket", package));
                 }
 
                 // implementation of the above goes to component
                 string implFileName = Path.Combine(functionDirectory, iface.Name + "WebSocketImpl.java");
                 using (StreamWriter writer = new StreamWriter(implFileName))
                 {
-                    writer.WriteLine(springInterfaceGen.GenerateProxyInterfaceImplementation(iface, component.Name.ToLower(), "WebSocket", package, dataBinding));
+                    writer.WriteLine(this.springInterfaceGen.GenerateProxyInterfaceImplementation(iface, component.Name.ToLower(), "WebSocket", package, dataBinding));
                 }
             }
         }
 
+        private string PackageOf(Interface iface)
+        {
+            return iface.Name.Contains("Repository") ? this.generatorUtil.Properties.repositoryPackage : this.generatorUtil.Properties.interfacePackage;
+        }
     }
 }

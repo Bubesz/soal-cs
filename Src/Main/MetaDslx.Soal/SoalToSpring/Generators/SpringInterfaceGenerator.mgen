@@ -104,7 +104,7 @@ end template
 
 
 // accessor of remote service (TODO for any tpye ?)
-template GenerateProxyForInterface(Interface iface, string bindingType, string currentComponent, string targetComponent)
+template GenerateProxyForInterface(Interface iface, string bindingType, string package, string currentComponent, string targetComponent)
 package [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.proxyPackage];
 ^
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -120,7 +120,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 ^
 import cinema.Configuration;
-import [SpringGeneratorUtil.GetPackage(iface)].[SpringGeneratorUtil.Properties.interfacePackage].[iface.Name][bindingType];
+import [SpringGeneratorUtil.GetPackage(iface)].[package].[iface.Name][bindingType];
 [SpringGeneratorUtil.GenerateImports(iface)]
 ^
 import javax.servlet.http.HttpServletRequest;
@@ -131,11 +131,12 @@ import java.util.stream.Collectors;
 public class [iface.Name][bindingType]Proxy implements [iface.Name][bindingType] {
 ^
 	private RestTemplate restTemplate = new RestTemplate();
-	private final String currentComponentName = "Cinema-[currentComponent]";
-    private final String targetComponentName = "Cinema-[targetComponent]";
+	private final String currentComponentName = "[iface.Namespace.Name]-[currentComponent]";
+    private final String targetComponentName = "[iface.Namespace.Name]-[targetComponent]";
 	^
+[int i=1]
 [loop(iface->op:Operations)]
-	private String urlOf[op.Name.ToPascalCase()];
+	private String url[i++]Of[op.Name.ToPascalCase()];
 [end loop]
 
 [loop(iface->op:Operations)]
@@ -183,25 +184,28 @@ public class [iface.Name][bindingType]Proxy implements [iface.Name][bindingType]
 	}
 [end loop]
 
+[i=1]
 [loop(iface->op:Operations)]
 	^
 	private String getUrlOf[op.Name.ToPascalCase()]([SpringGeneratorUtil.GetParameterList(op)]) {
-        if (this.urlOf[op.Name.ToPascalCase()] != null) {
-            return this.urlOf[op.Name.ToPascalCase()];
+        if (this.url[i]Of[op.Name.ToPascalCase()] != null) {
+            return this.url[i]Of[op.Name.ToPascalCase()];
         }
 		^
         // eg.: http://localhost/localapp-1.0/getMoviesFromReservation/
 	[if (op.Result.Type.GetJavaName() == "void")]
 		String url = null;
 		try {
-			java.lang.reflect.Method method = [iface.Name + bindingType].class.getMethod("[op.Name.ToCamelCase()]", [SpringGeneratorUtil.GetParameterTypeList(op)]);
-			Link link = linkTo([iface.Name + bindingType].class, method, [SpringGeneratorUtil.GetParameterNameList(op)]).withSelfRel();
+			java.lang.reflect.Method method = [iface.Name + bindingType].class.getMethod("[op.Name.ToCamelCase()]"[SpringGeneratorUtil.GetParameterTypeList(op)]);
+			Link link = linkTo([iface.Name + bindingType].class, method\
+[if (SpringGeneratorUtil.GetParameterNameList(op).Any())]
+, [SpringGeneratorUtil.GetParameterNameList(op)]\
+[end if]
+).withSelfRel();
 			url = link.getHref();
-		[loop(op->ex:Exceptions)]
 		} catch (NoSuchMethodException e) {
 			// TODO handle execption properly
 			throw new RuntimeException(e);
-		[end loop]
 		}
 
 	[else if(op.Exceptions.Any())]
@@ -229,7 +233,7 @@ public class [iface.Name][bindingType]Proxy implements [iface.Name][bindingType]
         url = url.replace(":" + serverPort, ":" + Configuration.getString("[targetComponent][bindingType]Port"));
         url = url.replace(currentComponentName, targetComponentName);
 		^
-        this.urlOf[op.Name.ToPascalCase()] = url;
+        this.url[i++]Of[op.Name.ToPascalCase()] = url;
         return url;
     }
 [end loop]
