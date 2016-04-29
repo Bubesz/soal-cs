@@ -107,6 +107,7 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
 
             Component api = new ComponentImpl();
             api.Name = comp.Name + "-API";
+            api.BaseComponent = comp;
 
             if (binding.hasAnyBinding())
             {
