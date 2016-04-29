@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringGeneratorUtil_1072182619;
-    namespace __Hidden_SpringGeneratorUtil_1072182619
+    using __Hidden_SpringGeneratorUtil_251493729;
+    namespace __Hidden_SpringGeneratorUtil_251493729
     {
         internal static class __Extensions
         {
@@ -368,128 +368,129 @@ namespace MetaDslx.Soal //1:1
                 select new { __loop4_var1 = __loop4_var1, param = param}
                 ).ToList(); //79:5
             int __loop4_iteration = 0;
-            string delimiter = ""; //79:33
+            string delimiter = ", "; //79:33
             foreach (var __tmp1 in __loop4_results)
             {
                 ++__loop4_iteration;
-                if (__loop4_iteration >= 2) //79:56
-                {
-                    delimiter = ", "; //79:56
-                }
                 var __loop4_var1 = __tmp1.__loop4_var1;
                 var param = __tmp1.param;
-                result = result + delimiter + param.Type.GetJavaName() + ".class"; //80:9
+                string javaName = param.Type.GetJavaName(); //80:3
+                if (javaName.Contains("<")) //81:3
+                {
+                    javaName = "Object"; //82:4
+                }
+                result = result + delimiter + javaName + ".class"; //84:9
             }
-            return result; //82:5
+            return result; //86:5
         }
 
-        public string GetExceptionList(Operation op) //87:1
+        public string GetExceptionList(Operation op) //91:1
         {
-            string result = ""; //88:5
+            string result = ""; //92:5
             var __loop5_results = 
-                (from __loop5_var1 in __Enumerate((op).GetEnumerator()) //89:11
-                from exc in __Enumerate((__loop5_var1.Exceptions).GetEnumerator()) //89:15
+                (from __loop5_var1 in __Enumerate((op).GetEnumerator()) //93:11
+                from exc in __Enumerate((__loop5_var1.Exceptions).GetEnumerator()) //93:15
                 select new { __loop5_var1 = __loop5_var1, exc = exc}
-                ).ToList(); //89:5
+                ).ToList(); //93:5
             int __loop5_iteration = 0;
-            string delimiter = ""; //89:31
+            string delimiter = ""; //93:31
             foreach (var __tmp1 in __loop5_results)
             {
                 ++__loop5_iteration;
-                if (__loop5_iteration >= 2) //89:54
+                if (__loop5_iteration >= 2) //93:54
                 {
-                    delimiter = ", "; //89:54
+                    delimiter = ", "; //93:54
                 }
                 var __loop5_var1 = __tmp1.__loop5_var1;
                 var exc = __tmp1.exc;
-                result = result + delimiter + exc.GetJavaName(); //90:9
+                result = result + delimiter + exc.GetJavaName(); //94:9
             }
-            return result; //92:5
+            return result; //96:5
         }
 
-        public string GetPropertyList(Struct sType) //97:1
+        public string GetPropertyList(Struct sType) //101:1
         {
-            string result = ""; //98:5
+            string result = ""; //102:5
             var __loop6_results = 
-                (from __loop6_var1 in __Enumerate((sType).GetEnumerator()) //99:11
-                from p in __Enumerate((__loop6_var1.Properties).GetEnumerator()) //99:18
+                (from __loop6_var1 in __Enumerate((sType).GetEnumerator()) //103:11
+                from p in __Enumerate((__loop6_var1.Properties).GetEnumerator()) //103:18
                 select new { __loop6_var1 = __loop6_var1, p = p}
-                ).ToList(); //99:5
+                ).ToList(); //103:5
             int __loop6_iteration = 0;
-            string delimiter = ""; //99:32
+            string delimiter = ""; //103:32
             foreach (var __tmp1 in __loop6_results)
             {
                 ++__loop6_iteration;
-                if (__loop6_iteration >= 2) //99:55
+                if (__loop6_iteration >= 2) //103:55
                 {
-                    delimiter = ", "; //99:55
+                    delimiter = ", "; //103:55
                 }
                 var __loop6_var1 = __tmp1.__loop6_var1;
                 var p = __tmp1.p;
-                result = result + delimiter + p.Type.GetJavaName() + " " + p.Name.ToCamelCase(); //100:9
+                result = result + delimiter + p.Type.GetJavaName() + " " + p.Name.ToCamelCase(); //104:9
             }
-            return result; //102:5
+            return result; //106:5
         }
 
-        public int GetNumberOfFieldWithIdSuffix(Struct sType) //107:1
+        public int GetNumberOfFieldWithIdSuffix(Struct sType) //111:1
         {
-            int result = 0; //108:2
+            int result = 0; //112:2
             var __loop7_results = 
-                (from __loop7_var1 in __Enumerate((sType).GetEnumerator()) //109:8
-                from p in __Enumerate((__loop7_var1.Properties).GetEnumerator()) //109:15
+                (from __loop7_var1 in __Enumerate((sType).GetEnumerator()) //113:8
+                from p in __Enumerate((__loop7_var1.Properties).GetEnumerator()) //113:15
                 select new { __loop7_var1 = __loop7_var1, p = p}
-                ).ToList(); //109:2
+                ).ToList(); //113:2
             int __loop7_iteration = 0;
             foreach (var __tmp1 in __loop7_results)
             {
                 ++__loop7_iteration;
                 var __loop7_var1 = __tmp1.__loop7_var1;
                 var p = __tmp1.p;
-                if (p.Name.EndsWith("Id")) //110:3
+                if (p.Name.EndsWith("Id")) //114:3
                 {
-                    result++; //111:4
+                    result++; //115:4
                 }
             }
-            return result; //114:5
+            return result; //118:5
         }
 
-        public string GetPackage(Declaration d) //119:1
+        public string GetPackage(Declaration d) //123:1
         {
-            return d.Namespace.FullName.ToLower(); //120:2
+            return d.Namespace.FullName.ToLower(); //124:2
         }
 
-        public string GetBindingType(Reference reference) //125:1
+        public string GetBindingType(Reference reference) //129:1
         {
-            Binding binding = reference.Binding; //126:2
-            if (binding == null) //127:2
+            Binding binding = reference.Binding; //130:2
+            if (binding == null) //131:2
             {
-                return ""; //128:3
+                return ""; //132:3
             }
-            if (binding.Transport is RestTransportBindingElement) //130:2
+            if (binding.Transport is RestTransportBindingElement) //134:2
             {
-                return "Rest"; //131:3
+                return "Rest"; //135:3
             }
-            if (binding.Transport is WebSocketTransportBindingElement) //133:2
+            if (binding.Transport is WebSocketTransportBindingElement) //137:2
             {
-                return "WebSocket"; //134:3
+                return "WebSocket"; //138:3
             }
             var __loop8_results = 
-                (from __loop8_var1 in __Enumerate((binding).GetEnumerator()) //136:8
-                from encoding in __Enumerate((__loop8_var1.Encodings).GetEnumerator()) //136:17
+                (from __loop8_var1 in __Enumerate((binding).GetEnumerator()) //140:8
+                from encoding in __Enumerate((__loop8_var1.Encodings).GetEnumerator()) //140:17
                 select new { __loop8_var1 = __loop8_var1, encoding = encoding}
-                ).ToList(); //136:2
+                ).ToList(); //140:2
             int __loop8_iteration = 0;
             foreach (var __tmp1 in __loop8_results)
             {
                 ++__loop8_iteration;
                 var __loop8_var1 = __tmp1.__loop8_var1;
                 var encoding = __tmp1.encoding;
-                if (encoding is SoapEncodingBindingElement) //137:3
+                if (encoding is SoapEncodingBindingElement) //141:3
                 {
-                    return "WebService"; //138:4
+                    return "WebService"; //142:4
                 }
             }
-            return ""; //141:2
+            return ""; //145:2
         }
 
         private class StringBuilder

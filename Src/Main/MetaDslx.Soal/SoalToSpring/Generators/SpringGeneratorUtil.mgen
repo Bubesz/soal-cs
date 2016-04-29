@@ -76,8 +76,12 @@ end function
 
 function string GetParameterTypeList(Operation op)
     string result = "";
-    loop (op->param:Parameters; string delimiter = ""; delimiter = ", ")
-        result = result + delimiter + param.Type.GetJavaName() + ".class";
+    loop (op->param:Parameters; string delimiter = ", ")
+		string javaName = param.Type.GetJavaName();
+		if (javaName.Contains("<"))
+			javaName = "Object";
+		end if
+        result = result + delimiter + javaName + ".class";
     end loop
     return result;
 end function
