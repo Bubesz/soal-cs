@@ -314,12 +314,12 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             {
                 clientFor.HasRestBinding = true;
                 KeyValuePair<string, string> keyValue;
-                keyValue = new KeyValuePair<string, string>(reference.Interface.Name + "RestServer", "localhost");
+                keyValue = new KeyValuePair<string, string>(referencedComp.Name + "RestServer", "localhost");
                 if (!properties.Contains(keyValue))
                 {
                     properties.Add(keyValue.Key, keyValue.Value);
                 }
-                keyValue = new KeyValuePair<string, string>(reference.Interface.Name + "RestPort", "8080");
+                keyValue = new KeyValuePair<string, string>(referencedComp.Name + "RestPort", "8080");
                 if (!properties.Contains(keyValue))
                 {
                     properties.Add(keyValue.Key, keyValue.Value);

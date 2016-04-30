@@ -461,10 +461,10 @@ namespace MetaDslx.Soal
 
             foreach (SoalType import in imports)
             {
-                //if (import is ArrayType)
-                //{
-                //    imported.Add("import java.util.List;");
-                //}
+                if (import is ArrayType)
+                {
+                    imported.Add("import java.util.List;");
+                }
                 imported.Add(import.GetImportString());
             }
 
@@ -690,7 +690,7 @@ namespace MetaDslx.Soal
             if (aType != null)
             {
                 if (aType.InnerType == SoalInstance.Byte) return "byte[]";
-                else return ("Iterable<"+GetJavaName(((ArrayType)type).InnerType) + ">");
+                else return ("List<"+GetJavaName(((ArrayType)type).InnerType) + ">");
             }
             Enum etype = type as Enum;
             if (etype != null)
