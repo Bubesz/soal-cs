@@ -438,10 +438,12 @@ template GenerateServlet(Namespace ns, ComponentType cType)
                            http://www.springframework.org/schema/mvc
                            http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 ^
-    <context:component-scan base-package="[ns.FullName.ToLower()].[SpringGeneratorUtil.Properties.controllerPackage]"/>
-^
     <mvc:annotation-driven/>
-[if (cType == ComponentType.WEB)]
+^
+[if (cType != ComponentType.WEB)]
+    <context:component-scan base-package="[ns.FullName.ToLower()]"/>
+[else]
+	<context:component-scan base-package="[ns.FullName.ToLower()].[SpringGeneratorUtil.Properties.controllerPackage]"/>
 ^
     <!--<mvc:resources mapping="/favicon.ico" location="/WEB-INF/resources/img/"/>-->
     <mvc:resources mapping="/resources/**" location="/WEB-INF/resources/"/>
