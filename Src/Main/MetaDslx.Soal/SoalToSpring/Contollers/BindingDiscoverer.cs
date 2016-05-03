@@ -37,7 +37,17 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             return result;
         }
 
-        public List<Binding> GetBindings(Namespace ns, Port port)
+        public List<Binding> GetBindings(Namespace ns, Reference reference)
+        {
+            return GetBindings(ns, reference, false);
+        }
+
+        public List<Binding> GetBindings(Namespace ns, Service service)
+        {
+            return GetBindings(ns, service, true);
+        }
+
+        public List<Binding> GetBindings(Namespace ns, Port port, bool searchForRef)
         {
 
             if (port.Interface.Name.Contains("Repository"))
@@ -76,31 +86,36 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                 }
             }
 
-            // check references
-            foreach (Component component in ns.Declarations.OfType<Component>())
+            if (searchForRef)
             {
-                foreach (Reference reference in component.References)
+                // check references
+                foreach (Component component in ns.Declarations.OfType<Component>())
                 {
-                    if (reference.Interface.Equals(port.Interface))
+                    foreach (Reference reference in component.References)
                     {
-                        if (reference.Binding != null)
+                        if (reference.Interface.Equals(port.Interface))
                         {
-                            bindings.Add(reference.Binding);
+                            if (reference.Binding != null)
+                            {
+                                bindings.Add(reference.Binding);
+                            }
                         }
                     }
                 }
             }
-
-            // check services
-            foreach (Component component in ns.Declarations.OfType<Component>())
+            else
             {
-                foreach (Service service in component.Services)
+                // check services
+                foreach (Component component in ns.Declarations.OfType<Component>())
                 {
-                    if (service.Interface.Equals(port.Interface))
+                    foreach (Service service in component.Services)
                     {
-                        if (service.Binding != null)
+                        if (service.Interface.Equals(port.Interface))
                         {
-                            bindings.Add(service.Binding);
+                            if (service.Binding != null)
+                            {
+                                bindings.Add(service.Binding);
+                            }
                         }
                     }
                 }
