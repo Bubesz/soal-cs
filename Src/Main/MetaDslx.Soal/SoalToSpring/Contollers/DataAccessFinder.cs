@@ -17,7 +17,6 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
 
         public bool HasDirectDataAccess(Namespace ns, List<Wire> wires, Component component, string dataModule)
         {
-            // collecting module dependencies
             bool hasDirectDataAccess = false;
             foreach (Reference reference in component.References)
             {
@@ -32,16 +31,10 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                     // Component comp = (Component)((ModelObject)port).MParent;
                     if (wire.Source.Equals(reference))
                     {
-                        foreach (Component comp in ns.Declarations.OfType<Component>())
+                        Service serv = wire.Target as Service;
+                        if (serv != null)
                         {
-                            foreach (Service serv in comp.Services)
-                            {
-                                if (wire.Target.Equals(serv))
-                                {
-                                    referenceStatisfied = true;
-                                    hasDirectDataAccess = CheckDirectDataAccess(ns, wires, dataModule, reference, comp, serv);
-                                }
-                            }
+                            hasDirectDataAccess = CheckDirectDataAccess(ns, wires, dataModule, reference, serv.Component, serv);
                         }
                     }
                 }
@@ -62,7 +55,7 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             return hasDirectDataAccess;
         }
 
-        public bool CheckDirectDataAccess(Namespace ns, List<Wire> wires, string dataModule, Reference reference, Component comp, Service serv)
+        private bool CheckDirectDataAccess(Namespace ns, List<Wire> wires, string dataModule, Reference reference, Component comp, Service serv)
         {
             bool hasDirectDataAccess = false;
             List<Binding> bindings = new List<Binding>();
