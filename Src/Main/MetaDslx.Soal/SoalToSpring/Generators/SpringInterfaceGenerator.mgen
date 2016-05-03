@@ -4,14 +4,14 @@ generator SpringInterfaceGenerator for object;
 using generator SpringGeneratorUtil;
 
 
-template GenerateInterface(Interface iface, string bindingType, string package)
+template GenerateInterface(Interface iface, string bindingType, string package, string entityName)
 package [SpringGeneratorUtil.GetPackage(iface)].[package];
 ^
 [GenerateImportsForBinding(bindingType)]
 
 [SpringGeneratorUtil.GenerateImports(iface)]
 ^
-[InterfaceAnnotation(bindingType)]
+[InterfaceAnnotation(bindingType, entityName)]
 public interface [iface.Name][bindingType] {
 [loop (iface->op:Operations)]
 ^
@@ -72,7 +72,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 ^
 import [SpringGeneratorUtil.GetPackage(iface)].[package].[iface.Name][bindingType];
-[SpringGeneratorUtil.GenerateImports(iface, true, dataBinding)]
+[SpringGeneratorUtil.GenerateImports(iface, package == SpringGeneratorUtil.Properties.repositoryPackage, dataBinding)]
 ^
 @Service
 public class [iface.Name][bindingType]Impl implements [iface.Name][bindingType] {
@@ -93,7 +93,7 @@ public class [iface.Name][bindingType]Impl implements [iface.Name][bindingType] 
 	[end if]
  {
 			[string resultJavaName = op.Result.Type.GetJavaName()]
-			[if (resultJavaName.Contains("List<"))]
+			[if (resultJavaName.Contains("List<") && package == SpringGeneratorUtil.Properties.repositoryPackage)]
 		[resultJavaName] result = new java.util.ArrayList<>();
 		[iface.Name.ToCamelCase()][impl].[op.Name.ToCamelCase()]([SpringGeneratorUtil.GetParameterNameList(op)]).forEach(result::add);
 		return result;
@@ -247,48 +247,6 @@ end template
 
 
 
-template GenerateCrudRepositoryCopy(string namespaceName, string entityName, string bindingType)
-package [namespaceName.ToLower()].[SpringGeneratorUtil.Properties.interfacePackage];
-^
-import [namespaceName.ToLower()].[SpringGeneratorUtil.Properties.entityPackage].[entityName];
-^
-[GenerateImportsForBinding(bindingType)]
-^
-[InterfaceAnnotation(bindingType)]
-public interface [entityName]Repository[bindingType] {
-	// should copy CrudRepository<[entityName], Long>
-
-	[if (bindingType == "Rest")]
-[GenerateCrudMethodsForRest(entityName)]
-	[else]
-^
-	public long count();
-^
-	public void delete(Long id);
-^
-	public void delete([entityName] entity);
-^
-	public void delete(Iterable<? extends [entityName]> entities);
-^
-	public void deleteAll();
-^
-	public boolean exists(Long id) ;
-^
-	public Iterable<[entityName]> findAll();
-^
-	public Iterable<[entityName]> findAll(Iterable<Long> entities);
-^
-	public [entityName] findOne(Long id);
-^
-	public <S extends [entityName]> S save(S entity);
-^
-	public <S extends [entityName]> Iterable<S> save(Iterable<S> entities);
-	[end if]
-^
-}
-end template
-
-
 template GenerateImportsForBinding(string bindingType)
 	[if (bindingType == "Rest")]
 import org.springframework.web.bind.annotation.PathVariable;
@@ -305,120 +263,15 @@ import org.springframework.web.bind.annotation.RestController;
 end template
 
 
-template GenerateCrudMethodsForRest(string entityName)
-^
-	@RequestMapping(value = "/count")
-	public long count();
-^
-	@RequestMapping(value = "/delete/{id}", method = RequestMethod.POST) // TODO Http.Delete method?
-	public void delete(@PathVariable Long id);
-^
-	@RequestMapping(value = "/delete", method = RequestMethod.POST) // TODO Http.Delete method?
-	public void delete(@RequestBody [entityName] entity);
-^
-	@RequestMapping(value = "/delete", method = RequestMethod.POST) // TODO Http.Delete method?
-	public void delete(@RequestBody Iterable<? extends [entityName]> entities);
-^
-	@RequestMapping(value = "/deleteAll", method = RequestMethod.POST) // TODO Http.Delete method?
-	public void deleteAll();
-^
-	@RequestMapping(value = "/exists/{id}")
-	public boolean exists(@PathVariable Long id) ;
-^
-	@RequestMapping(value = "/findAll")
-	public Iterable<[entityName]> findAll();
-^
-	@RequestMapping(value = "/findAll")
-	public Iterable<[entityName]> findAll(@RequestBody Iterable<Long> entities);
-^
-	@RequestMapping(value = "/findOne/{id}")
-	public [entityName] findOne(@PathVariable Long id);
-^
-	@RequestMapping(value = "/save")
-	public <S extends [entityName]> S save(@RequestBody S entity);
-^
-	@RequestMapping(value = "/save")
-	public <S extends [entityName]> Iterable<S> save(@RequestBody Iterable<S> entities);
-end template
 
-
-template GenerateRepositoryProxyImpl(string namespaceName, string entityName, string bindingType)
-package [namespaceName.ToLower()].[SpringGeneratorUtil.Properties.repositoryPackage];
-^
-import org.springframework.beans.factory.annotation.Autowired;
-^
-import [namespaceName.ToLower()].[SpringGeneratorUtil.Properties.entityPackage].[entityName];
-import [namespaceName.ToLower()].[SpringGeneratorUtil.Properties.repositoryPackage].[entityName]Repository;
-import [namespaceName.ToLower()].[SpringGeneratorUtil.Properties.interfacePackage].[entityName]Repository[bindingType];
-^
-public class [entityName]Repository[bindingType]Impl implements [entityName]Repository[bindingType] {
-^
-	@Autowired
-	[entityName]Repository repository;
-^
-	@Override
-	public long count() {
-		return repository.count();
-	}
-^
-	@Override
-	public void delete(Long id) {
-		repository.delete(id);
-	}
-^
-	@Override
-	public void delete([entityName] entity) {
-		repository.delete(entity);
-	}
-^
-	@Override
-	public void delete(Iterable<? extends [entityName]> entities) {
-		repository.delete(entities);
-	}
-^
-	@Override
-	public void deleteAll() {
-		repository.deleteAll();
-	}
-^
-	@Override
-	public boolean exists(Long id) {
-		return repository.exists(id);
-	}
-^
-	@Override
-	public Iterable<[entityName]> findAll() {
-		return repository.findAll();
-	}
-^
-	@Override
-	public Iterable<[entityName]> findAll(Iterable<Long> entities) {
-		return repository.findAll(entities);
-	}
-^
-	@Override
-	public [entityName] findOne(Long id) {
-		return repository.findOne(id);
-	}
-^
-	@Override
-	public <S extends [entityName]> S save(S entity) {
-		return repository.save(entity);
-	}
-^
-	@Override
-	public <S extends [entityName]> Iterable<S> save(Iterable<S> entities) {
-		return repository.save(entities);
-	}
-^
-}
-end template
-
-
-template InterfaceAnnotation(string bindingType)
+template InterfaceAnnotation(string bindingType, string enitityName)
 	[if (bindingType.Equals("Rest"))]
 @RestController
-@RequestMapping(method = RequestMethod.GET)
+@RequestMapping(\
+	[if (enitityName != null)]
+value = "/[enitityName]", \
+	[end if]
+method = RequestMethod.GET)
 	[else if (bindingType.Equals("WebService"))]
 //@WebService
 	[else if (bindingType.Equals("WebSockett"))]
@@ -431,12 +284,15 @@ end template
 template OperationAnnotation(Operation op, string bindingType)
 	[if (bindingType.Equals("Rest"))]
 	@RequestMapping(value = "/[op.Name.ToCamelCase()]\
-		[loop(op->param:Parameters)]
+		[string _params="{"]
+		[loop(op->param:Parameters; string delimiter = ""; delimiter = ", ")]
+			[_params += delimiter + "\"" + param.Name + "\""]
 			[if (param.Type.IsJavaPrimitiveType())]
 /{[param.Name]}\
 			[end if]
 		[end loop]
-"\
+		[_params += "}"]
+", params = [_params]\
 		[if (!op.Name.ToPascalCase().StartsWith("Get"))]
 , method = RequestMethod.POST /* TODO consider other method */\
 		[end if]
