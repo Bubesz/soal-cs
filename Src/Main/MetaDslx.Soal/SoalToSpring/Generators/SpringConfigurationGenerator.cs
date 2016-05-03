@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringConfigurationGenerator_676296896;
-    namespace __Hidden_SpringConfigurationGenerator_676296896
+    using __Hidden_SpringConfigurationGenerator_505128128;
+    namespace __Hidden_SpringConfigurationGenerator_505128128
     {
         internal static class __Extensions
         {
@@ -783,7 +783,7 @@ namespace MetaDslx.Soal //1:1
                         __out.Append(__tmp40Prefix);
                         if (__tmp41Line != null) __out.Append(__tmp41Line);
                         if (!__tmp41_last) __out.AppendLine(true);
-                        __out.AppendLine(false); //135:99
+                        __out.AppendLine(false); //135:100
                     }
                 }
                 string __tmp42Prefix = "		"; //136:1

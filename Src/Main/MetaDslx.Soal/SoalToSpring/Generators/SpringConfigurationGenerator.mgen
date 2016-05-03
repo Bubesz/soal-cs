@@ -132,7 +132,7 @@ template GenerateComponentPom(Namespace ns, Component component, List<string> mo
 [if (cType == ComponentType.DATA)]
 		^
 		<!-- spring data -->
-		[GeneratePomDependency("org.springframework","spring-orm", "${springframework.version}", false)]
+		[GeneratePomDependency("org.springframework", "spring-orm", "${springframework.version}", false)]
 		[GeneratePomDependency("org.springframework.data", "spring-data-jpa", "${spring-data-jpa.version}", false)]
           <!--  <exclusions>
                 <exclusion>
