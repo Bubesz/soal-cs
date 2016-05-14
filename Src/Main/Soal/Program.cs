@@ -18,21 +18,13 @@ namespace Soal
             {
                 string fileName = null;
                 string outputDirectory = null;
-                bool separateXsdWsdl = false;
-                bool singleFileWsdl = false;
+                //bool separateXsdWsdl = false;
+                //bool singleFileWsdl = false;
                 for (int i = 0; i < args.Length; i++)
                 {
                     if (args[i].StartsWith("-"))
                     {
-                        if (args[i] == "-separateXsdWsdl")
-                        {
-                            separateXsdWsdl = true;
-                        }
-                        else if (args[i] == "-singleFileWsdl")
-                        {
-                            singleFileWsdl = true;
-                        }
-                        else if (i + 1 < args.Length)
+                        if (i + 1 < args.Length)
                         {
                             if (args[i] == "-o")
                             {
@@ -58,9 +50,7 @@ namespace Soal
                     Console.WriteLine("Usage:");
                     Console.WriteLine("  Soal.exe [options] [input.soal]");
                     Console.WriteLine("Options:");
-                    Console.WriteLine("  -o [dir]: output directory");
-                    Console.WriteLine("  -separateXsdWsdl: separate XSD and WSDL files into different directories");
-                    Console.WriteLine("  -singleFileWsdl: include XSD code into the WSDL");
+                    Console.WriteLine("  -o [dir]: output directory");;
                     return;
                 }
                 if (outputDirectory == null)
@@ -72,10 +62,10 @@ namespace Soal
                     Console.WriteLine("Could not find file: "+fileName);
                     return;
                 }
-                if (singleFileWsdl && separateXsdWsdl)
-                {
-                    Console.WriteLine("Warning: conflicting options '-separateXsdWsdl' and '-singleFileWsdl'. '-singleFileWsdl' will be used.");
-                }
+                //if (singleFileWsdl && separateXsdWsdl)
+                //{
+                //    Console.WriteLine("Warning: conflicting options '-separateXsdWsdl' and '-singleFileWsdl'. '-singleFileWsdl' will be used.");
+                //}
                 using (StreamReader reader = new StreamReader(fileName))
                 {
                     string source = reader.ReadToEnd();
@@ -84,10 +74,10 @@ namespace Soal
                     if (!compiler.Diagnostics.HasErrors())
                     {
                         Model model = compiler.Model;
-                        //GenJpaInterface(model);
-                        SpringGenerator generator = new SpringGenerator(compiler.Model, outputDirectory, compiler.Diagnostics, compiler.FileName);
-                        generator.SeparateXsdWsdl = separateXsdWsdl;
-                        generator.SingleFileWsdl = singleFileWsdl;
+                        SpringGenerator generator = new SpringGenerator(compiler.Model, compiler.Diagnostics, compiler.FileName);
+                        //generator.SeparateXsdWsdl = separateXsdWsdl;
+                        //generator.SingleFileWsdl = singleFileWsdl;
+                        generator.OutputDirectory = outputDirectory;
                         generator.Generate();
                         SoalPrinter printer = new SoalPrinter(compiler.Model.Instances);
                         using (StreamWriter writer = new StreamWriter(fileName+"0"))

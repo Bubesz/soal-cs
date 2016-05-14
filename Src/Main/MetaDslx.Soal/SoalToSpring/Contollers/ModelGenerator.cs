@@ -11,13 +11,20 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
     {
         private DirectoryHandler directoryHandler;
 
-        public ModelGenerator(DirectoryHandler directoryHandler)
+        private SpringClassGenerator springClassGen;
+        private SpringConfigurationGenerator springConfigGen;
+        private SpringGeneratorUtil generatorUtil;
+
+
+        public ModelGenerator(DirectoryHandler directoryHandler, SpringClassGenerator springClassGen, SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil)
         {
             this.directoryHandler = directoryHandler;
+            this.springClassGen = springClassGen;
+            this.springConfigGen = springConfigGen;
+            this.generatorUtil = generatorUtil;
         }
 
-        public void GenerateModelModule(Namespace ns, List<Struct> entities, Dictionary<string, string> properties,
-            SpringClassGenerator springClassGen, SpringConfigurationGenerator springConfigGen, SpringGeneratorUtil generatorUtil)
+        public void GenerateModelModule(Namespace ns, List<Struct> entities, Dictionary<string, string> properties)
         {
             string baseJavaDir = directoryHandler.createJavaDirectory(ns, "Model", "");
             //pom.xml
@@ -27,7 +34,7 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
 
             using (StreamWriter writer = new StreamWriter(filename))
             {
-                writer.WriteLine(springConfigGen.GenerateComponentPom(ns, comp, new List<string>(), false, false, false, ComponentType.DATA));
+                writer.WriteLine(this.springConfigGen.GenerateComponentPom(ns, comp, new List<string>(), false, false, false, ComponentType.DATA));
             }
 
             // generate persistence.xml
@@ -38,7 +45,7 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                 filename = Path.Combine(metaFolder, "persistence.xml");
                 using (StreamWriter writer = new StreamWriter(filename))
                 {
-                    writer.WriteLine(springConfigGen.GeneratePersistence(ns, entities));
+                    writer.WriteLine(this.springConfigGen.GeneratePersistence(ns, entities));
                 }
             }
 
@@ -46,24 +53,24 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             foreach (Struct entity in entities)
             {
                 // entity
-                string entityDirectory = directoryHandler.createJavaDirectory(ns, "Model", generatorUtil.Properties.entityPackage);
+                string entityDirectory = directoryHandler.createJavaDirectory(ns, "Model", this.generatorUtil.Properties.entityPackage);
                 string javaFileName = Path.Combine(entityDirectory, entity.Name + ".java");
 
                 using (StreamWriter writer = new StreamWriter(javaFileName))
                 {
-                    writer.WriteLine(springClassGen.GenerateEntity(entity));
+                    writer.WriteLine(this.springClassGen.GenerateEntity(entity));
                 }
             }
 
             //enums
             foreach (Enum myEnum in ns.Declarations.OfType<Enum>())
             {
-                string enumDirectory = directoryHandler.createJavaDirectory(ns, "Model", generatorUtil.Properties.enumPackage);
+                string enumDirectory = directoryHandler.createJavaDirectory(ns, "Model", this.generatorUtil.Properties.enumPackage);
                 string javaFileName = Path.Combine(enumDirectory, myEnum.Name + ".java");
 
                 using (StreamWriter writer = new StreamWriter(javaFileName))
                 {
-                    writer.WriteLine(springClassGen.GenerateEnum(myEnum));
+                    writer.WriteLine(this.springClassGen.GenerateEnum(myEnum));
 
                 }
             }
@@ -73,13 +80,13 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             filename = Path.Combine(dir, "configuration.properties");
             using (StreamWriter writer = new StreamWriter(filename))
             {
-                writer.WriteLine(springConfigGen.GenerateConfig(properties));
+                writer.WriteLine(this.springConfigGen.GenerateConfig(properties));
             }
 
             filename = Path.Combine(baseJavaDir, "Configuration.java");
             using (StreamWriter writer = new StreamWriter(filename))
             {
-                writer.WriteLine(springConfigGen.GenerateConfigClass(ns));
+                writer.WriteLine(this.springConfigGen.GenerateConfigClass(ns));
             }
         }
     }

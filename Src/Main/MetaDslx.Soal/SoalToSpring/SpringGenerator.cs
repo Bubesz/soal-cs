@@ -11,31 +11,19 @@ namespace MetaDslx.Soal
 {
     public class SpringGenerator
     {
-        public static Namespace XsdNamespace { get; private set; }
-        static SpringGenerator()
-        {
-            XsdNamespace = SoalFactory.Instance.CreateNamespace();
-            XsdNamespace.Prefix = "xs";
-            XsdNamespace.Uri = "http://www.w3.org/2001/XMLSchema";
-        }
-
-
-        public SpringGenerator(Model model, string outputDirectory, ModelCompilerDiagnostics diagnostics, string fileName)
+        public SpringGenerator(Model model, ModelCompilerDiagnostics diagnostics, string fileName)
         {
             this.FileName = fileName;
-            this.OutputDirectory = outputDirectory;
             this.Model = model;
             this.Diagnostics = diagnostics;
-            this.SeparateXsdWsdl = false;
-            this.SingleFileWsdl = false;
         }
 
         public string FileName { get; private set; }
-        public string OutputDirectory { get; private set; }
+        public string OutputDirectory { get; set; }
         public ModelCompilerDiagnostics Diagnostics { get; private set; }
         public Model Model { get; private set; }
-        public bool SeparateXsdWsdl { get; set; }
-        public bool SingleFileWsdl { get; set; }
+        //public bool SeparateXsdWsdl { get; set; }
+        //public bool SingleFileWsdl { get; set; }
 
         private void PrepareGeneration()
         {
@@ -343,14 +331,13 @@ namespace MetaDslx.Soal
                 SpringConfigurationGenerator springConfigGen = new SpringConfigurationGenerator(ns);
                 SpringViewGenerator springViewGen = new SpringViewGenerator(ns);
                 SpringGeneratorUtil generatorUtil = new SpringGeneratorUtil(ns);
-                //generatorUtil.Properties.entityPackage = "asdasd";
 
                 BindingDiscoverer bindingDiscoverer = new BindingDiscoverer();
                 DirectoryHandler directoryHandler = new DirectoryHandler();
                 DependencyDiscoverer dependencyDiscoverer = new DependencyDiscoverer(bindingDiscoverer);
                 DataAccessFinder dataAccessFinder = new DataAccessFinder(bindingDiscoverer);
-                ModelGenerator modelGenerator = new ModelGenerator(directoryHandler);
                 JSFGenerator jSFGenerator = new JSFGenerator(springViewGen, generatorUtil, directoryHandler);
+                ModelGenerator modelGenerator = new ModelGenerator(directoryHandler, springClassGen, springConfigGen, generatorUtil);
 
                 ComponentGenerator componentGenerator =
                     new ComponentGenerator(springInterfaceGen, springClassGen, springConfigGen, springViewGen, generatorUtil,
@@ -380,7 +367,7 @@ namespace MetaDslx.Soal
                     if (entities.Any() || ns.Declarations.OfType<Enum>().Any())
                     {
                         modules.Add("Model");
-                        modelGenerator.GenerateModelModule(ns, entities, properties, springClassGen, springConfigGen, generatorUtil);
+                        modelGenerator.GenerateModelModule(ns, entities, properties);
                     }
 
                     // generate master pom.xml
