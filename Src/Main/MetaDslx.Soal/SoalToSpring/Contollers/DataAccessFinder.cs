@@ -9,10 +9,16 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
     public class DataAccessFinder
     {
         private BindingDiscoverer bindingGenerator;
+        private const string ANY = "Any_Data_Module_#!%";
 
         public DataAccessFinder(BindingDiscoverer bindingGenerator)
         {
             this.bindingGenerator = bindingGenerator;
+        }
+
+        public bool HasAnyDirectDataAccess(Namespace ns, List<Wire> wires, Component component)
+        {
+            return HasDirectDataAccess(ns, wires, component, ANY);
         }
 
         public bool HasDirectDataAccess(Namespace ns, List<Wire> wires, Component component, string dataModule)
@@ -28,13 +34,13 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                 bool referenceStatisfied = false;
                 foreach (Wire wire in wires)
                 {
-                    // Component comp = (Component)((ModelObject)port).MParent;
                     if (wire.Source.Equals(reference))
                     {
                         Service serv = wire.Target as Service;
                         if (serv != null)
                         {
-                            hasDirectDataAccess = CheckDirectDataAccess(ns, wires, dataModule, reference, serv.Component, serv);
+                            referenceStatisfied = true;
+                            hasDirectDataAccess = CheckDirectDataAccess(ns, wires, dataModule, reference, serv);
                         }
                     }
                 }
@@ -46,7 +52,7 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                         {
                             if (serv.Interface.Equals(reference.Interface))
                             {
-                                hasDirectDataAccess = CheckDirectDataAccess(ns, wires, dataModule, reference, comp, serv);
+                                hasDirectDataAccess = CheckDirectDataAccess(ns, wires, dataModule, reference, serv);
                             }
                         }
                     }
@@ -55,8 +61,9 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             return hasDirectDataAccess;
         }
 
-        private bool CheckDirectDataAccess(Namespace ns, List<Wire> wires, string dataModule, Reference reference, Component comp, Service serv)
+        private bool CheckDirectDataAccess(Namespace ns, List<Wire> wires, string dataModule, Reference reference, Service serv)
         {
+            Component comp = serv.Component;
             bool hasDirectDataAccess = false;
             List<Binding> bindings = new List<Binding>();
             if (serv.Binding != null)
@@ -68,7 +75,7 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             if (!binding.hasAnyBinding())
             {
                 // direct access
-                if (comp.Name == dataModule)
+                if (comp.Name == dataModule || dataModule == ANY && serv.Interface is Database)
                 {
                     hasDirectDataAccess = true;
                 }

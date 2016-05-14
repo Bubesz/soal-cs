@@ -15,7 +15,7 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
         private SpringViewGenerator springViewGen;
         private SpringGeneratorUtil generatorUtil;
 
-        private BindingDiscoverer bindingGenerator;
+        private BindingDiscoverer bindingDiscoverer;
         private DirectoryHandler directoryHandler;
 
         private DependencyDiscoverer dependencyDiscoverer;
@@ -24,7 +24,7 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
 
         public ComponentGenerator(SpringInterfaceGenerator springInterfaceGen, SpringClassGenerator springClassGen,
             SpringConfigurationGenerator springConfigGen, SpringViewGenerator springViewGen, SpringGeneratorUtil generatorUtil,
-            BindingDiscoverer bindingGenerator, DirectoryHandler directoryHandler,
+            BindingDiscoverer bindingDiscoverer, DirectoryHandler directoryHandler,
             DependencyDiscoverer dependencyDiscoverer, DataAccessFinder dataAccessFinder, JSFGenerator jSFGenerator)
         {
             this.springInterfaceGen = springInterfaceGen;
@@ -33,7 +33,7 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             this.springViewGen = springViewGen;
             this.generatorUtil = generatorUtil;
 
-            this.bindingGenerator = bindingGenerator;
+            this.bindingDiscoverer = bindingDiscoverer;
             this.directoryHandler = directoryHandler;
 
             this.dependencyDiscoverer = dependencyDiscoverer;
@@ -50,25 +50,14 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                 ComponentType cType = ComponentType.IMPLEMENTATION;
 
                 Dictionary<Reference, Component> dependencyMap = this.dependencyDiscoverer.GetherDependencyMap(ns, wires, component);
+
                 List<string> dependencies = this.dependencyDiscoverer.GetherDependencies(dependencyMap);
 
-                Reference dataReference = null;
-                foreach (Component comp in ns.Declarations.OfType<Component>())
-                {
-                    foreach (Reference reference in component.References)
-                    {
-                        if (reference.Interface is Database)
-                        {
-                            dataReference = reference;
-                        }
-                    }
-                }
-                string dataModule = dataReference != null ? dependencyMap[dataReference].Name : "";
-                bool directDataAccess = this.dataAccessFinder.HasDirectDataAccess(ns, wires, component, dataModule);
+                bool directDataAccess = this.dataAccessFinder.HasAnyDirectDataAccess(ns, wires, component);
 
                 if (component.Services.Any())
                 {
-                    this.GenerateServiceImplementations(ns, modules, wires, component, dependencies, dataModule);
+                    this.GenerateServiceImplementations(ns, modules, wires, component, dependencies, dependencyMap);
                 }
                 else
                 {
@@ -114,18 +103,20 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
         }
 
         private void GenerateServiceImplementations(Namespace ns, List<string> modules, List<Wire> wires, Component component,
-            List<string> dependencies, string dataModule)
+            List<string> dependencies, Dictionary<Reference, Component> dependencyMap)
         {
             modules.Add(component.Name + "-API");
             BindingTypeHolder bindingsOfModule = new BindingTypeHolder();
 
+            string dataModule = "";
             string dataBinding = "";
             foreach (Reference reference in component.References)
             {
                 if (reference.Interface is Database)
                 {
-                    List<Binding> binds = bindingGenerator.GetBindings(ns, reference);
-                    BindingTypeHolder binding = bindingGenerator.CheckForBindings(binds);
+                    dataModule = dependencyMap[reference].Name;
+                    List<Binding> binds = bindingDiscoverer.GetBindings(ns, reference);
+                    BindingTypeHolder binding = bindingDiscoverer.CheckForBindings(binds);
                     if (binding.HasRestBinding)
                         dataBinding = "Rest";
                     else if (binding.HasWebServiceBinding)
@@ -138,9 +129,19 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
 
             foreach (Service service in component.Services)
             {
+                if (service.Interface is Database)
+                {
+                    
+                }
+            }
+
+            ComponentType cType = ComponentType.API;
+
+            foreach (Service service in component.Services)
+            {
                 Interface iface = service.Interface;
 
-                if (iface is Database) { continue; } // Repositry interfaces have been generated already
+                if (iface is Database) { cType = ComponentType.DATA; continue; } // Repositry interfaces have been generated already
 
                 string package = this.PackageOf(iface);
                 string apiIfDirectory = this.directoryHandler.createJavaDirectory(ns, component.Name + "-API", package);
@@ -192,8 +193,8 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                     }
                 }
 
-                List<Binding> bindings = this.bindingGenerator.GetBindings(ns, service);
-                BindingTypeHolder bindingsOfService = this.bindingGenerator.CheckForBindings(bindings);
+                List<Binding> bindings = this.bindingDiscoverer.GetBindings(ns, service);
+                BindingTypeHolder bindingsOfService = this.bindingDiscoverer.CheckForBindings(bindings);
 
                 this.CreateBindings(bindingsOfService, component, iface, apiIfDirectory, functionDirectory, package, entityName, dataBinding);
 
@@ -229,26 +230,26 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                 Component c = new ComponentImpl();
                 c.Name = component.Name + "-API";
                 string output = this.springConfigGen.GenerateComponentPom(ns, c, apiDependencies,
-                    bindingsOfModule.HasRestBinding, bindingsOfModule.HasWebServiceBinding, bindingsOfModule.HasWebSocketBinding, ComponentType.API);
+                    bindingsOfModule.HasRestBinding, bindingsOfModule.HasWebServiceBinding, bindingsOfModule.HasWebSocketBinding, cType);
                 writer.WriteLine(output);
             }
 
             if (bindingsOfModule.hasAnyBinding())
             {
-                GenerateRemoteAccessTier(ns, modules, component, dependencies, hasDirectDataAccess);
+                GenerateRemoteAccessTier(ns, modules, component, hasDirectDataAccess);
             }
 
             dependencies.Add(component.Name + "-API");
         }
 
-        private void GenerateRemoteAccessTier(Namespace ns, List<string> modules, Component component, List<string> dependencies, bool hasDirectDataAccess)
+        private void GenerateRemoteAccessTier(Namespace ns, List<string> modules, Component component, bool hasDirectDataAccess)
         {
             Component c = new ComponentImpl();
             c.Name = component.Name + "-WEB";
             modules.Add(c.Name);
 
             List<string> deps = new List<string>();
-            deps.Add(component.Name);
+            deps.Add(component.Name + "-API");
             this.directoryHandler.createJavaDirectory(ns, c.Name, "");
             string fileName = Path.Combine(ns.Name + "-" + c.Name, "pom.xml");
             using (StreamWriter writer = new StreamWriter(fileName))
@@ -303,16 +304,16 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                     {
                         if (!(service.Interface is Database))
                         {
-                            List<Binding> binds = this.bindingGenerator.GetBindings(ns, reference);
-                            BindingTypeHolder binding = this.bindingGenerator.CheckForBindings(binds);
+                            List<Binding> binds = this.bindingDiscoverer.GetBindings(ns, reference);
+                            BindingTypeHolder binding = this.bindingDiscoverer.CheckForBindings(binds);
                             this.GenerateAccessor(ns, component, referencedComp, binding, properties, clientFor, service);
                         }
                     }
                 }
                 else
                 {
-                    List<Binding> binds = this.bindingGenerator.GetBindings(ns, reference);
-                    BindingTypeHolder binding = this.bindingGenerator.CheckForBindings(binds);
+                    List<Binding> binds = this.bindingDiscoverer.GetBindings(ns, reference);
+                    BindingTypeHolder binding = this.bindingDiscoverer.CheckForBindings(binds);
                     this.GenerateAccessor(ns, component, referencedComp, binding, properties, clientFor, reference);
                 }
             }
