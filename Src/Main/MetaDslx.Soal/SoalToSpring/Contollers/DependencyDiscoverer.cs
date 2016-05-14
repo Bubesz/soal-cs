@@ -17,7 +17,6 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
 
         public List<string> GetherDependencies(Dictionary<Reference, Component> dependecyMap)
         {
-            // collecting module dependencies
             List<string> dependencies = new List<string>();
             foreach (KeyValuePair<Reference, Component> entry in dependecyMap)
             {
@@ -59,7 +58,6 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             return dependencies;
         }
 
-        // collecting module dependencies
         public Dictionary<Reference, Component> GetherDependencyMap(Namespace ns, List<Wire> wires, Component component)
         {
             Dictionary<Reference, Component> dependencies = new Dictionary<Reference, Component>();
@@ -98,25 +96,10 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
 
         private void PutDependecy(Dictionary<Reference, Component> dependencies, Reference reference, Service serv, Component comp)
         {
-            List<Binding> bindings = new List<Binding>();
-            if (serv.Binding != null)
-                bindings.Add(serv.Binding);
-            if (reference.Binding != null)
-                bindings.Add(reference.Binding);
-            BindingTypeHolder binding = bindingGenerator.CheckForBindings(bindings);
-
             Component api = new ComponentImpl();
             api.Name = comp.Name + "-API";
             api.BaseComponent = comp;
-
-            if (binding.hasAnyBinding())
-            {
-                dependencies.Add(reference, api);
-            }
-            else
-            {
-                dependencies.Add(reference, comp);
-            }
+            dependencies.Add(reference, api);
         }
     }
 }
