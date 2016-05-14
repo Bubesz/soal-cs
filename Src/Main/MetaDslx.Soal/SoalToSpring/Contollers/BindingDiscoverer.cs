@@ -47,7 +47,7 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             return GetBindings(ns, service, true);
         }
 
-        public List<Binding> GetBindings(Namespace ns, Port port, bool searchForRef)
+        private List<Binding> GetBindings(Namespace ns, Port port, bool searchForRef)
         {
 
             if (port.Interface.Name.Contains("Repository"))
