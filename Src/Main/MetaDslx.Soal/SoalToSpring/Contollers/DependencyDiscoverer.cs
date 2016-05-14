@@ -96,10 +96,25 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
 
         private void PutDependecy(Dictionary<Reference, Component> dependencies, Reference reference, Service serv, Component comp)
         {
+            List<Binding> bindings = new List<Binding>();
+            if (serv.Binding != null)
+                bindings.Add(serv.Binding);
+            if (reference.Binding != null)
+                bindings.Add(reference.Binding);
+            BindingTypeHolder binding = bindingGenerator.CheckForBindings(bindings);
+
             Component api = new ComponentImpl();
             api.Name = comp.Name + "-API";
             api.BaseComponent = comp;
-            dependencies.Add(reference, api);
+
+            if (binding.hasAnyBinding())
+            {
+                dependencies.Add(reference, api);
+            }
+            else
+            {
+                dependencies.Add(reference, comp);
+            }
         }
     }
 }
