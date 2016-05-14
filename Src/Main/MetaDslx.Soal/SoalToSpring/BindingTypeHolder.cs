@@ -8,48 +8,11 @@ namespace MetaDslx.Soal
 {
     public class BindingTypeHolder
     {
-        private bool restBinding = false;
-        private bool webServiceBinding = false;
-        private bool webSocketBinding = false;
+        public bool HasRestBinding { get; set; }
 
-        public bool HasRestBinding
-        {
-            get
-            {
-                return restBinding;
-            }
+        public bool HasWebServiceBinding { get; set; }
 
-            set
-            {
-                restBinding = value;
-            }
-        }
-
-        public bool HasWebServiceBinding
-        {
-            get
-            {
-                return webServiceBinding;
-            }
-
-            set
-            {
-                webServiceBinding = value;
-            }
-        }
-
-        public bool HasWebSocketBinding
-        {
-            get
-            {
-                return webSocketBinding;
-            }
-
-            set
-            {
-                webSocketBinding = value;
-            }
-        }
+        public bool HasWebSocketBinding { get; set; }
 
         public bool hasAnyBinding()
         {

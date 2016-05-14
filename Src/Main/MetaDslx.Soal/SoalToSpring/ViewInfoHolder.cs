@@ -8,47 +8,10 @@ namespace MetaDslx.Soal
 {
     public class ViewInfoHolder
     {
-        private string fileName;
-        private string mapping;
-        private string name;
+        public string FileName { get; set; }
 
-        public string FileName
-        {
-            get
-            {
-                return fileName;
-            }
+        public string Mapping { get; set; }
 
-            set
-            {
-                fileName = value;
-            }
-        }
-
-        public string Mapping
-        {
-            get
-            {
-                return mapping;
-            }
-
-            set
-            {
-                mapping = value;
-            }
-        }
-
-        public string Name
-        {
-            get
-            {
-                return name;
-            }
-
-            set
-            {
-                name = value;
-            }
-        }
+        public string Name { get; set; }
     }
 }
