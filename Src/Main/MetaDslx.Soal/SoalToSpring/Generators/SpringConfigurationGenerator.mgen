@@ -34,6 +34,7 @@ template GenerateMasterPom(Namespace ns, List<string> modules)
 		<springframework.hateoas.version>0.19.0.RELEASE</springframework.hateoas.version>
 		<springframework.ws.version>2.2.4.RELEASE</springframework.ws.version>
         <spring-data-jpa.version>1.9.0.RELEASE</spring-data-jpa.version>
+		<jackson.version>2.7.4</jackson.version>
 		<wsdl4j.version>1.6.3</wsdl4j.version>
 		<thymeleaf.version>2.1.4.RELEASE</thymeleaf.version>
         <!--<spring-security.version>4.0.2.RELEASE</spring-security.version>-->
@@ -88,6 +89,7 @@ template GenerateComponentPom(Namespace ns, Component component, List<string> mo
 		[GeneratePomDependency(ns.Name, ns.Name+"-"+module, "1.0", false)]
 [end loop]
 [bool webmvc = false]
+[bool jackson = false]
 
 [if (cType == ComponentType.WEB || cType == ComponentType.REMOTE)]
 		^
@@ -103,10 +105,14 @@ template GenerateComponentPom(Namespace ns, Component component, List<string> mo
 	[end if]
 [end if]
 
-[if (rest && !webmvc)]
+[if (rest)]
 		^
 		<!-- for rest service -->
+	[if (!webmvc)]
 		[GeneratePomDependency("org.springframework", "spring-webmvc", "${springframework.version}", false)]
+	[end if]
+		[GeneratePomDependency("com.fasterxml.jackson.datatype", "jackson-datatype-jsr310", "${jackson.version}", false)]
+		[jackson = true]
 [end if]
 [if (webService)]
 		^
@@ -126,6 +132,9 @@ template GenerateComponentPom(Namespace ns, Component component, List<string> mo
 		<!-- for rest client -->
 		[GeneratePomDependency("org.springframework.hateoas", "spring-hateoas", "${springframework.hateoas.version}", false)]
 		[GeneratePomDependency("javax.servlet", "javax.servlet-api", "3.1.0", true)]
+	[end if]
+	[if (!jackson)]
+	[GeneratePomDependency("com.fasterxml.jackson.datatype", "jackson-datatype-jsr310", "${jackson.version}", false)]
 	[end if]
 [end if]
 
