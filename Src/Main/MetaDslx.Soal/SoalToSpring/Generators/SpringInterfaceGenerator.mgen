@@ -137,7 +137,7 @@ public class [iface.Name][bindingType]Proxy implements [iface.Name][bindingType]
 ^
 	private RestTemplate restTemplate = new RestTemplate();
 	private final String currentComponentName = "[iface.Namespace.Name]-["[\\\\w]*"]";
-    private final String targetComponentName = "[iface.Namespace.Name]-[targetComponent]";
+    private final String targetComponentName = "[iface.Namespace.Name]-[targetComponent]-WEB";
 	^
 [int i=1]
 [loop(iface->op:Operations)]

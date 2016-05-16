@@ -125,13 +125,13 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                         dataBinding = "WebSocket";
                 }
             }
-            bool hasDirectDataAccess = dataBinding == "" && this.dataAccessFinder.HasDirectDataAccess(ns, wires, component, dataModule);
 
+            bool hasDirectDataAccess = dataBinding == "" && this.dataAccessFinder.HasDirectDataAccess(ns, wires, component, dataModule);
             foreach (Service service in component.Services)
             {
                 if (service.Interface is Database)
                 {
-                    
+                    hasDirectDataAccess = true; //itself
                 }
             }
 
@@ -249,7 +249,7 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             modules.Add(c.Name);
 
             List<string> deps = new List<string>();
-            deps.Add(component.Name + "-API");
+            deps.Add(component.Name);
             this.directoryHandler.createJavaDirectory(ns, c.Name, "");
             string fileName = Path.Combine(ns.Name + "-" + c.Name, "pom.xml");
             using (StreamWriter writer = new StreamWriter(fileName))
@@ -327,18 +327,6 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
             if (binding.HasRestBinding)
             {
                 clientFor.HasRestBinding = true;
-                KeyValuePair<string, string> keyValue;
-                keyValue = new KeyValuePair<string, string>(referencedComp.Name + "RestServer", "localhost");
-                if (!properties.Contains(keyValue))
-                {
-                    properties.Add(keyValue.Key, keyValue.Value);
-                }
-                keyValue = new KeyValuePair<string, string>(referencedComp.Name + "RestPort", "8080");
-                if (!properties.Contains(keyValue))
-                {
-                    properties.Add(keyValue.Key, keyValue.Value);
-                }
-
                 string package = this.PackageOf(port.Interface);
                 string proxyDir = this.directoryHandler.createJavaDirectory(ns, component.Name, generatorUtil.Properties.proxyPackage);
                 string accessorFile = Path.Combine(proxyDir, port.Interface.Name + "RestProxy.java");
@@ -348,6 +336,19 @@ namespace MetaDslx.Soal.SoalToSpring.Contollers
                 {
                     targetComponent = targetComponent.Split(new string[] { "-API", "-WEB" }, StringSplitOptions.RemoveEmptyEntries)[0];
                 }
+
+                KeyValuePair<string, string> keyValue;
+                keyValue = new KeyValuePair<string, string>(targetComponent + "RestServer", "localhost");
+                if (!properties.Contains(keyValue))
+                {
+                    properties.Add(keyValue.Key, keyValue.Value);
+                }
+                keyValue = new KeyValuePair<string, string>(targetComponent + "RestPort", "8080");
+                if (!properties.Contains(keyValue))
+                {
+                    properties.Add(keyValue.Key, keyValue.Value);
+                }
+
 
                 using (StreamWriter writer = new StreamWriter(accessorFile))
                 {

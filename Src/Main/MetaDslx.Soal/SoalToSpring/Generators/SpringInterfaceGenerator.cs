@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MetaDslx.Soal //1:1
 {
-    using __Hidden_SpringInterfaceGenerator_126730577;
-    namespace __Hidden_SpringInterfaceGenerator_126730577
+    using __Hidden_SpringInterfaceGenerator_938884027;
+    namespace __Hidden_SpringInterfaceGenerator_938884027
     {
         internal static class __Extensions
         {
@@ -1575,9 +1575,9 @@ namespace MetaDslx.Soal //1:1
                     if (!__tmp36_last) __out.AppendLine(true);
                 }
             }
-            string __tmp37Line = "\";"; //140:89
+            string __tmp37Line = "-WEB\";"; //140:89
             if (__tmp37Line != null) __out.Append(__tmp37Line);
-            __out.AppendLine(false); //140:91
+            __out.AppendLine(false); //140:95
             __out.AppendLine(true); //141:2
             int i = 1; //142:2
             var __loop6_results = 
